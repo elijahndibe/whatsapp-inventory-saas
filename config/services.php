@@ -42,4 +42,13 @@ return [
         'base_url' => env('PAYSTACK_PAYMENT_URL', 'https://api.paystack.co'),
     ],
 
+    'whatsapp' => [
+        'api_version' => env('WHATSAPP_API_VERSION', 'v20.0'),
+        // Platform-level Meta app credentials, used only to verify the
+        // incoming webhook signature — per-business sending credentials
+        // live on the Business model, not here.
+        'app_secret' => env('WHATSAPP_APP_SECRET'),
+        'webhook_verify_token' => env('WHATSAPP_WEBHOOK_VERIFY_TOKEN'),
+    ],
+
 ];

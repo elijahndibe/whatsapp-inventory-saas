@@ -34,6 +34,8 @@
         <env name="PAYSTACK_SECRET_KEY" value="sk_test_fake_secret"/>
         <env name="PAYSTACK_WEBHOOK_SECRET" value="sk_test_fake_secret"/>
         <env name="PAYSTACK_PAYMENT_URL" value="https://api.paystack.co"/>
+        <env name="WHATSAPP_APP_SECRET" value="fake_app_secret"/>
+        <env name="WHATSAPP_WEBHOOK_VERIFY_TOKEN" value="fake_verify_token"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>

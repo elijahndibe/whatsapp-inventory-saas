@@ -1,8 +1,16 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Order') }} <span class="font-mono">{{ $order->order_number }}</span>
-        </h2>
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Order') }} <span class="font-mono">{{ $order->order_number }}</span>
+            </h2>
+            <div class="flex gap-3 text-sm">
+                <a href="{{ route('orders.invoice', $order) }}" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Invoice') }}</a>
+                @if ($order->payment_status === 'paid')
+                    <a href="{{ route('orders.receipt', $order) }}" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Receipt') }}</a>
+                @endif
+            </div>
+        </div>
     </x-slot>
 
     <div class="py-6 sm:py-12">

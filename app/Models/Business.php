@@ -36,8 +36,10 @@ class Business extends Model
     {
         return [
             'allow_overselling' => 'boolean',
-            // Encrypted at rest: never store WhatsApp Cloud API secrets in plain text.
-            'whatsapp_phone_number_id' => 'encrypted',
+            // whatsapp_phone_number_id is a plain, queryable identifier (like a
+            // publishable key) — the incoming-webhook handler looks businesses
+            // up by it, which an encrypted column can't support. Only the
+            // actual credentials are encrypted at rest.
             'whatsapp_business_account_id' => 'encrypted',
             'whatsapp_access_token' => 'encrypted',
         ];
@@ -133,5 +135,21 @@ class Business extends Model
         }
 
         return preg_replace('/\D+/', '', $raw);
+    }
+
+    public function hasWhatsAppCloudApi(): bool
+    {
+        return filled($this->whatsapp_phone_number_id) && filled($this->whatsapp_access_token);
+    }
+
+    /**
+     * Staff notifications (new order, payment received, low stock) go to
+     * whoever on this specific business holds the permission — roles and
+     * permissions aren't business-scoped themselves, so this filters the
+     * business's own users rather than querying the permission globally.
+     */
+    public function staffWithPermission(string $permission): \Illuminate\Support\Collection
+    {
+        return $this->users()->get()->filter(fn (User $user) => $user->can($permission))->values();
     }
 }

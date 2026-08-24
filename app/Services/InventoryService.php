@@ -3,12 +3,15 @@
 namespace App\Services;
 
 use App\Exceptions\InsufficientStockException;
+use App\Models\Business;
 use App\Models\InventoryTransaction;
 use App\Models\Product;
 use App\Models\Scopes\BusinessScope;
+use App\Notifications\LowStockNotification;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use InvalidArgumentException;
 
 /**
@@ -57,7 +60,7 @@ class InventoryService
 
     private function applyChange(Product $product, string $type, array $options, Closure $resolveNewQuantity): InventoryTransaction
     {
-        return DB::transaction(function () use ($product, $type, $options, $resolveNewQuantity) {
+        $transaction = DB::transaction(function () use ($product, $type, $options, $resolveNewQuantity) {
             $locked = Product::withoutGlobalScope(BusinessScope::class)
                 ->whereKey($product->getKey())
                 ->lockForUpdate()
@@ -95,6 +98,32 @@ class InventoryService
 
             return $transaction;
         });
+
+        $this->notifyIfCrossedIntoLowStock($product, $transaction);
+
+        return $transaction;
+    }
+
+    /**
+     * Fires once when a decrease pushes stock from healthy into low/out-of
+     * -stock territory — not on every subsequent sale while it stays low,
+     * which would spam staff with a notification per order.
+     */
+    private function notifyIfCrossedIntoLowStock(Product $product, InventoryTransaction $transaction): void
+    {
+        if ($transaction->quantity >= 0) {
+            return; // only decreases can cross into low stock
+        }
+
+        $wasHealthy = $transaction->previous_quantity > $product->low_stock_threshold;
+        $isLowNow = $product->stock_quantity <= $product->low_stock_threshold;
+
+        if (! ($wasHealthy && $isLowNow)) {
+            return;
+        }
+
+        $business = $product->business ?? Business::withoutGlobalScopes()->find($product->business_id);
+        Notification::send($business->staffWithPermission('view inventory'), new LowStockNotification($product));
     }
 
     private function assertPositiveQuantity(int $quantity): void

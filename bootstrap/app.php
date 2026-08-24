@@ -18,10 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->appendToGroup('web', \App\Http\Middleware\EnsureBusinessIsActive::class);
 
-        // Paystack posts to this URL directly — it can't send a CSRF token.
-        // The signature check inside PaystackWebhookController is what
-        // actually authenticates the request.
-        $middleware->validateCsrfTokens(except: ['webhooks/paystack']);
+        // Paystack/Meta post to these URLs directly — they can't send a CSRF
+        // token. The signature checks inside the webhook controllers are
+        // what actually authenticate the requests.
+        $middleware->validateCsrfTokens(except: ['webhooks/paystack', 'webhooks/whatsapp']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

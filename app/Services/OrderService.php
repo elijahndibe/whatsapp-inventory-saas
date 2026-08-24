@@ -2,13 +2,17 @@
 
 namespace App\Services;
 
+use App\Jobs\SendWhatsAppOrderMessage;
 use App\Models\Business;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Scopes\BusinessScope;
+use App\Notifications\NewOrderNotification;
+use App\Notifications\PaymentReceivedNotification;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use InvalidArgumentException;
 
 class OrderService
@@ -24,7 +28,7 @@ class OrderService
             throw new InvalidArgumentException('Cannot create an order from an empty cart.');
         }
 
-        return DB::transaction(function () use ($business, $cartItems, $customerData) {
+        $order = DB::transaction(function () use ($business, $cartItems, $customerData) {
             $customer = Customer::updateOrCreate(
                 ['business_id' => $business->id, 'phone' => $customerData['phone']],
                 [
@@ -63,6 +67,10 @@ class OrderService
 
             return $order;
         });
+
+        Notification::send($business->staffWithPermission('view orders'), new NewOrderNotification($order));
+
+        return $order;
     }
 
     /**
@@ -88,7 +96,7 @@ class OrderService
             return $order;
         }
 
-        return DB::transaction(function () use ($order, $status) {
+        $order = DB::transaction(function () use ($order, $status) {
             if ($status === 'cancelled') {
                 if ($order->inventory_deducted_at) {
                     $this->restockItems($order);
@@ -104,6 +112,12 @@ class OrderService
 
             return $order;
         });
+
+        // Dispatched after the transaction commits — a job must never fire
+        // for a status change that ends up rolled back.
+        SendWhatsAppOrderMessage::dispatch($order->id, $status === 'confirmed' ? 'order_confirmed' : $status);
+
+        return $order;
     }
 
     public function updatePaymentStatus(Order $order, string $paymentStatus): Order
@@ -112,7 +126,14 @@ class OrderService
             throw new InvalidArgumentException("Invalid payment status: {$paymentStatus}");
         }
 
+        $wasUnpaid = $order->payment_status !== 'paid';
+
         $order->update(['payment_status' => $paymentStatus]);
+
+        if ($paymentStatus === 'paid' && $wasUnpaid) {
+            $this->notifyPaymentReceived($order);
+            SendWhatsAppOrderMessage::dispatch($order->id, 'payment_received');
+        }
 
         return $order;
     }
@@ -127,13 +148,17 @@ class OrderService
      */
     public function markAsPaidViaGateway(Order $order, array $context = []): Order
     {
-        return DB::transaction(function () use ($order, $context) {
+        $alreadyPaid = false;
+
+        $order = DB::transaction(function () use ($order, $context, &$alreadyPaid) {
             $locked = Order::withoutGlobalScope(BusinessScope::class)
                 ->whereKey($order->getKey())
                 ->lockForUpdate()
                 ->first();
 
             if ($locked->payment_status === 'paid') {
+                $alreadyPaid = true;
+
                 return $locked; // idempotent — already processed
             }
 
@@ -157,6 +182,19 @@ class OrderService
 
             return $locked;
         });
+
+        if (! $alreadyPaid) {
+            $this->notifyPaymentReceived($order);
+            SendWhatsAppOrderMessage::dispatch($order->id, 'payment_received');
+        }
+
+        return $order;
+    }
+
+    private function notifyPaymentReceived(Order $order): void
+    {
+        $business = $order->business ?? Business::withoutGlobalScopes()->find($order->business_id);
+        Notification::send($business->staffWithPermission('view orders'), new PaymentReceivedNotification($order));
     }
 
     private function deductItems(Order $order): void
