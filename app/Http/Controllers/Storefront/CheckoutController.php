@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Storefront;
 
+use App\Exceptions\PaystackException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Storefront\CheckoutRequest;
 use App\Models\Business;
 use App\Models\Order;
 use App\Services\CartService;
 use App\Services\OrderService;
+use App\Services\PaymentService;
 use App\Services\WhatsAppMessageFormatter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -17,6 +19,7 @@ class CheckoutController extends Controller
     public function __construct(
         private readonly CartService $cart,
         private readonly OrderService $orders,
+        private readonly PaymentService $payments,
     ) {}
 
     public function create(Business $business): View|RedirectResponse
@@ -57,6 +60,17 @@ class CheckoutController extends Controller
         $order = $this->orders->createFromCart($business, $items, $request->validated());
 
         $this->cart->clear($business->id);
+
+        if ($request->validated('payment_method') === 'paystack') {
+            try {
+                $result = $this->payments->initializeForOrder($order, $request->validated('email'));
+
+                return redirect()->away($result['authorization_url']);
+            } catch (PaystackException) {
+                return redirect()->route('storefront.orders.confirmation', [$business, $order->public_token])
+                    ->with('error', 'Unable to start online payment right now. You can retry payment or order via WhatsApp below.');
+            }
+        }
 
         return redirect()->route('storefront.orders.confirmation', [$business, $order->public_token]);
     }

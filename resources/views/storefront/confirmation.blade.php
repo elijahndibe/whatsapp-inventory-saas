@@ -1,15 +1,42 @@
 <x-storefront-layout :business="$business">
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 text-center">
-        <div class="mx-auto h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center text-green-600 dark:text-green-400 text-2xl">
-            &check;
-        </div>
-        <h1 class="mt-4 text-xl font-bold text-gray-900 dark:text-gray-100">{{ __('Order Received') }}</h1>
+        @if ($order->payment_status === 'paid')
+            <div class="mx-auto h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center text-green-600 dark:text-green-400 text-2xl">
+                &check;
+            </div>
+            <h1 class="mt-4 text-xl font-bold text-gray-900 dark:text-gray-100">{{ __('Payment Received') }}</h1>
+        @else
+            <div class="mx-auto h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400 text-2xl">
+                &hellip;
+            </div>
+            <h1 class="mt-4 text-xl font-bold text-gray-900 dark:text-gray-100">{{ __('Order Received') }}</h1>
+        @endif
         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
             {{ __('Order') }} <span class="font-mono">#{{ $order->order_number }}</span>
         </p>
 
-        @if ($whatsappUrl)
+        @if (session('error'))
+            <p class="mt-4 text-sm text-red-600 dark:text-red-400">{{ session('error') }}</p>
+        @endif
+
+        @if ($order->payment_method === 'paystack')
+            @if ($order->payment_status === 'paid')
+                <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                    {{ __('Thank you — your payment was successful and :business has been notified.', ['business' => $business->name]) }}
+                </p>
+            @else
+                <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                    {{ __("We haven't received your payment yet. If you already paid, this page will update shortly — otherwise you can try again.") }}
+                </p>
+                <form method="POST" action="{{ route('storefront.payments.retry', [$business, $order->public_token]) }}" class="mt-4">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 border border-transparent rounded-md font-semibold text-sm text-white uppercase tracking-widest hover:bg-indigo-700">
+                        {{ __('Try Payment Again') }}
+                    </button>
+                </form>
+            @endif
+        @elseif ($whatsappUrl)
             <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
                 {{ __('One last step — send your order to :business on WhatsApp to confirm it.', ['business' => $business->name]) }}
             </p>

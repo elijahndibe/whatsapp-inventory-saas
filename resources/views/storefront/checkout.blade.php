@@ -4,8 +4,33 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="md:col-span-2">
-            <form method="POST" action="{{ route('storefront.checkout.store', $business) }}" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-4">
+            <form method="POST" action="{{ route('storefront.checkout.store', $business) }}"
+                  x-data="{ paymentMethod: '{{ old('payment_method', 'whatsapp') }}' }"
+                  class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-4">
                 @csrf
+
+                <div>
+                    <x-input-label :value="__('Payment Method')" />
+                    <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label @class([
+                            'flex items-center gap-2 border rounded-md px-4 py-3 text-sm cursor-pointer',
+                            'border-indigo-500 ring-1 ring-indigo-500' => old('payment_method', 'whatsapp') === 'whatsapp',
+                            'border-gray-300 dark:border-gray-700' => old('payment_method', 'whatsapp') !== 'whatsapp',
+                        ])>
+                            <input type="radio" name="payment_method" value="whatsapp" x-model="paymentMethod" class="text-indigo-600">
+                            <span class="text-gray-900 dark:text-gray-100">{{ __('Order via WhatsApp') }}</span>
+                        </label>
+                        <label @class([
+                            'flex items-center gap-2 border rounded-md px-4 py-3 text-sm cursor-pointer',
+                            'border-indigo-500 ring-1 ring-indigo-500' => old('payment_method') === 'paystack',
+                            'border-gray-300 dark:border-gray-700' => old('payment_method') !== 'paystack',
+                        ])>
+                            <input type="radio" name="payment_method" value="paystack" x-model="paymentMethod" class="text-indigo-600">
+                            <span class="text-gray-900 dark:text-gray-100">{{ __('Pay Online Now') }}</span>
+                        </label>
+                    </div>
+                    <x-input-error :messages="$errors->get('payment_method')" class="mt-2" />
+                </div>
 
                 <div>
                     <x-input-label for="name" :value="__('Full Name')" />
@@ -20,8 +45,10 @@
                         <x-input-error :messages="$errors->get('phone')" class="mt-2" />
                     </div>
                     <div>
-                        <x-input-label for="email" :value="__('Email (optional)')" />
-                        <x-text-input id="email" name="email" type="email" class="block mt-1 w-full" :value="old('email')" />
+                        <x-input-label for="email">
+                            <span x-text="paymentMethod === 'paystack' ? '{{ __('Email') }}' : '{{ __('Email (optional)') }}'"></span>
+                        </x-input-label>
+                        <x-text-input id="email" name="email" type="email" class="block mt-1 w-full" :value="old('email')" :required="false" x-bind:required="paymentMethod === 'paystack'" />
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
                 </div>
@@ -50,11 +77,17 @@
                     <x-input-error :messages="$errors->get('notes')" class="mt-2" />
                 </div>
 
-                <p class="text-xs text-gray-500 dark:text-gray-400">
+                <p class="text-xs text-gray-500 dark:text-gray-400" x-show="paymentMethod === 'whatsapp'" x-cloak>
                     {{ __('Placing your order opens WhatsApp with your order details pre-filled, ready to send to :business.', ['business' => $business->name]) }}
                 </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400" x-show="paymentMethod === 'paystack'" x-cloak>
+                    {{ __("You'll be redirected to Paystack to pay by card, bank transfer, or USSD.") }}
+                </p>
 
-                <x-primary-button class="w-full justify-center py-3">{{ __('Place Order via WhatsApp') }}</x-primary-button>
+                <x-primary-button class="w-full justify-center py-3">
+                    <span x-show="paymentMethod === 'whatsapp'" x-cloak>{{ __('Place Order via WhatsApp') }}</span>
+                    <span x-show="paymentMethod === 'paystack'" x-cloak>{{ __('Continue to Payment') }}</span>
+                </x-primary-button>
             </form>
         </div>
 

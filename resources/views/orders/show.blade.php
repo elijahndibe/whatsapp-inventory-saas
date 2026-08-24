@@ -68,6 +68,12 @@
                     @if ($order->customer_notes)
                         <div>{{ __('Notes') }}: {{ $order->customer_notes }}</div>
                     @endif
+                    @if ($order->payment_method)
+                        <div>{{ __('Payment method') }}: {{ ucfirst($order->payment_method) }}</div>
+                    @endif
+                    @if ($order->payment_reference)
+                        <div>{{ __('Payment reference') }}: <span class="font-mono">{{ $order->payment_reference }}</span></div>
+                    @endif
                 </div>
             </div>
 

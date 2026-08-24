@@ -117,6 +117,48 @@ class OrderService
         return $order;
     }
 
+    /**
+     * Applies a confirmed online payment to an order: marks it paid,
+     * auto-confirms it if it was still pending, and deducts inventory —
+     * per spec: "For online payment: Payment confirmed → inventory
+     * deducted." Locks the order row and re-checks payment_status under
+     * the lock, so this is safe to call from both the payment callback
+     * and the webhook without double-deducting even if they race.
+     */
+    public function markAsPaidViaGateway(Order $order, array $context = []): Order
+    {
+        return DB::transaction(function () use ($order, $context) {
+            $locked = Order::withoutGlobalScope(BusinessScope::class)
+                ->whereKey($order->getKey())
+                ->lockForUpdate()
+                ->first();
+
+            if ($locked->payment_status === 'paid') {
+                return $locked; // idempotent — already processed
+            }
+
+            $locked->payment_status = 'paid';
+            $locked->payment_method = 'paystack';
+
+            if (! empty($context['reference'])) {
+                $locked->payment_reference = $context['reference'];
+            }
+
+            if ($locked->order_status === 'pending') {
+                $locked->order_status = 'confirmed';
+            }
+
+            if (! $locked->inventory_deducted_at) {
+                $this->deductItems($locked);
+                $locked->inventory_deducted_at = now();
+            }
+
+            $locked->save();
+
+            return $locked;
+        });
+    }
+
     private function deductItems(Order $order): void
     {
         foreach ($order->items as $item) {

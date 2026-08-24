@@ -24,6 +24,7 @@ class CheckoutTest extends TestCase
             'phone' => '08012345678',
             'address' => '12 Lagos Street',
             'city' => 'Lagos',
+            'payment_method' => 'whatsapp',
         ]);
 
         $order = Order::where('business_id', $business->id)->firstOrFail();
@@ -50,6 +51,7 @@ class CheckoutTest extends TestCase
             'name' => 'Jane Doe',
             'phone' => '08099999999',
             'address' => 'Somewhere',
+            'payment_method' => 'whatsapp',
         ]);
 
         $cartResponse = $this->get(route('storefront.cart.index', $business));
@@ -64,6 +66,7 @@ class CheckoutTest extends TestCase
             'name' => 'Jane Doe',
             'phone' => '08099999999',
             'address' => 'Somewhere',
+            'payment_method' => 'whatsapp',
         ]);
 
         $response->assertRedirect(route('storefront.cart.index', $business));
@@ -81,6 +84,7 @@ class CheckoutTest extends TestCase
             'name' => 'New Name',
             'phone' => '08011112222',
             'address' => 'New Address',
+            'payment_method' => 'whatsapp',
         ]);
 
         $this->assertSame(1, Customer::where('business_id', $business->id)->count());
@@ -100,6 +104,7 @@ class CheckoutTest extends TestCase
             'name' => 'Jane Doe',
             'phone' => '08099999999',
             'address' => 'Somewhere',
+            'payment_method' => 'whatsapp',
         ]);
 
         $response->assertRedirect(route('storefront.cart.index', $business));
@@ -114,7 +119,7 @@ class CheckoutTest extends TestCase
 
         $response = $this->post(route('storefront.checkout.store', $business), []);
 
-        $response->assertSessionHasErrors(['name', 'phone', 'address']);
+        $response->assertSessionHasErrors(['name', 'phone', 'address', 'payment_method']);
     }
 
     public function test_the_confirmation_page_shows_a_whatsapp_link_when_the_business_has_a_number(): void
@@ -126,6 +131,7 @@ class CheckoutTest extends TestCase
             'name' => 'John Doe',
             'phone' => '08012345678',
             'address' => 'Lagos',
+            'payment_method' => 'whatsapp',
         ]);
         $order = Order::firstOrFail();
 
@@ -147,6 +153,7 @@ class CheckoutTest extends TestCase
             'name' => 'John Doe',
             'phone' => '08012345678',
             'address' => 'Lagos',
+            'payment_method' => 'whatsapp',
         ]);
         $order = Order::firstOrFail();
 

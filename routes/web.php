@@ -9,8 +9,10 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CheckoutController;
+use App\Http\Controllers\Storefront\PaymentController;
 use App\Http\Controllers\Storefront\StorefrontController;
 use App\Http\Controllers\Storefront\StorefrontProductController;
+use App\Http\Controllers\Webhooks\PaystackWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -58,6 +60,13 @@ Route::prefix('store/{business:slug}')->name('storefront.')->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'create'])->name('checkout.create');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/orders/{publicToken}', [CheckoutController::class, 'confirmation'])->name('orders.confirmation');
+
+    Route::get('/payments/callback', [PaymentController::class, 'callback'])->name('payments.callback');
+    Route::post('/orders/{publicToken}/pay', [PaymentController::class, 'retry'])->name('payments.retry');
 });
+
+// Platform-wide (not business-scoped): Paystack sends one webhook URL for
+// the whole account. Must stay outside CSRF protection — see bootstrap/app.php.
+Route::post('/webhooks/paystack', PaystackWebhookController::class)->name('webhooks.paystack');
 
 require __DIR__.'/auth.php';

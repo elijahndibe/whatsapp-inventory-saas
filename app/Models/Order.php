@@ -123,8 +123,23 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
     public function currencySymbol(): string
     {
         return Business::currencySymbolFor($this->currency);
+    }
+
+    /**
+     * Raw integer minor-unit total, e.g. for Paystack's `amount` param
+     * which expects kobo, not the major-unit float the `total` accessor
+     * returns.
+     */
+    public function totalInMinorUnits(): int
+    {
+        return (int) $this->getRawOriginal('total');
     }
 }
