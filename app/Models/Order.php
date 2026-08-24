@@ -32,7 +32,19 @@ class Order extends Model
         'notes',
         'customer_notes',
         'shipping_address',
+        'inventory_deducted_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'inventory_deducted_at' => 'datetime',
+        ];
+    }
+
+    public const STATUSES = ['pending', 'confirmed', 'processing', 'ready', 'shipped', 'completed', 'cancelled', 'refunded'];
+
+    public const PAYMENT_STATUSES = ['pending', 'paid', 'failed', 'refunded', 'partially_refunded'];
 
     protected static function booted(): void
     {

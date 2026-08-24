@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Storefront\CartController;
@@ -32,6 +34,16 @@ Route::middleware('auth')->group(function () {
     Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
     Route::get('products/{product}/inventory', [InventoryController::class, 'history'])->name('products.inventory.history');
     Route::post('products/{product}/inventory/adjust', [InventoryController::class, 'adjust'])->name('products.inventory.adjust');
+
+    Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status.update');
+    Route::patch('orders/{order}/payment-status', [OrderController::class, 'updatePaymentStatus'])->name('orders.payment-status.update');
+
+    Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
+    Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
+    Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit');
+    Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
 });
 
 Route::prefix('store/{business:slug}')->name('storefront.')->group(function () {

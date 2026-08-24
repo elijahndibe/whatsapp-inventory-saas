@@ -16,32 +16,39 @@
                     </p>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
                         {{ __('Storefront') }}:
-                        <span class="font-mono">{{ url('/store/'.$business->slug) }}</span>
-                        <span class="italic text-gray-400">({{ __('coming in a later phase') }})</span>
+                        <a href="{{ route('storefront.show', $business) }}" target="_blank" class="font-mono text-indigo-600 dark:text-indigo-400 hover:underline">{{ url('/store/'.$business->slug) }}</a>
                     </p>
                 </div>
             </div>
 
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                @foreach ([
-                    "Today's Sales" => 0,
-                    'Pending Orders' => 0,
-                    'Low Stock' => 0,
-                    'Total Customers' => 0,
-                ] as $label => $value)
+                @foreach ($stats as $label => $value)
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg p-4">
                         <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{{ __($label) }}</p>
-                        <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $value }}</p>
+                        <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                            @if ($label === "Today's Sales")
+                                {{ $business->currencySymbol() }}{{ number_format($value, 2) }}
+                            @else
+                                {{ $value }}
+                            @endif
+                        </p>
                     </div>
                 @endforeach
             </div>
 
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                        {{ __('Products, orders, customers and inventory tools will appear here as they are built out in the next phases.') }}
-                    </p>
-                </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                @can('view orders')
+                    <a href="{{ route('orders.index') }}" class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-900/40">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('View all orders') }}</span>
+                        <span class="text-indigo-600 dark:text-indigo-400">&rarr;</span>
+                    </a>
+                @endcan
+                @can('view inventory')
+                    <a href="{{ route('inventory.index') }}" class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-900/40">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Check inventory') }}</span>
+                        <span class="text-indigo-600 dark:text-indigo-400">&rarr;</span>
+                    </a>
+                @endcan
             </div>
 
         </div>

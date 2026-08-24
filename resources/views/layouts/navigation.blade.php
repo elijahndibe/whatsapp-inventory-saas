@@ -31,6 +31,18 @@
                             {{ __('Inventory') }}
                         </x-nav-link>
                     @endcan
+
+                    @can('view orders')
+                        <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
+                            {{ __('Orders') }}
+                        </x-nav-link>
+                    @endcan
+
+                    @can('view customers')
+                        <x-nav-link :href="route('customers.index')" :active="request()->routeIs('customers.*')">
+                            {{ __('Customers') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -100,6 +112,18 @@
             @can('view inventory')
                 <x-responsive-nav-link :href="route('inventory.index')" :active="request()->routeIs('inventory.*')">
                     {{ __('Inventory') }}
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('view orders')
+                <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
+                    {{ __('Orders') }}
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('view customers')
+                <x-responsive-nav-link :href="route('customers.index')" :active="request()->routeIs('customers.*')">
+                    {{ __('Customers') }}
                 </x-responsive-nav-link>
             @endcan
         </div>
