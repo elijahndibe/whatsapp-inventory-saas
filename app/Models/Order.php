@@ -1,0 +1,118 @@
+<?php
+
+namespace App\Models;
+
+use App\Models\Concerns\BelongsToTenant;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
+
+class Order extends Model
+{
+    use BelongsToTenant, HasFactory;
+
+    protected $fillable = [
+        'business_id',
+        'customer_id',
+        'order_number',
+        'public_token',
+        'subtotal',
+        'discount',
+        'delivery_fee',
+        'tax',
+        'total',
+        'currency',
+        'payment_status',
+        'payment_method',
+        'order_status',
+        'payment_reference',
+        'notes',
+        'customer_notes',
+        'shipping_address',
+    ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Order $order) {
+            if (empty($order->order_number)) {
+                $order->order_number = static::generateOrderNumber($order->business_id);
+            }
+            if (empty($order->public_token)) {
+                $order->public_token = static::generatePublicToken();
+            }
+        });
+    }
+
+    public static function generateOrderNumber(int $businessId): string
+    {
+        do {
+            $number = 'ORD-'.strtoupper(Str::random(8));
+        } while (static::withoutGlobalScopes()->where('business_id', $businessId)->where('order_number', $number)->exists());
+
+        return $number;
+    }
+
+    public static function generatePublicToken(): string
+    {
+        do {
+            $token = Str::random(40);
+        } while (static::withoutGlobalScopes()->where('public_token', $token)->exists());
+
+        return $token;
+    }
+
+    /**
+     * Money is stored as integer minor currency units; the model API works
+     * in major units transparently, same convention as Product.
+     */
+    protected function subtotal(): Attribute
+    {
+        return $this->moneyAttribute();
+    }
+
+    protected function discount(): Attribute
+    {
+        return $this->moneyAttribute();
+    }
+
+    protected function deliveryFee(): Attribute
+    {
+        return $this->moneyAttribute();
+    }
+
+    protected function tax(): Attribute
+    {
+        return $this->moneyAttribute();
+    }
+
+    protected function total(): Attribute
+    {
+        return $this->moneyAttribute();
+    }
+
+    private function moneyAttribute(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?int $value) => $value === null ? null : $value / 100,
+            set: fn (?float $value) => $value === null ? null : (int) round($value * 100),
+        );
+    }
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function currencySymbol(): string
+    {
+        return Business::currencySymbolFor($this->currency);
+    }
+}

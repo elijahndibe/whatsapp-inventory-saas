@@ -81,8 +81,52 @@ class Business extends Model
         return $this->hasMany(Product::class);
     }
 
+    public function customers(): HasMany
+    {
+        return $this->hasMany(Customer::class);
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active';
+    }
+
+    public function currencySymbol(): string
+    {
+        return static::currencySymbolFor($this->currency);
+    }
+
+    public static function currencySymbolFor(string $currency): string
+    {
+        return match (strtoupper($currency)) {
+            'NGN' => '₦',
+            'USD' => '$',
+            'GBP' => '£',
+            'EUR' => '€',
+            'GHS' => 'GH₵',
+            'KES' => 'KSh',
+            'ZAR' => 'R',
+            default => strtoupper($currency).' ',
+        };
+    }
+
+    /**
+     * WhatsApp's wa.me click-to-chat links require digits only (country
+     * code + number, no '+', spaces, or leading zeros after the code).
+     */
+    public function whatsappChatNumber(): ?string
+    {
+        $raw = $this->whatsapp_number ?: $this->phone;
+
+        if (! $raw) {
+            return null;
+        }
+
+        return preg_replace('/\D+/', '', $raw);
     }
 }
