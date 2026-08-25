@@ -48,4 +48,13 @@ class DashboardStatsTest extends TestCase
                 && $stats['Pending Orders'] === 1;
         });
     }
+
+    public function test_a_super_admin_visiting_dashboard_is_redirected_to_the_admin_panel(): void
+    {
+        $superAdmin = User::factory()->create(['business_id' => null, 'is_super_admin' => true]);
+
+        $response = $this->actingAs($superAdmin)->get(route('dashboard'));
+
+        $response->assertRedirect(route('admin.dashboard'));
+    }
 }
