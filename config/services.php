@@ -44,11 +44,25 @@ return [
 
     'whatsapp' => [
         'api_version' => env('WHATSAPP_API_VERSION', 'v20.0'),
-        // Platform-level Meta app credentials, used only to verify the
-        // incoming webhook signature — per-business sending credentials
-        // live on the Business model, not here.
+        // Platform-level Meta app credentials — the SaaS's own Meta app,
+        // not anything a business ever sees or configures. app_secret is
+        // used both to verify incoming webhook signatures and to exchange
+        // an Embedded Signup authorization code for a token; the others
+        // are Embedded-Signup-specific. See WHATSAPP_SETUP.md.
+        'app_id' => env('WHATSAPP_APP_ID'),
         'app_secret' => env('WHATSAPP_APP_SECRET'),
         'webhook_verify_token' => env('WHATSAPP_WEBHOOK_VERIFY_TOKEN'),
+        // The "Configuration ID" created under App Dashboard > WhatsApp >
+        // Embedded Signup — passed to FB.login() to launch the flow.
+        'embedded_signup_config_id' => env('WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID'),
+        // A long-lived token for a System User on the platform's own Meta
+        // Business, granted whatsapp_business_management +
+        // whatsapp_business_messaging once in Meta Business Settings. This
+        // single token works for every business's WABA once they've
+        // completed Embedded Signup (Meta shares WABA access with our
+        // Business at that point) — no per-business token needed or
+        // stored. See Business::whatsappAccessToken().
+        'system_user_token' => env('WHATSAPP_SYSTEM_USER_TOKEN'),
     ],
 
 ];

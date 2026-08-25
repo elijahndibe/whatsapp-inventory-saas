@@ -57,4 +57,37 @@ class WhatsAppCloudApiServiceTest extends TestCase
 
         $this->assertFalse($result);
     }
+
+    public function test_an_embedded_signup_connection_sends_using_the_platform_system_user_token(): void
+    {
+        config(['services.whatsapp.system_user_token' => 'platform-shared-token']);
+        Http::fake(['graph.facebook.com/*' => Http::response(['messages' => [['id' => 'wamid.abc']]])]);
+
+        $business = Business::factory()->create([
+            'whatsapp_phone_number_id' => '1234567890',
+            'whatsapp_access_token' => null, // Embedded Signup never stores a per-business token.
+            'whatsapp_connected_via' => 'embedded_signup',
+        ]);
+
+        $result = app(WhatsAppCloudApiService::class)->sendTextMessage($business, '2348012345678', 'Hello');
+
+        $this->assertTrue($result);
+        Http::assertSent(fn ($request) => $request->hasHeader('Authorization', 'Bearer platform-shared-token'));
+    }
+
+    public function test_sending_no_ops_when_neither_a_business_token_nor_a_platform_token_is_configured(): void
+    {
+        config(['services.whatsapp.system_user_token' => null]);
+        Http::fake();
+
+        $business = Business::factory()->create([
+            'whatsapp_phone_number_id' => '1234567890',
+            'whatsapp_access_token' => null,
+        ]);
+
+        $result = app(WhatsAppCloudApiService::class)->sendTextMessage($business, '2348012345678', 'Hello');
+
+        $this->assertFalse($result);
+        Http::assertNothingSent();
+    }
 }

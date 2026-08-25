@@ -29,6 +29,9 @@ class Business extends Model
         'whatsapp_phone_number_id',
         'whatsapp_business_account_id',
         'whatsapp_access_token',
+        'whatsapp_connected_via',
+        'whatsapp_display_phone_number',
+        'whatsapp_connected_at',
         'allow_overselling',
         'commission_rate',
         'paystack_subaccount_code',
@@ -41,12 +44,14 @@ class Business extends Model
     {
         return [
             'allow_overselling' => 'boolean',
-            // whatsapp_phone_number_id is a plain, queryable identifier (like a
-            // publishable key) — the incoming-webhook handler looks businesses
-            // up by it, which an encrypted column can't support. Only the
-            // actual credentials are encrypted at rest.
-            'whatsapp_business_account_id' => 'encrypted',
+            // whatsapp_phone_number_id and whatsapp_business_account_id are
+            // plain, queryable identifiers (like a publishable key) — the
+            // incoming-webhook handler and the Embedded Signup uniqueness
+            // check both look businesses up by these, which an encrypted
+            // column can't support. Only the actual credential is
+            // encrypted at rest.
             'whatsapp_access_token' => 'encrypted',
+            'whatsapp_connected_at' => 'datetime',
             'commission_rate' => 'float',
         ];
     }
@@ -163,9 +168,34 @@ class Business extends Model
         return preg_replace('/\D+/', '', $raw);
     }
 
+    /**
+     * True once a phone number is connected, regardless of whether it got
+     * there via Embedded Signup (no per-business token stored — see
+     * whatsappAccessToken()) or the legacy manual-entry fallback (token
+     * stored on this record).
+     */
     public function hasWhatsAppCloudApi(): bool
     {
-        return filled($this->whatsapp_phone_number_id) && filled($this->whatsapp_access_token);
+        return filled($this->whatsapp_phone_number_id);
+    }
+
+    public function isWhatsAppConnectedViaEmbeddedSignup(): bool
+    {
+        return $this->whatsapp_connected_via === 'embedded_signup';
+    }
+
+    /**
+     * The access token used to send/manage messages for this business's
+     * WhatsApp number. Embedded Signup connections share the platform's
+     * own System User token (config('services.whatsapp.system_user_token')
+     * — see WHATSAPP_SETUP.md) rather than a per-business token, since the
+     * platform's Meta Business has been granted access to the business's
+     * WABA during the signup flow; the legacy manual-entry path still
+     * stores and uses its own token per business.
+     */
+    public function whatsappAccessToken(): ?string
+    {
+        return $this->whatsapp_access_token ?: config('services.whatsapp.system_user_token');
     }
 
     public function hasPaystackSubaccount(): bool

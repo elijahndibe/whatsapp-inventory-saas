@@ -63,6 +63,7 @@ The `queue` and `scheduler` services in `docker-compose.yml` run continuously �
 - `SESSION_SECURE_COOKIE=true` — only send the session cookie over HTTPS
 - Live Paystack keys (`PAYSTACK_SECRET_KEY` etc.) — never the `sk_test_`/`pk_test_` pair used in development
 - `WHATSAPP_APP_SECRET` set — the webhook handler fails closed (rejects every request) without it, by design; leaving it blank means WhatsApp webhooks silently stop working, not a silent security hole
+- `WHATSAPP_APP_ID`, `WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID`, `WHATSAPP_SYSTEM_USER_TOKEN` set — the "Connect WhatsApp" button on the store settings page silently shows a "not available" error without these. See `WHATSAPP_SETUP.md` for the exact Meta Developer Dashboard steps to obtain each one.
 - `PAYSTACK_WEBHOOK_SECRET` matches what's configured in the Paystack dashboard
 - Register the two webhook URLs with their respective providers once the domain is live: `https://your-domain/webhooks/paystack` and `https://your-domain/webhooks/whatsapp`
 - `MAIL_MAILER` set to a real transport — `log`/`array` mean password-reset and notification emails silently never send

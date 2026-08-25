@@ -9,6 +9,9 @@
             @if (session('status'))
                 <div class="rounded-md bg-green-50 dark:bg-green-900/30 px-4 py-3 text-sm text-green-700 dark:text-green-300">{{ session('status') }}</div>
             @endif
+            @if (session('error'))
+                <div class="rounded-md bg-red-50 dark:bg-red-900/30 px-4 py-3 text-sm text-red-700 dark:text-red-300">{{ session('error') }}</div>
+            @endif
 
             <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" class="space-y-6">
                 @csrf
@@ -95,15 +98,11 @@
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
-                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('WhatsApp Cloud API') }}</h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                        {{ __('Configure this to send automated order and payment updates to customers. Get these values from your Meta for Developers app.') }}
+                <details class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+                    <summary class="cursor-pointer select-none font-semibold text-gray-800 dark:text-gray-200">{{ __('Advanced: connect WhatsApp manually') }}</summary>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 mb-4">
+                        {{ __('Most stores should use the "Connect WhatsApp" button above instead. Only use this if you already have your own Meta Cloud API credentials.') }}
                     </p>
-
-                    @unless ($business->hasWhatsAppCloudApi())
-                        <div class="mb-4 text-xs text-amber-600 dark:text-amber-400">{{ __('Not configured yet — automated WhatsApp messages are disabled until this is set up.') }}</div>
-                    @endunless
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
@@ -121,12 +120,154 @@
                         <x-text-input id="whatsapp_access_token" name="whatsapp_access_token" type="password" class="block mt-1 w-full" placeholder="{{ $business->whatsapp_access_token ? '•••••••• (unchanged — enter a new token to replace it)' : '' }}" />
                         <x-input-error :messages="$errors->get('whatsapp_access_token')" class="mt-2" />
                     </div>
-                </div>
+                </details>
 
                 <div class="flex justify-end">
                     <x-primary-button>{{ __('Save Settings') }}</x-primary-button>
                 </div>
             </form>
+
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+                <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('WhatsApp Integration') }}</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                    {{ __('Connect your WhatsApp Business account to send and receive customer messages directly through the platform.') }}
+                </p>
+
+                @if ($business->hasWhatsAppCloudApi())
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="h-2.5 w-2.5 rounded-full bg-green-500"></span>
+                        <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ __('Connected') }}</span>
+                    </div>
+                    @if ($business->whatsapp_display_phone_number)
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            {{ __('Connected number') }}: <span class="font-mono">{{ $business->whatsapp_display_phone_number }}</span>
+                        </p>
+                    @endif
+                    <ul class="text-sm text-green-600 dark:text-green-400 space-y-1 mb-4">
+                        <li>&check; {{ __('WhatsApp connected') }}</li>
+                        <li>&check; {{ __('Messages enabled') }}</li>
+                    </ul>
+                    <form method="POST" action="{{ route('settings.whatsapp.disconnect') }}" onsubmit="return confirm('{{ __('Disconnect WhatsApp? Automated messages will stop until you reconnect.') }}')">
+                        @csrf
+                        <button type="submit" class="px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-md text-sm font-semibold hover:bg-red-100 dark:hover:bg-red-900/50">{{ __('Disconnect WhatsApp') }}</button>
+                    </form>
+                @else
+                    <form method="POST" action="{{ route('settings.whatsapp.connect') }}" id="whatsapp-connect-form" class="hidden">
+                        @csrf
+                        <input type="hidden" name="code" id="whatsapp-connect-code">
+                        <input type="hidden" name="waba_id" id="whatsapp-connect-waba-id">
+                        <input type="hidden" name="phone_number_id" id="whatsapp-connect-phone-number-id">
+                    </form>
+
+                    <div id="whatsapp-connect-error" class="hidden mb-4 text-sm text-red-600 dark:text-red-400"></div>
+
+                    <button type="button" id="whatsapp-connect-button" onclick="launchWhatsAppSignup()" disabled
+                            class="px-5 py-2.5 bg-green-600 text-white rounded-md text-sm font-semibold hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed">
+                        {{ __('Connect WhatsApp') }}
+                    </button>
+                    <p id="whatsapp-connect-loading" class="mt-2 text-xs text-gray-400">{{ __('Loading…') }}</p>
+
+                    @push('scripts')
+                        <script>
+                            window.fbAsyncInit = function () {
+                                FB.init({
+                                    appId: '{{ config('services.whatsapp.app_id') }}',
+                                    autoLogAppEvents: true,
+                                    xfbml: false,
+                                    version: '{{ config('services.whatsapp.api_version') }}',
+                                });
+
+                                const button = document.getElementById('whatsapp-connect-button');
+                                const loading = document.getElementById('whatsapp-connect-loading');
+                                if (button) {
+                                    button.disabled = false;
+                                }
+                                if (loading) {
+                                    loading.remove();
+                                }
+                            };
+
+                            (function (d, s, id) {
+                                if (d.getElementById(id)) return;
+                                const js = d.createElement(s);
+                                js.id = id;
+                                js.src = 'https://connect.facebook.net/en_US/sdk.js';
+                                js.async = true;
+                                js.defer = true;
+                                d.body.appendChild(js);
+                            })(document, 'script', 'facebook-jssdk');
+
+                            let waCapturedWabaId = null;
+                            let waCapturedPhoneNumberId = null;
+
+                            const WA_TRUSTED_ORIGINS = ['https://www.facebook.com', 'https://web.facebook.com'];
+
+                            window.addEventListener('message', (event) => {
+                                // Exact match only — a suffix/substring check here would also
+                                // trust a spoofed domain like https://evilfacebook.com.
+                                if (!WA_TRUSTED_ORIGINS.includes(event.origin)) return;
+
+                                let data;
+                                try {
+                                    data = JSON.parse(event.data);
+                                } catch (e) {
+                                    return;
+                                }
+
+                                if (data.type !== 'WA_EMBEDDED_SIGNUP') return;
+
+                                if (data.event === 'FINISH' && data.data) {
+                                    waCapturedWabaId = data.data.waba_id;
+                                    waCapturedPhoneNumberId = data.data.phone_number_id;
+                                } else if (data.event === 'CANCEL') {
+                                    showWhatsAppConnectError('{{ __('WhatsApp connection was cancelled.') }}');
+                                } else if (data.event === 'ERROR') {
+                                    showWhatsAppConnectError('{{ __('Meta reported an error during setup. Please try again.') }}');
+                                }
+                            });
+
+                            function showWhatsAppConnectError(message) {
+                                const el = document.getElementById('whatsapp-connect-error');
+                                if (!el) return;
+                                el.textContent = message;
+                                el.classList.remove('hidden');
+                            }
+
+                            function launchWhatsAppSignup() {
+                                showWhatsAppConnectError('');
+                                document.getElementById('whatsapp-connect-error')?.classList.add('hidden');
+
+                                if (typeof FB === 'undefined') {
+                                    showWhatsAppConnectError('{{ __('WhatsApp connection could not load. Please refresh and try again.') }}');
+                                    return;
+                                }
+
+                                FB.login(function (response) {
+                                    if (!response.authResponse || !response.authResponse.code) {
+                                        showWhatsAppConnectError('{{ __('WhatsApp connection was cancelled or denied.') }}');
+                                        return;
+                                    }
+
+                                    if (!waCapturedWabaId || !waCapturedPhoneNumberId) {
+                                        showWhatsAppConnectError('{{ __('We could not detect your WhatsApp Business account or phone number. Please try again.') }}');
+                                        return;
+                                    }
+
+                                    document.getElementById('whatsapp-connect-code').value = response.authResponse.code;
+                                    document.getElementById('whatsapp-connect-waba-id').value = waCapturedWabaId;
+                                    document.getElementById('whatsapp-connect-phone-number-id').value = waCapturedPhoneNumberId;
+                                    document.getElementById('whatsapp-connect-form').submit();
+                                }, {
+                                    config_id: '{{ config('services.whatsapp.embedded_signup_config_id') }}',
+                                    response_type: 'code',
+                                    override_default_response_type: true,
+                                    extras: { sessionInfoVersion: '3' },
+                                });
+                            }
+                        </script>
+                    @endpush
+                @endif
+            </div>
 
             <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
                 <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('Paystack Marketplace Account') }}</h3>

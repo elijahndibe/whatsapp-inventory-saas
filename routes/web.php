@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\BusinessSettingsController;
 use App\Http\Controllers\PaystackConnectController;
+use App\Http\Controllers\WhatsAppConnectController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\NotificationController;
@@ -84,6 +85,9 @@ Route::middleware('auth')->group(function () {
     Route::get('settings', [BusinessSettingsController::class, 'edit'])->name('settings.edit');
     Route::put('settings', [BusinessSettingsController::class, 'update'])->name('settings.update');
     Route::post('settings/paystack/connect', [PaystackConnectController::class, 'connect'])->name('settings.paystack.connect');
+
+    Route::post('settings/whatsapp/connect', [WhatsAppConnectController::class, 'connect'])->name('settings.whatsapp.connect');
+    Route::post('settings/whatsapp/disconnect', [WhatsAppConnectController::class, 'disconnect'])->name('settings.whatsapp.disconnect');
 
     Route::get('billing', [BillingController::class, 'index'])->name('billing.index');
     Route::post('billing/subscribe/{plan}', [BillingController::class, 'subscribe'])->name('billing.subscribe');
