@@ -10,10 +10,15 @@ services:
       # with no access to this image's filesystem — gets the built
       # frontend assets.
       - assets:/var/www/html/public/build
-    env_file: .env
+      # Bind-mounted rather than baked into the image (see .dockerignore)
+      # so secrets never end up in an image layer, and so `artisan
+      # key:generate` has an actual file on disk to write the key into.
+      - ./.env:/var/www/html/.env
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   nginx:
     image: nginx:alpine
@@ -33,10 +38,12 @@ services:
     command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
     volumes:
       - storage:/var/www/html/storage
-    env_file: .env
+      - ./.env:/var/www/html/.env
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   scheduler:
     build: .
@@ -44,9 +51,10 @@ services:
     command: sh -c "while true; do php artisan schedule:run; sleep 60; done"
     volumes:
       - storage:/var/www/html/storage
-    env_file: .env
+      - ./.env:/var/www/html/.env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: mysql:8.0
@@ -58,10 +66,20 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     volumes:
       - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   redis:
     image: redis:7-alpine
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   db-data:

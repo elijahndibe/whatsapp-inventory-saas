@@ -30,6 +30,8 @@ docker compose exec app php artisan view:cache
 
 The `queue` and `scheduler` services in `docker-compose.yml` run continuously — nothing further to set up for those. To deploy a new version: rebuild and recreate (`docker compose build && docker compose up -d`), then re-run the three `artisan *:cache` commands (opcache is configured with `validate_timestamps=0`, so a stale worker's cached bytecode is only cleared by the container restart the recreate already does).
 
+**First deploy only:** `queue`/`scheduler` will restart-loop a few times (`docker compose ps` shows a rising restart count) between `docker compose up -d` and the `php artisan migrate --force` step above — they're trying to read tables (`cache`, `jobs`) that don't exist yet. This is expected and self-resolves the moment migrations finish; it does not recur on later deploys since the schema already exists. Verified end-to-end against a real build (Docker Desktop, MySQL 8) before this was written: image build → healthcheck-gated boot order → migrate → seed → `storage:link` → cache commands → login through nginx all confirmed working.
+
 ## Option B: Traditional VPS (Nginx + PHP-FPM)
 
 1. Point Nginx at `public/`, proxy `.php` to PHP-FPM (`docker/nginx/default.conf` is a usable starting template — swap `fastcgi_pass app:9000` for `unix:/run/php/php8.2-fpm.sock` or your local socket).

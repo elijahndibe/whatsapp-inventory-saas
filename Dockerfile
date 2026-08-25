@@ -22,11 +22,18 @@ RUN composer dump-autoload --optimize --no-dev
 FROM php:8.2-fpm-alpine AS app
 WORKDIR /var/www/html
 
-RUN apk add --no-cache \
-        libpng-dev libjpeg-turbo-dev freetype-dev libzip-dev icu-dev oniguruma-dev \
+# Runtime shared libraries stay installed permanently — gd/intl/zip need
+# them to load at all, not just to compile. Only the -dev/headers/build
+# toolchain (grouped as the .build-deps virtual package) gets removed
+# afterwards; deleting the -dev packages directly would also cascade-
+# remove these runtime libs since apk sees them as only pulled in by the
+# -dev packages, which is exactly the bug this split avoids.
+RUN apk add --no-cache libpng libjpeg-turbo freetype libzip icu-libs oniguruma \
+    && apk add --no-cache --virtual .build-deps \
+        $PHPIZE_DEPS libpng-dev libjpeg-turbo-dev freetype-dev libzip-dev icu-dev oniguruma-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) pdo_mysql gd zip bcmath intl opcache \
-    && apk del libpng-dev libjpeg-turbo-dev freetype-dev libzip-dev icu-dev oniguruma-dev
+    && apk del .build-deps
 
 COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache-custom.ini
 
@@ -34,7 +41,7 @@ COPY --from=vendor /app /var/www/html
 COPY --from=assets /app/public/build /var/www/html/public/build
 
 RUN addgroup -g 1000 www && adduser -G www -g www -s /bin/sh -D www \
-    && chown -R www:www /var/www/html/storage /var/www/html/bootstrap/cache
+    && chown -R www:www /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public
 
 USER www
 
