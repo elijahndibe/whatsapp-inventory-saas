@@ -74,4 +74,19 @@ class WhatsAppWebhookTest extends TestCase
 
         $response->assertStatus(400);
     }
+
+    public function test_the_webhook_fails_closed_when_no_app_secret_is_configured(): void
+    {
+        config(['services.whatsapp.app_secret' => null]);
+
+        $payload = ['entry' => []];
+        $body = json_encode($payload);
+
+        $response = $this->call('POST', route('webhooks.whatsapp.handle'), [], [], [], [
+            'HTTP_x-hub-signature-256' => 'sha256=anything',
+            'CONTENT_TYPE' => 'application/json',
+        ], $body);
+
+        $response->assertStatus(400);
+    }
 }

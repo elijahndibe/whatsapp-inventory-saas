@@ -1,0 +1,69 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - storage:/var/www/html/storage
+      # Named volume mounted at a path that already has files baked into
+      # the image: Docker copies that image content into the (empty)
+      # volume on first start, which is how nginx — a separate container
+      # with no access to this image's filesystem — gets the built
+      # frontend assets.
+      - assets:/var/www/html/public/build
+    env_file: .env
+    depends_on:
+      - db
+      - redis
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - assets:/var/www/html/public/build:ro
+      - storage:/var/www/html/storage:ro
+    depends_on:
+      - app
+
+  queue:
+    build: .
+    restart: unless-stopped
+    command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+    volumes:
+      - storage:/var/www/html/storage
+    env_file: .env
+    depends_on:
+      - db
+      - redis
+
+  scheduler:
+    build: .
+    restart: unless-stopped
+    command: sh -c "while true; do php artisan schedule:run; sleep 60; done"
+    volumes:
+      - storage:/var/www/html/storage
+    env_file: .env
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+volumes:
+  db-data:
+  storage:
+  assets:

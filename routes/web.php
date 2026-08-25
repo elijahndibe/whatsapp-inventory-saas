@@ -103,7 +103,7 @@ Route::prefix('store/{business:slug}')->name('storefront.')->group(function () {
     Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
 
     Route::get('/checkout', [CheckoutController::class, 'create'])->name('checkout.create');
-    Route::post('/checkout', [CheckoutController::class, 'store'])->middleware('plan.limit:orders')->name('checkout.store');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->middleware(['plan.limit:orders', 'throttle:10,1'])->name('checkout.store');
     Route::get('/orders/{publicToken}', [CheckoutController::class, 'confirmation'])->name('orders.confirmation');
 
     Route::get('/payments/callback', [PaymentController::class, 'callback'])->name('payments.callback');

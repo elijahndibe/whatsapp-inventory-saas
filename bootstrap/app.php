@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->appendToGroup('web', \App\Http\Middleware\EnsureBusinessIsActive::class);
+        $middleware->appendToGroup('web', \App\Http\Middleware\SecurityHeaders::class);
 
         // Paystack/Meta post to these URLs directly — they can't send a CSRF
         // token. The signature checks inside the webhook controllers are

@@ -40,17 +40,24 @@ class WhatsAppWebhookController extends Controller
 
     public function handle(Request $request): Response
     {
-        $signature = $request->header('x-hub-signature-256');
         $appSecret = config('services.whatsapp.app_secret');
 
-        if ($appSecret) {
-            $expected = 'sha256='.hash_hmac('sha256', $request->getContent(), $appSecret);
+        // Fail closed: an unconfigured app secret must never mean "skip
+        // verification" — that would let anyone POST arbitrary payloads
+        // that get attributed to a real business by phone_number_id.
+        if (! $appSecret) {
+            Log::warning('Rejected WhatsApp webhook: WHATSAPP_APP_SECRET is not configured.');
 
-            if (! $signature || ! hash_equals($expected, $signature)) {
-                Log::warning('Rejected WhatsApp webhook: invalid signature.');
+            return response()->json(['message' => 'webhook not configured'], 400);
+        }
 
-                return response()->json(['message' => 'invalid signature'], 400);
-            }
+        $signature = $request->header('x-hub-signature-256');
+        $expected = 'sha256='.hash_hmac('sha256', $request->getContent(), $appSecret);
+
+        if (! $signature || ! hash_equals($expected, $signature)) {
+            Log::warning('Rejected WhatsApp webhook: invalid signature.');
+
+            return response()->json(['message' => 'invalid signature'], 400);
         }
 
         foreach ($request->input('entry', []) as $entry) {
