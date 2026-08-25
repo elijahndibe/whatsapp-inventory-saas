@@ -26,6 +26,8 @@ class InventoryTransaction extends Model
         'new_quantity',
         'reference_type',
         'reference_id',
+        'from_location_id',
+        'to_location_id',
         'notes',
         'created_by',
     ];
@@ -38,5 +40,15 @@ class InventoryTransaction extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function fromLocation(): BelongsTo
+    {
+        return $this->belongsTo(BusinessLocation::class, 'from_location_id');
+    }
+
+    public function toLocation(): BelongsTo
+    {
+        return $this->belongsTo(BusinessLocation::class, 'to_location_id');
     }
 }

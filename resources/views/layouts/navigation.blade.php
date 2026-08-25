@@ -44,7 +44,23 @@
                         </x-nav-link>
                     @endcan
 
+                    @can('view reports')
+                        <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                            {{ __('Reports') }}
+                        </x-nav-link>
+                    @endcan
+
+                    @can('manage staff')
+                        <x-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
+                            {{ __('Staff') }}
+                        </x-nav-link>
+                    @endcan
+
                     @can('manage settings')
+                        <x-nav-link :href="route('locations.index')" :active="request()->routeIs('locations.*')">
+                            {{ __('Locations') }}
+                        </x-nav-link>
+
                         <x-nav-link :href="route('settings.edit')" :active="request()->routeIs('settings.*')">
                             {{ __('Settings') }}
                         </x-nav-link>
@@ -141,7 +157,23 @@
                 </x-responsive-nav-link>
             @endcan
 
+            @can('view reports')
+                <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                    {{ __('Reports') }}
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('manage staff')
+                <x-responsive-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
+                    {{ __('Staff') }}
+                </x-responsive-nav-link>
+            @endcan
+
             @can('manage settings')
+                <x-responsive-nav-link :href="route('locations.index')" :active="request()->routeIs('locations.*')">
+                    {{ __('Locations') }}
+                </x-responsive-nav-link>
+
                 <x-responsive-nav-link :href="route('settings.edit')" :active="request()->routeIs('settings.*')">
                     {{ __('Settings') }}
                 </x-responsive-nav-link>

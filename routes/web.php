@@ -15,9 +15,12 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\StaffController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\PaymentController;
@@ -49,6 +52,18 @@ Route::middleware('auth')->group(function () {
     Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
     Route::get('products/{product}/inventory', [InventoryController::class, 'history'])->name('products.inventory.history');
     Route::post('products/{product}/inventory/adjust', [InventoryController::class, 'adjust'])->name('products.inventory.adjust');
+    Route::post('products/{product}/inventory/transfer', [InventoryController::class, 'transfer'])->name('products.inventory.transfer');
+    Route::post('products/{product}/inventory/location-stock', [InventoryController::class, 'setLocationStock'])->name('products.inventory.location-stock');
+
+    Route::resource('locations', LocationController::class)->except(['show']);
+
+    Route::get('staff', [StaffController::class, 'index'])->name('staff.index');
+    Route::get('staff/create', [StaffController::class, 'create'])->name('staff.create');
+    Route::post('staff', [StaffController::class, 'store'])->name('staff.store');
+    Route::get('staff/{user}/edit', [StaffController::class, 'edit'])->name('staff.edit');
+    Route::put('staff/{user}', [StaffController::class, 'update'])->name('staff.update');
+
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
 
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');

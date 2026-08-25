@@ -100,6 +100,11 @@ class Product extends Model
         return $this->hasMany(InventoryTransaction::class);
     }
 
+    public function locationStock(): HasMany
+    {
+        return $this->hasMany(ProductLocationStock::class);
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active');

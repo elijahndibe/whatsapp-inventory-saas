@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Exceptions\InsufficientStockException;
 use App\Models\Business;
+use App\Models\BusinessLocation;
 use App\Models\InventoryTransaction;
 use App\Models\Product;
+use App\Models\ProductLocationStock;
 use App\Models\Scopes\BusinessScope;
 use App\Notifications\LowStockNotification;
 use Closure;
@@ -56,6 +58,106 @@ class InventoryService
         }
 
         return $this->applyChange($product, 'adjustment', $options, fn () => $newQuantity);
+    }
+
+    /**
+     * Reallocates a product's stock between two of a business's locations.
+     * This does NOT touch the product's aggregate stock_quantity — a
+     * transfer moves stock within the business, it doesn't create or
+     * remove any, so the total is unaffected. Logged as its own
+     * InventoryTransaction (quantity delta 0 against the aggregate, but
+     * from/to location recorded) so "where did this stock go" stays
+     * answerable the same way every other stock change is.
+     */
+    public function transferStock(Product $product, BusinessLocation $from, BusinessLocation $to, int $quantity, array $options = []): InventoryTransaction
+    {
+        $this->assertPositiveQuantity($quantity);
+
+        if ($from->is($to)) {
+            throw new InvalidArgumentException('Cannot transfer stock to the same location.');
+        }
+
+        return DB::transaction(function () use ($product, $from, $to, $quantity, $options) {
+            $fromStock = ProductLocationStock::withoutGlobalScope(BusinessScope::class)
+                ->where('product_id', $product->id)
+                ->where('location_id', $from->id)
+                ->lockForUpdate()
+                ->first();
+
+            $available = $fromStock?->quantity ?? 0;
+
+            if ($available < $quantity) {
+                throw new InvalidArgumentException(
+                    "\"{$from->name}\" only has {$available} of \"{$product->name}\" allocated — cannot transfer {$quantity}."
+                );
+            }
+
+            ProductLocationStock::withoutGlobalScope(BusinessScope::class)
+                ->where('product_id', $product->id)->where('location_id', $from->id)
+                ->update(['quantity' => $available - $quantity]);
+
+            $toStock = ProductLocationStock::withoutGlobalScope(BusinessScope::class)
+                ->where('product_id', $product->id)
+                ->where('location_id', $to->id)
+                ->lockForUpdate()
+                ->first();
+
+            if ($toStock) {
+                $toStock->increment('quantity', $quantity);
+            } else {
+                ProductLocationStock::create([
+                    'business_id' => $product->business_id,
+                    'product_id' => $product->id,
+                    'location_id' => $to->id,
+                    'quantity' => $quantity,
+                ]);
+            }
+
+            return InventoryTransaction::create([
+                'business_id' => $product->business_id,
+                'product_id' => $product->id,
+                'type' => 'transfer',
+                'quantity' => 0, // aggregate stock is unaffected by a transfer
+                'previous_quantity' => $product->stock_quantity,
+                'new_quantity' => $product->stock_quantity,
+                'from_location_id' => $from->id,
+                'to_location_id' => $to->id,
+                'notes' => $options['notes'] ?? "Transferred {$quantity} unit(s) from \"{$from->name}\" to \"{$to->name}\"",
+                'created_by' => $options['created_by'] ?? Auth::id(),
+            ]);
+        });
+    }
+
+    /**
+     * Records how much of a product's stock is physically allocated to a
+     * given location — a recount, not a transfer, so it doesn't require
+     * (or move stock out of) another location. Also does not touch the
+     * aggregate stock_quantity, same reasoning as transferStock().
+     */
+    public function setLocationStock(Product $product, BusinessLocation $location, int $quantity, array $options = []): InventoryTransaction
+    {
+        if ($quantity < 0) {
+            throw new InvalidArgumentException('Location stock cannot be set to a negative value.');
+        }
+
+        return DB::transaction(function () use ($product, $location, $quantity, $options) {
+            ProductLocationStock::withoutGlobalScope(BusinessScope::class)->updateOrCreate(
+                ['product_id' => $product->id, 'location_id' => $location->id],
+                ['business_id' => $product->business_id, 'quantity' => $quantity]
+            );
+
+            return InventoryTransaction::create([
+                'business_id' => $product->business_id,
+                'product_id' => $product->id,
+                'type' => 'adjustment',
+                'quantity' => 0,
+                'previous_quantity' => $product->stock_quantity,
+                'new_quantity' => $product->stock_quantity,
+                'to_location_id' => $location->id,
+                'notes' => $options['notes'] ?? "Set \"{$location->name}\" allocation to {$quantity} unit(s)",
+                'created_by' => $options['created_by'] ?? Auth::id(),
+            ]);
+        });
     }
 
     private function applyChange(Product $product, string $type, array $options, Closure $resolveNewQuantity): InventoryTransaction

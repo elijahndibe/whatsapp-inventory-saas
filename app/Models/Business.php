@@ -103,6 +103,11 @@ class Business extends Model
         return $this->hasMany(Subscription::class);
     }
 
+    public function locations(): HasMany
+    {
+        return $this->hasMany(BusinessLocation::class);
+    }
+
     /**
      * The most recent subscription row, regardless of status — the source
      * of truth SubscriptionService reads from (a business with none is

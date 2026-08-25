@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\InsufficientStockException;
 use App\Http\Requests\Product\AdjustStockRequest;
+use App\Http\Requests\Product\SetLocationStockRequest;
+use App\Http\Requests\Product\TransferStockRequest;
+use App\Models\BusinessLocation;
 use App\Models\Product;
 use App\Services\InventoryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use InvalidArgumentException;
 
 class InventoryController extends Controller
 {
@@ -24,16 +28,45 @@ class InventoryController extends Controller
         return view('inventory.index', compact('lowStock', 'outOfStock'));
     }
 
-    public function history(Product $product): View
+    public function history(Request $request, Product $product): View
     {
         $this->authorize('view', $product);
 
         $transactions = $product->inventoryTransactions()
-            ->with('creator')
+            ->with(['creator', 'fromLocation', 'toLocation'])
             ->latest('id')
             ->paginate(20);
 
-        return view('inventory.history', compact('product', 'transactions'));
+        $locationStock = $product->locationStock()->with('location')->get();
+        $businessLocations = $request->user()->business->locations()->where('status', 'active')->get();
+
+        return view('inventory.history', compact('product', 'transactions', 'locationStock', 'businessLocations'));
+    }
+
+    public function transfer(TransferStockRequest $request, Product $product): RedirectResponse
+    {
+        $data = $request->validated();
+
+        $from = BusinessLocation::findOrFail($data['from_location_id']);
+        $to = BusinessLocation::findOrFail($data['to_location_id']);
+
+        try {
+            $this->inventory->transferStock($product, $from, $to, $data['quantity'], ['notes' => $data['notes'] ?? null]);
+        } catch (InvalidArgumentException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('status', 'Stock transferred.');
+    }
+
+    public function setLocationStock(SetLocationStockRequest $request, Product $product): RedirectResponse
+    {
+        $data = $request->validated();
+        $location = BusinessLocation::findOrFail($data['location_id']);
+
+        $this->inventory->setLocationStock($product, $location, $data['quantity']);
+
+        return back()->with('status', 'Location stock updated.');
     }
 
     public function adjust(AdjustStockRequest $request, Product $product): RedirectResponse

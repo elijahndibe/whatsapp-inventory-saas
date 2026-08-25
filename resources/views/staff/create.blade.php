@@ -1,0 +1,69 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">{{ __('Add Staff Member') }}</h2>
+    </x-slot>
+
+    <div class="py-6 sm:py-12">
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+                <form method="POST" action="{{ route('staff.store') }}" x-data="{ role: '{{ old('role', 'Staff') }}' }">
+                    @csrf
+
+                    <div>
+                        <x-input-label for="name" :value="__('Name')" />
+                        <x-text-input id="name" name="name" type="text" class="block mt-1 w-full" :value="old('name')" required autofocus />
+                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                    </div>
+
+                    <div class="mt-4">
+                        <x-input-label for="email" :value="__('Email')" />
+                        <x-text-input id="email" name="email" type="email" class="block mt-1 w-full" :value="old('email')" required />
+                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                    </div>
+
+                    <div class="mt-4">
+                        <x-input-label for="role" :value="__('Role')" />
+                        <select id="role" name="role" x-model="role" class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm">
+                            <option value="Admin" @selected(old('role') === 'Admin')>{{ __('Admin — almost full access') }}</option>
+                            <option value="Staff" @selected(old('role', 'Staff') === 'Staff')>{{ __('Staff — limited, choose permissions below') }}</option>
+                        </select>
+                        <x-input-error :messages="$errors->get('role')" class="mt-2" />
+                    </div>
+
+                    <div class="mt-4" x-show="role === 'Staff'" x-cloak>
+                        <x-input-label :value="__('Permissions')" />
+                        <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            @foreach (\Database\Seeders\RolesAndPermissionsSeeder::PERMISSIONS as $permission)
+                                <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                                    <input type="checkbox" name="permissions[]" value="{{ $permission }}" @checked(in_array($permission, old('permissions', [])))
+                                           class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                                    {{ ucfirst($permission) }}
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    @if ($locations->isNotEmpty())
+                        <div class="mt-4">
+                            <x-input-label :value="__('Assigned Locations (optional)')" />
+                            <div class="mt-2 space-y-1">
+                                @foreach ($locations as $location)
+                                    <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                                        <input type="checkbox" name="locations[]" value="{{ $location->id }}" @checked(in_array($location->id, old('locations', [])))
+                                               class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                                        {{ $location->name }}
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="flex items-center justify-end mt-6 gap-3">
+                        <a href="{{ route('staff.index') }}" class="text-sm text-gray-600 dark:text-gray-400 hover:underline">{{ __('Cancel') }}</a>
+                        <x-primary-button>{{ __('Add Staff Member') }}</x-primary-button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</x-app-layout>

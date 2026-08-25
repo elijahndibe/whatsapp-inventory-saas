@@ -68,6 +68,29 @@ class SubscriptionService
         return $ordersThisMonth < $plan->max_orders_per_month;
     }
 
+    public function canAddLocation(Business $business): bool
+    {
+        $plan = $this->currentPlan($business);
+
+        if (! $plan || $plan->max_locations === null) {
+            return true;
+        }
+
+        return $business->locations()->count() < $plan->max_locations;
+    }
+
+    public function canAddStaff(Business $business): bool
+    {
+        $plan = $this->currentPlan($business);
+
+        if (! $plan || $plan->max_staff === null) {
+            return true;
+        }
+
+        // The owner counts as one of the seats.
+        return $business->users()->count() < $plan->max_staff;
+    }
+
     /**
      * Activates a plan for a business — either free (immediate, no
      * payment) or paid (called after a verified Paystack transaction).
