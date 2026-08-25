@@ -48,6 +48,10 @@
                         <x-nav-link :href="route('settings.edit')" :active="request()->routeIs('settings.*')">
                             {{ __('Settings') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('billing.index')" :active="request()->routeIs('billing.*')">
+                            {{ __('Billing') }}
+                        </x-nav-link>
                     @endcan
                 </div>
             </div>
@@ -140,6 +144,10 @@
             @can('manage settings')
                 <x-responsive-nav-link :href="route('settings.edit')" :active="request()->routeIs('settings.*')">
                     {{ __('Settings') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('billing.index')" :active="request()->routeIs('billing.*')">
+                    {{ __('Billing') }}
                 </x-responsive-nav-link>
             @endcan
         </div>

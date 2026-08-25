@@ -1,0 +1,91 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">{{ __('Billing & Plan') }}</h2>
+    </x-slot>
+
+    <div class="py-6 sm:py-12">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+
+            @if (session('status'))
+                <div class="rounded-md bg-green-50 dark:bg-green-900/30 px-4 py-3 text-sm text-green-700 dark:text-green-300">{{ session('status') }}</div>
+            @endif
+            @if (session('error'))
+                <div class="rounded-md bg-red-50 dark:bg-red-900/30 px-4 py-3 text-sm text-red-700 dark:text-red-300">{{ session('error') }}</div>
+            @endif
+
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+                <h3 class="font-semibold text-gray-800 dark:text-gray-200">{{ __('Current Plan') }}</h3>
+                @if ($currentPlan)
+                    <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $currentPlan->name }}</p>
+                    @if ($subscription && $subscription->ends_at)
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Renews or expires') }}: {{ $subscription->ends_at->format('d M Y') }}</p>
+                    @else
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Does not expire') }}</p>
+                    @endif
+                @else
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('No plan on record — currently unrestricted.') }}</p>
+                @endif
+
+                <div class="mt-4 grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 uppercase">{{ __('Products') }}</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            {{ $usage['products'] }} / {{ $currentPlan?->max_products ?? __('Unlimited') }}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 uppercase">{{ __('Orders this month') }}</div>
+                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            {{ $usage['orders_this_month'] }} / {{ $currentPlan?->max_orders_per_month ?? __('Unlimited') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                @foreach ($plans as $plan)
+                    <div @class([
+                        'bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 border-2',
+                        'border-indigo-500' => $currentPlan?->id === $plan->id,
+                        'border-transparent' => $currentPlan?->id !== $plan->id,
+                    ])>
+                        <h4 class="font-semibold text-gray-800 dark:text-gray-200">{{ $plan->name }}</h4>
+                        <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">
+                            @if ($plan->isFree())
+                                {{ __('Free') }}
+                            @else
+                                {{ $plan->currencySymbol() }}{{ number_format($plan->price, 0) }}<span class="text-sm font-normal text-gray-500">/{{ $plan->duration_days }}d</span>
+                            @endif
+                        </p>
+
+                        <ul class="mt-4 space-y-1.5 text-sm text-gray-600 dark:text-gray-400">
+                            <li>{{ $plan->max_products ?? __('Unlimited') }} {{ __('products') }}</li>
+                            <li>{{ $plan->max_orders_per_month ?? __('Unlimited') }} {{ __('orders/month') }}</li>
+                            @foreach (['paystack' => 'Online payments', 'invoices' => 'Invoices & receipts', 'whatsapp_cloud_api' => 'WhatsApp Cloud API', 'advanced_analytics' => 'Advanced analytics'] as $key => $label)
+                                @if ($plan->hasFeature($key))
+                                    <li class="flex items-center gap-1.5 text-green-600 dark:text-green-400">
+                                        <span>&check;</span> {{ __($label) }}
+                                    </li>
+                                @endif
+                            @endforeach
+                        </ul>
+
+                        <div class="mt-6">
+                            @if ($currentPlan?->id === $plan->id)
+                                <span class="block text-center text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 py-2">{{ __('Current Plan') }}</span>
+                            @else
+                                <form method="POST" action="{{ route('billing.subscribe', $plan) }}">
+                                    @csrf
+                                    <button type="submit" class="w-full px-4 py-2 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 rounded-md font-semibold text-xs uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white">
+                                        {{ $plan->isFree() ? __('Switch to Free') : __('Upgrade') }}
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+        </div>
+    </div>
+</x-app-layout>

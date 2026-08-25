@@ -28,10 +28,7 @@ class SendWhatsAppOrderMessageTest extends TestCase
             'subtotal' => 100, 'total' => 100, 'currency' => 'NGN', 'order_status' => 'confirmed',
         ]);
 
-        (new SendWhatsAppOrderMessage($order->id, 'order_confirmed'))->handle(
-            app(\App\Services\WhatsAppCloudApiService::class),
-            app(\App\Services\WhatsAppMessageFormatter::class),
-        );
+        app()->call([new SendWhatsAppOrderMessage($order->id, 'order_confirmed'), 'handle']);
 
         Http::assertSent(fn ($request) => str_contains($request->url(), '1234567890/messages')
             && str_contains($request['text']['body'], 'confirmed'));
@@ -48,10 +45,7 @@ class SendWhatsAppOrderMessageTest extends TestCase
             'subtotal' => 100, 'total' => 100, 'currency' => 'NGN',
         ]);
 
-        (new SendWhatsAppOrderMessage($order->id, 'order_confirmed'))->handle(
-            app(\App\Services\WhatsAppCloudApiService::class),
-            app(\App\Services\WhatsAppMessageFormatter::class),
-        );
+        app()->call([new SendWhatsAppOrderMessage($order->id, 'order_confirmed'), 'handle']);
 
         Http::assertNothingSent();
     }

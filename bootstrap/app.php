@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'business.active' => \App\Http\Middleware\EnsureBusinessIsActive::class,
             'super_admin' => \App\Http\Middleware\EnsureUserIsSuperAdmin::class,
+            'plan.limit' => \App\Http\Middleware\CheckPlanLimit::class,
         ]);
 
         $middleware->appendToGroup('web', \App\Http\Middleware\EnsureBusinessIsActive::class);

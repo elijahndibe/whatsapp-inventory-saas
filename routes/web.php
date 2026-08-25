@@ -1,5 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\BusinessController as AdminBusinessController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\FailedJobController as AdminFailedJobController;
+use App\Http\Controllers\Admin\LogController as AdminLogController;
+use App\Http\Controllers\Admin\PlanController as AdminPlanController;
+use App\Http\Controllers\Admin\SubscriptionController as AdminSubscriptionController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\BusinessSettingsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
@@ -34,7 +42,8 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('categories', CategoryController::class)->except(['show']);
 
-    Route::resource('products', ProductController::class)->except(['show']);
+    Route::resource('products', ProductController::class)->except(['show'])
+        ->middlewareFor('store', 'plan.limit:products');
     Route::delete('products/{product}/images/{image}', [ProductController::class, 'destroyImage'])->name('products.images.destroy');
 
     Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
@@ -56,6 +65,10 @@ Route::middleware('auth')->group(function () {
     Route::get('settings', [BusinessSettingsController::class, 'edit'])->name('settings.edit');
     Route::put('settings', [BusinessSettingsController::class, 'update'])->name('settings.update');
 
+    Route::get('billing', [BillingController::class, 'index'])->name('billing.index');
+    Route::post('billing/subscribe/{plan}', [BillingController::class, 'subscribe'])->name('billing.subscribe');
+    Route::get('billing/callback', [BillingController::class, 'callback'])->name('billing.callback');
+
     Route::post('notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
     Route::post('notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
 });
@@ -70,11 +83,32 @@ Route::prefix('store/{business:slug}')->name('storefront.')->group(function () {
     Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
 
     Route::get('/checkout', [CheckoutController::class, 'create'])->name('checkout.create');
-    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->middleware('plan.limit:orders')->name('checkout.store');
     Route::get('/orders/{publicToken}', [CheckoutController::class, 'confirmation'])->name('orders.confirmation');
 
     Route::get('/payments/callback', [PaymentController::class, 'callback'])->name('payments.callback');
     Route::post('/orders/{publicToken}/pay', [PaymentController::class, 'retry'])->name('payments.retry');
+});
+
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'super_admin'])->group(function () {
+    Route::get('/', AdminDashboardController::class)->name('dashboard');
+
+    Route::get('businesses', [AdminBusinessController::class, 'index'])->name('businesses.index');
+    Route::get('businesses/{business}', [AdminBusinessController::class, 'show'])->name('businesses.show');
+    Route::post('businesses/{business}/suspend', [AdminBusinessController::class, 'suspend'])->name('businesses.suspend');
+    Route::post('businesses/{business}/activate', [AdminBusinessController::class, 'activate'])->name('businesses.activate');
+
+    Route::resource('plans', AdminPlanController::class)->except(['show', 'destroy']);
+
+    Route::get('subscriptions', [AdminSubscriptionController::class, 'index'])->name('subscriptions.index');
+
+    Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
+
+    Route::get('failed-jobs', [AdminFailedJobController::class, 'index'])->name('failed-jobs.index');
+    Route::post('failed-jobs/{uuid}/retry', [AdminFailedJobController::class, 'retry'])->name('failed-jobs.retry');
+    Route::delete('failed-jobs/{uuid}', [AdminFailedJobController::class, 'destroy'])->name('failed-jobs.destroy');
+
+    Route::get('logs', [AdminLogController::class, 'index'])->name('logs.index');
 });
 
 // Platform-wide (not business-scoped): Paystack sends one webhook URL for

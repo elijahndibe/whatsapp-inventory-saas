@@ -4,10 +4,14 @@
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 {{ __('Order') }} <span class="font-mono">{{ $order->order_number }}</span>
             </h2>
-            <div class="flex gap-3 text-sm">
-                <a href="{{ route('orders.invoice', $order) }}" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Invoice') }}</a>
-                @if ($order->payment_status === 'paid')
-                    <a href="{{ route('orders.receipt', $order) }}" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Receipt') }}</a>
+            <div class="flex items-center gap-3 text-sm">
+                @if ($canUseInvoices)
+                    <a href="{{ route('orders.invoice', $order) }}" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Invoice') }}</a>
+                    @if ($order->payment_status === 'paid')
+                        <a href="{{ route('orders.receipt', $order) }}" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Receipt') }}</a>
+                    @endif
+                @else
+                    <a href="{{ route('billing.index') }}" class="text-xs text-amber-600 dark:text-amber-400 hover:underline">{{ __('Upgrade for invoices') }}</a>
                 @endif
             </div>
         </div>

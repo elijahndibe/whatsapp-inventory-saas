@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Webhooks;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\ProcessPaystackWebhook;
+use App\Jobs\ProcessSubscriptionPaymentWebhook;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class PaystackWebhookController extends Controller
 {
@@ -25,7 +27,14 @@ class PaystackWebhookController extends Controller
         $reference = $request->input('data.reference');
 
         if ($event === 'charge.success' && $reference) {
-            ProcessPaystackWebhook::dispatch($reference);
+            // Two independent payment flows share this one webhook URL —
+            // routed by reference prefix (order payments: PAY-, subscription
+            // upgrades: SUB-) rather than sharing one model/idempotency key.
+            if (Str::startsWith($reference, 'SUB-')) {
+                ProcessSubscriptionPaymentWebhook::dispatch($reference);
+            } else {
+                ProcessPaystackWebhook::dispatch($reference);
+            }
         }
 
         // Always 200 quickly once the signature checks out — actual

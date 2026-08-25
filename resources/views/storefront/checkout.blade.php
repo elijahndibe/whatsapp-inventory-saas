@@ -20,14 +20,16 @@
                             <input type="radio" name="payment_method" value="whatsapp" x-model="paymentMethod" class="text-indigo-600">
                             <span class="text-gray-900 dark:text-gray-100">{{ __('Order via WhatsApp') }}</span>
                         </label>
-                        <label @class([
-                            'flex items-center gap-2 border rounded-md px-4 py-3 text-sm cursor-pointer',
-                            'border-indigo-500 ring-1 ring-indigo-500' => old('payment_method') === 'paystack',
-                            'border-gray-300 dark:border-gray-700' => old('payment_method') !== 'paystack',
-                        ])>
-                            <input type="radio" name="payment_method" value="paystack" x-model="paymentMethod" class="text-indigo-600">
-                            <span class="text-gray-900 dark:text-gray-100">{{ __('Pay Online Now') }}</span>
-                        </label>
+                        @if ($canPayOnline)
+                            <label @class([
+                                'flex items-center gap-2 border rounded-md px-4 py-3 text-sm cursor-pointer',
+                                'border-indigo-500 ring-1 ring-indigo-500' => old('payment_method') === 'paystack',
+                                'border-gray-300 dark:border-gray-700' => old('payment_method') !== 'paystack',
+                            ])>
+                                <input type="radio" name="payment_method" value="paystack" x-model="paymentMethod" class="text-indigo-600">
+                                <span class="text-gray-900 dark:text-gray-100">{{ __('Pay Online Now') }}</span>
+                            </label>
+                        @endif
                     </div>
                     <x-input-error :messages="$errors->get('payment_method')" class="mt-2" />
                 </div>

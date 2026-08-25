@@ -3,14 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Services\SubscriptionService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Symfony\Component\HttpFoundation\Response;
 
 class InvoiceController extends Controller
 {
+    public function __construct(private readonly SubscriptionService $subscriptions) {}
+
     public function invoice(Order $order): Response
     {
         $this->authorize('view', $order);
+        $this->authorizeInvoiceFeature($order);
 
         return $this->render($order, 'invoice');
     }
@@ -18,10 +22,20 @@ class InvoiceController extends Controller
     public function receipt(Order $order): Response
     {
         $this->authorize('view', $order);
+        $this->authorizeInvoiceFeature($order);
 
         abort_unless($order->payment_status === 'paid', 404);
 
         return $this->render($order, 'receipt');
+    }
+
+    private function authorizeInvoiceFeature(Order $order): void
+    {
+        abort_unless(
+            $this->subscriptions->hasFeature($order->business, 'invoices'),
+            403,
+            'Invoices and receipts require the Starter plan or higher.'
+        );
     }
 
     private function render(Order $order, string $documentType): Response

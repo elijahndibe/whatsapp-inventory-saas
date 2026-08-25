@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Models\Business;
+use App\Models\Plan;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -31,6 +32,15 @@ class RegisterBusinessAction
             ]);
 
             $user->assignRole('Owner');
+
+            if ($freePlan = Plan::where('slug', 'free')->first()) {
+                $business->subscriptions()->create([
+                    'plan_id' => $freePlan->id,
+                    'status' => 'active',
+                    'starts_at' => now(),
+                    'ends_at' => null,
+                ]);
+            }
 
             return $user;
         });

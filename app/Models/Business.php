@@ -98,6 +98,21 @@ class Business extends Model
         return $this->hasMany(Payment::class);
     }
 
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    /**
+     * The most recent subscription row, regardless of status — the source
+     * of truth SubscriptionService reads from (a business with none is
+     * treated as unrestricted, not blocked; see SubscriptionService).
+     */
+    public function currentSubscription(): ?Subscription
+    {
+        return $this->subscriptions()->latest('id')->first();
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active';

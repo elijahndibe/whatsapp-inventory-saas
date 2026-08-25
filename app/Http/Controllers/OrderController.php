@@ -7,13 +7,17 @@ use App\Http\Requests\Order\UpdateOrderStatusRequest;
 use App\Http\Requests\Order\UpdatePaymentStatusRequest;
 use App\Models\Order;
 use App\Services\OrderService;
+use App\Services\SubscriptionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class OrderController extends Controller
 {
-    public function __construct(private readonly OrderService $orders) {}
+    public function __construct(
+        private readonly OrderService $orders,
+        private readonly SubscriptionService $subscriptions,
+    ) {}
 
     public function index(Request $request): View
     {
@@ -40,9 +44,10 @@ class OrderController extends Controller
     {
         $this->authorize('view', $order);
 
-        $order->load(['items', 'customer']);
+        $order->load(['items', 'customer', 'business']);
+        $canUseInvoices = $this->subscriptions->hasFeature($order->business, 'invoices');
 
-        return view('orders.show', compact('order'));
+        return view('orders.show', compact('order', 'canUseInvoices'));
     }
 
     public function updateStatus(UpdateOrderStatusRequest $request, Order $order): RedirectResponse
