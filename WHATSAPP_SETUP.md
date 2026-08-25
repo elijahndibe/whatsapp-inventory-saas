@@ -8,6 +8,22 @@ API credentials. That flow depends on **one Meta app that the platform owns**
 setup performed by whoever operates this SaaS, in Meta's dashboards, not in
 code.
 
+## HTTPS is required — including for local testing
+
+Confirmed empirically against this app: Meta's SDK refuses to open the
+Embedded Signup dialog at all on a plain-HTTP page, **with no exception for
+`localhost`** — it fails client-side (`FB.login() can no longer be called
+from http pages`) before any request even reaches Meta. The settings page
+now detects this and shows a clear warning instead of a dead button, but the
+underlying limitation is Meta's, not something this codebase can work around.
+
+Production should already be HTTPS-only, so this is a non-issue there. To
+test the real flow locally (an XAMPP/`http://localhost` setup won't work),
+put the app behind HTTPS first — e.g. `ngrok http 80` and use the `https://`
+forwarding URL it gives you (also update `APP_URL` and Meta's App Domains to
+match while testing that way), or a local dev tool that provisions a trusted
+cert (Laravel Herd/Valet, `mkcert` + a virtual host, etc).
+
 ## 1. Create the platform's Meta app
 
 1. Go to [developers.facebook.com](https://developers.facebook.com/) → **My Apps** → **Create App** → type **Business**.

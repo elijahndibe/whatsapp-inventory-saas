@@ -151,6 +151,10 @@
                         @csrf
                         <button type="submit" class="px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-md text-sm font-semibold hover:bg-red-100 dark:hover:bg-red-900/50">{{ __('Disconnect WhatsApp') }}</button>
                     </form>
+                @elseif (! config('services.whatsapp.app_id') || ! config('services.whatsapp.embedded_signup_config_id'))
+                    <div class="text-sm text-amber-600 dark:text-amber-400">
+                        {{ __('WhatsApp connection isn\'t set up on this platform yet. Contact support.') }}
+                    </div>
                 @else
                     <form method="POST" action="{{ route('settings.whatsapp.connect') }}" id="whatsapp-connect-form" class="hidden">
                         @csrf
@@ -160,6 +164,12 @@
                     </form>
 
                     <div id="whatsapp-connect-error" class="hidden mb-4 text-sm text-red-600 dark:text-red-400"></div>
+
+                    @unless (request()->secure())
+                        <div class="mb-4 text-sm text-amber-600 dark:text-amber-400">
+                            {{ __('WhatsApp connection requires a secure (HTTPS) connection — Meta blocks it on plain HTTP, including on localhost. This won\'t work until the site is served over HTTPS.') }}
+                        </div>
+                    @endunless
 
                     <button type="button" id="whatsapp-connect-button" onclick="launchWhatsAppSignup()" disabled
                             class="px-5 py-2.5 bg-green-600 text-white rounded-md text-sm font-semibold hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed">
@@ -236,6 +246,14 @@
                             function launchWhatsAppSignup() {
                                 showWhatsAppConnectError('');
                                 document.getElementById('whatsapp-connect-error')?.classList.add('hidden');
+
+                                // Meta's SDK refuses to open the login dialog at all on plain
+                                // HTTP (no exception for localhost) and fails silently — give a
+                                // real message instead of a dead button.
+                                if (location.protocol !== 'https:') {
+                                    showWhatsAppConnectError('{{ __('WhatsApp connection requires a secure (HTTPS) connection. It won\'t work on this page.') }}');
+                                    return;
+                                }
 
                                 if (typeof FB === 'undefined') {
                                     showWhatsAppConnectError('{{ __('WhatsApp connection could not load. Please refresh and try again.') }}');
