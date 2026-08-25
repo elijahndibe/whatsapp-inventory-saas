@@ -36,6 +36,24 @@
                 @endforeach
             </div>
 
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">{{ __('Sales & Fees') }}</h3>
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase">{{ __('Total Sales') }}</p>
+                        <p class="mt-1 text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $business->currencySymbol() }}{{ number_format($earnings['total_sales'], 2) }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase">{{ __('Platform Fees') }}</p>
+                        <p class="mt-1 text-lg font-semibold text-amber-600 dark:text-amber-400">-{{ $business->currencySymbol() }}{{ number_format($earnings['platform_fees'], 2) }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase">{{ __('Net Sales') }}</p>
+                        <p class="mt-1 text-lg font-semibold text-green-600 dark:text-green-400">{{ $business->currencySymbol() }}{{ number_format($earnings['net_sales'], 2) }}</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 @can('view orders')
                     <a href="{{ route('orders.index') }}" class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-900/40">

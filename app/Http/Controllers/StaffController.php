@@ -6,7 +6,7 @@ use App\Http\Requests\Staff\StoreStaffRequest;
 use App\Http\Requests\Staff\UpdateStaffRequest;
 use App\Models\BusinessLocation;
 use App\Models\User;
-use App\Services\SubscriptionService;
+use App\Services\FeatureService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -15,7 +15,7 @@ use Illuminate\View\View;
 
 class StaffController extends Controller
 {
-    public function __construct(private readonly SubscriptionService $subscriptions) {}
+    public function __construct(private readonly FeatureService $features) {}
 
     public function index(Request $request): View
     {
@@ -30,7 +30,7 @@ class StaffController extends Controller
     {
         $this->authorize('manage staff');
 
-        if (! $this->subscriptions->canAddStaff($request->user()->business)) {
+        if (! $this->features->withinLimit($request->user()->business, 'staff', $request->user()->business->users()->count())) {
             return redirect()->route('staff.index')
                 ->with('error', 'You have reached your plan\'s staff limit. Upgrade to add more team members.');
         }
@@ -44,7 +44,7 @@ class StaffController extends Controller
     {
         $business = $request->user()->business;
 
-        if (! $this->subscriptions->canAddStaff($business)) {
+        if (! $this->features->withinLimit($business, 'staff', $business->users()->count())) {
             return redirect()->route('staff.index')
                 ->with('error', 'You have reached your plan\'s staff limit. Upgrade to add more team members.');
         }

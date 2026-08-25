@@ -13,6 +13,25 @@
             @endforeach
         </div>
 
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('GMV') }}</p>
+                <p class="mt-1 text-xl font-semibold text-gray-900 dark:text-gray-100">₦{{ number_format($revenue['gmv'], 2) }}</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Platform Commission') }}</p>
+                <p class="mt-1 text-xl font-semibold text-indigo-600 dark:text-indigo-400">₦{{ number_format($revenue['commission'], 2) }}</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Payment Fees') }}</p>
+                <p class="mt-1 text-xl font-semibold text-gray-900 dark:text-gray-100">₦{{ number_format($revenue['fees'], 2) }}</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Seller Revenue') }}</p>
+                <p class="mt-1 text-xl font-semibold text-gray-900 dark:text-gray-100">₦{{ number_format($revenue['seller'], 2) }}</p>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Order Revenue (Platform)') }}</p>

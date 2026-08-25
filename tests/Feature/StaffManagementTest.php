@@ -3,8 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Models\Feature;
 use App\Models\Plan;
+use App\Models\PlanFeature;
 use App\Models\User;
+use App\Services\PlatformSettingsService;
 use App\Services\SubscriptionService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -114,7 +117,11 @@ class StaffManagementTest extends TestCase
 
     public function test_adding_staff_is_blocked_once_the_plan_limit_is_reached(): void
     {
-        $plan = Plan::create(['name' => 'Solo', 'price' => 0, 'max_staff' => 1]);
+        app(PlatformSettingsService::class)->set('subscription.enabled', true);
+
+        $plan = Plan::create(['name' => 'Solo', 'price' => 0]);
+        $feature = Feature::firstOrCreate(['key' => 'staff'], ['name' => 'Staff', 'type' => Feature::TYPE_LIMIT, 'is_enabled' => true]);
+        PlanFeature::create(['plan_id' => $plan->id, 'feature_id' => $feature->id, 'enabled' => true, 'value' => 1]);
         app(SubscriptionService::class)->subscribeToPlan($this->business, $plan);
         // The owner already counts as the one seat.
 

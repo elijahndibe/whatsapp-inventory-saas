@@ -13,6 +13,8 @@ class Payment extends Model
 
     public const STATUSES = ['pending', 'success', 'failed', 'abandoned'];
 
+    public const SETTLEMENT_STATUSES = ['pending', 'settled', 'platform_held', 'failed'];
+
     protected $fillable = [
         'business_id',
         'order_id',
@@ -23,12 +25,18 @@ class Payment extends Model
         'status',
         'gateway_response',
         'paid_at',
+        'commission_rate',
+        'commission_amount',
+        'seller_amount',
+        'payment_fee',
+        'settlement_status',
     ];
 
     protected function casts(): array
     {
         return [
             'paid_at' => 'datetime',
+            'commission_rate' => 'float',
         ];
     }
 
@@ -44,6 +52,39 @@ class Payment extends Model
             get: fn (?int $value) => $value === null ? null : $value / 100,
             set: fn (?float $value) => $value === null ? null : (int) round($value * 100),
         );
+    }
+
+    private function minorUnitAttribute(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?int $value) => $value === null ? null : $value / 100,
+            set: fn (?float $value) => $value === null ? null : (int) round($value * 100),
+        );
+    }
+
+    protected function commissionAmount(): Attribute
+    {
+        return $this->minorUnitAttribute();
+    }
+
+    protected function sellerAmount(): Attribute
+    {
+        return $this->minorUnitAttribute();
+    }
+
+    protected function paymentFee(): Attribute
+    {
+        return $this->minorUnitAttribute();
+    }
+
+    public function commissionAmountInMinorUnits(): int
+    {
+        return (int) $this->getRawOriginal('commission_amount');
+    }
+
+    public function sellerAmountInMinorUnits(): int
+    {
+        return (int) $this->getRawOriginal('seller_amount');
     }
 
     public function order(): BelongsTo

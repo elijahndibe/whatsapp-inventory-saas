@@ -5,14 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Location\StoreLocationRequest;
 use App\Http\Requests\Location\UpdateLocationRequest;
 use App\Models\BusinessLocation;
-use App\Services\SubscriptionService;
+use App\Services\FeatureService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class LocationController extends Controller
 {
-    public function __construct(private readonly SubscriptionService $subscriptions) {}
+    public function __construct(private readonly FeatureService $features) {}
 
     public function index(Request $request): View
     {
@@ -27,7 +27,7 @@ class LocationController extends Controller
     {
         $this->authorize('manage settings');
 
-        if (! $this->subscriptions->canAddLocation($request->user()->business)) {
+        if (! $this->features->withinLimit($request->user()->business, 'locations', $request->user()->business->locations()->count())) {
             return redirect()->route('locations.index')
                 ->with('error', 'You have reached your plan\'s location limit. Upgrade to add more branches.');
         }
@@ -39,7 +39,7 @@ class LocationController extends Controller
     {
         $business = $request->user()->business;
 
-        if (! $this->subscriptions->canAddLocation($business)) {
+        if (! $this->features->withinLimit($business, 'locations', $business->locations()->count())) {
             return redirect()->route('locations.index')
                 ->with('error', 'You have reached your plan\'s location limit. Upgrade to add more branches.');
         }

@@ -38,6 +38,26 @@
             <div>{{ __('Phone') }}: {{ $business->phone ?? '—' }}</div>
             <div>{{ __('Currency') }}: {{ $business->currency }}</div>
             <div>{{ __('Created') }}: {{ $business->created_at->format('d M Y') }}</div>
+            <div>{{ __('Paystack') }}: {{ $business->hasPaystackSubaccount() ? __('Connected') : __('Not connected') }}</div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+            <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('Commission Rate') }}</h3>
+            <p class="text-xs mb-4">
+                @if ($business->hasCustomCommissionRate())
+                    <span class="text-indigo-600 dark:text-indigo-400 font-semibold">{{ __('Custom seller commission') }}: {{ $business->commission_rate }}%</span>
+                @else
+                    <span class="text-gray-500 dark:text-gray-400">{{ __('Default platform commission') }}</span>
+                @endif
+            </p>
+            <form method="POST" action="{{ route('admin.businesses.commission.update', $business) }}" class="flex items-end gap-3">
+                @csrf
+                <div>
+                    <x-input-label for="commission_rate" :value="__('Custom Rate % (blank = use default)')" />
+                    <x-text-input id="commission_rate" name="commission_rate" type="number" step="0.01" min="0" max="100" class="block mt-1 w-40" :value="$business->commission_rate" />
+                </div>
+                <x-primary-button>{{ __('Save') }}</x-primary-button>
+            </form>
         </div>
 
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">

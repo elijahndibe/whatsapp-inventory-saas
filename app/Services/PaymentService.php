@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Business;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Scopes\BusinessScope;
@@ -14,6 +15,7 @@ class PaymentService
     public function __construct(
         private readonly PaystackService $paystack,
         private readonly OrderService $orders,
+        private readonly CommissionService $commission,
     ) {}
 
     /**
@@ -21,10 +23,17 @@ class PaymentService
      * hosted checkout URL to redirect the customer to. Each attempt gets
      * its own reference — an order can have several Payment rows if a
      * first attempt fails or is abandoned and the customer retries.
+     *
+     * Commission is calculated server-side here (never from anything the
+     * client sends) and snapshotted onto the Payment row immediately —
+     * this is the permanent record later reports must read, regardless of
+     * what the commission configuration becomes afterwards.
      */
     public function initializeForOrder(Order $order, string $email): array
     {
         $reference = $this->generateReference();
+        $grossAmount = $order->totalInMinorUnits();
+        $split = $this->commission->calculate($order->business, $grossAmount);
 
         $payment = Payment::create([
             'business_id' => $order->business_id,
@@ -34,11 +43,15 @@ class PaymentService
             'amount' => $order->total, // major units in, minor units stored (Attribute mutator)
             'currency' => $order->currency,
             'status' => 'pending',
+            'commission_rate' => $split['rate'],
+            'commission_amount' => $split['commission_amount'] / 100,
+            'seller_amount' => $split['seller_amount'] / 100,
+            'settlement_status' => 'pending',
         ]);
 
         $result = $this->paystack->initializeTransaction([
             'email' => $email,
-            'amount' => $order->totalInMinorUnits(),
+            'amount' => $grossAmount,
             'currency' => $order->currency,
             'reference' => $reference,
             'callback_url' => route('storefront.payments.callback', $order->business),
@@ -47,9 +60,31 @@ class PaymentService
                 'order_id' => $order->id,
                 'order_number' => $order->order_number,
             ],
+            ...$this->splitParams($order->business, $split['commission_amount']),
         ]);
 
         return ['payment' => $payment, 'authorization_url' => $result['authorization_url']];
+    }
+
+    /**
+     * When the seller has a connected Paystack subaccount, Paystack
+     * splits the payment automatically at settlement: the platform
+     * receives transaction_charge, the seller's subaccount bears the
+     * rest. Without a connected subaccount, the full amount lands in the
+     * platform's own account (today's behaviour) and settlement_status
+     * stays platform_held for manual reconciliation later.
+     */
+    private function splitParams(Business $business, int $commissionAmountMinorUnits): array
+    {
+        if (! $business->hasPaystackSubaccount()) {
+            return [];
+        }
+
+        return [
+            'subaccount' => $business->paystack_subaccount_code,
+            'transaction_charge' => $commissionAmountMinorUnits,
+            'bearer' => 'account',
+        ];
     }
 
     /**
@@ -84,6 +119,16 @@ class PaymentService
             $payment->status = ($isSuccessful && $amountMatches) ? 'success' : 'failed';
             $payment->gateway_response = json_encode($verified);
             $payment->paid_at = $payment->status === 'success' ? now() : null;
+
+            if ($payment->status === 'success') {
+                $payment->payment_fee = ((int) ($verified['fees'] ?? 0)) / 100;
+
+                $business = Business::withoutGlobalScope(BusinessScope::class)->find($payment->business_id);
+                $payment->settlement_status = $business?->hasPaystackSubaccount() ? 'settled' : 'platform_held';
+            } else {
+                $payment->settlement_status = 'failed';
+            }
+
             $payment->save();
 
             if ($payment->status === 'success') {

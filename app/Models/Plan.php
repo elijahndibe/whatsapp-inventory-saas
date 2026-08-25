@@ -9,27 +9,13 @@ use Illuminate\Support\Str;
 
 class Plan extends Model
 {
-    public const FEATURES = [
-        'whatsapp_ordering' => 'WhatsApp ordering (click-to-chat)',
-        'basic_inventory' => 'Basic inventory management',
-        'paystack' => 'Online payments (Paystack)',
-        'invoices' => 'Invoices & receipts',
-        'whatsapp_cloud_api' => 'WhatsApp Cloud API (automated messages)',
-        'advanced_analytics' => 'Advanced analytics',
-        'priority_support' => 'Priority support',
-    ];
-
     protected $fillable = [
         'name',
         'slug',
+        'is_default',
         'price',
         'currency',
         'duration_days',
-        'max_products',
-        'max_orders_per_month',
-        'max_staff',
-        'max_locations',
-        'features',
         'is_active',
         'sort_order',
     ];
@@ -37,7 +23,7 @@ class Plan extends Model
     protected function casts(): array
     {
         return [
-            'features' => 'array',
+            'is_default' => 'boolean',
             'is_active' => 'boolean',
         ];
     }
@@ -64,9 +50,9 @@ class Plan extends Model
         return $this->hasMany(Subscription::class);
     }
 
-    public function hasFeature(string $feature): bool
+    public function planFeatures(): HasMany
     {
-        return (bool) ($this->features[$feature] ?? false);
+        return $this->hasMany(PlanFeature::class);
     }
 
     public function isFree(): bool

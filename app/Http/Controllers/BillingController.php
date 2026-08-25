@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Exceptions\PaystackException;
 use App\Models\Order;
 use App\Models\Plan;
+use App\Models\PlanFeature;
 use App\Models\Product;
 use App\Services\PaystackService;
+use App\Services\PlatformSettingsService;
 use App\Services\SubscriptionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,6 +20,7 @@ class BillingController extends Controller
     public function __construct(
         private readonly SubscriptionService $subscriptions,
         private readonly PaystackService $paystack,
+        private readonly PlatformSettingsService $settings,
     ) {}
 
     public function index(Request $request): View
@@ -28,6 +31,7 @@ class BillingController extends Controller
         $plans = Plan::where('is_active', true)->orderBy('sort_order')->get();
         $currentPlan = $this->subscriptions->currentPlan($business);
         $subscription = $business->currentSubscription();
+        $subscriptionSystemEnabled = $this->settings->subscriptionSystemEnabled();
 
         $usage = [
             'products' => Product::forBusiness($business->id)->count(),
@@ -37,12 +41,21 @@ class BillingController extends Controller
                 ->count(),
         ];
 
-        return view('billing.index', compact('plans', 'currentPlan', 'subscription', 'usage', 'business'));
+        $featuresByPlan = PlanFeature::with('feature')
+            ->whereIn('plan_id', $plans->pluck('id'))
+            ->get()
+            ->groupBy('plan_id');
+
+        return view('billing.index', compact('plans', 'currentPlan', 'subscription', 'usage', 'business', 'subscriptionSystemEnabled', 'featuresByPlan'));
     }
 
     public function subscribe(Request $request, Plan $plan): RedirectResponse
     {
         $this->authorize('manage settings');
+
+        if (! $this->settings->subscriptionSystemEnabled()) {
+            return redirect()->route('billing.index')->with('error', 'Subscriptions are not currently available — every plan feature listed here is already included for free.');
+        }
 
         $business = $request->user()->business;
 

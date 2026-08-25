@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Services\SubscriptionService;
+use App\Services\FeatureService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class ReportController extends Controller
 {
-    public function __construct(private readonly SubscriptionService $subscriptions) {}
+    public function __construct(private readonly FeatureService $features) {}
 
     public function index(Request $request): View
     {
@@ -59,7 +59,7 @@ class ReportController extends Controller
             ->get()
             ->map(fn ($row) => ['name' => $row->product_name, 'units' => (int) $row->units_sold, 'revenue' => $row->revenue / 100]);
 
-        $canUseAdvanced = $this->subscriptions->hasFeature($business, 'advanced_analytics');
+        $canUseAdvanced = $this->features->enabled($business, 'advanced_analytics');
 
         $salesByCategory = collect();
         $paymentMethods = collect();

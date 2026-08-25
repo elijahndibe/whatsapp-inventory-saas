@@ -3,12 +3,16 @@
 use App\Http\Controllers\Admin\BusinessController as AdminBusinessController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FailedJobController as AdminFailedJobController;
+use App\Http\Controllers\Admin\FeatureController as AdminFeatureController;
 use App\Http\Controllers\Admin\LogController as AdminLogController;
+use App\Http\Controllers\Admin\MonetizationController as AdminMonetizationController;
 use App\Http\Controllers\Admin\PlanController as AdminPlanController;
 use App\Http\Controllers\Admin\SubscriptionController as AdminSubscriptionController;
+use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\BusinessSettingsController;
+use App\Http\Controllers\PaystackConnectController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\NotificationController;
@@ -79,6 +83,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('settings', [BusinessSettingsController::class, 'edit'])->name('settings.edit');
     Route::put('settings', [BusinessSettingsController::class, 'update'])->name('settings.update');
+    Route::post('settings/paystack/connect', [PaystackConnectController::class, 'connect'])->name('settings.paystack.connect');
 
     Route::get('billing', [BillingController::class, 'index'])->name('billing.index');
     Route::post('billing/subscribe/{plan}', [BillingController::class, 'subscribe'])->name('billing.subscribe');
@@ -112,8 +117,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'super_admin'])->gro
     Route::get('businesses/{business}', [AdminBusinessController::class, 'show'])->name('businesses.show');
     Route::post('businesses/{business}/suspend', [AdminBusinessController::class, 'suspend'])->name('businesses.suspend');
     Route::post('businesses/{business}/activate', [AdminBusinessController::class, 'activate'])->name('businesses.activate');
+    Route::post('businesses/{business}/commission', [AdminBusinessController::class, 'updateCommission'])->name('businesses.commission.update');
 
     Route::resource('plans', AdminPlanController::class)->except(['show', 'destroy']);
+
+    Route::get('features', [AdminFeatureController::class, 'index'])->name('features.index');
+    Route::post('features', [AdminFeatureController::class, 'store'])->name('features.store');
+    Route::put('features', [AdminFeatureController::class, 'update'])->name('features.update');
+
+    Route::get('monetization', [AdminMonetizationController::class, 'index'])->name('monetization.index');
+    Route::put('monetization/commission', [AdminMonetizationController::class, 'updateCommission'])->name('monetization.commission.update');
+    Route::put('monetization/subscription-system', [AdminMonetizationController::class, 'updateSubscriptionSystem'])->name('monetization.subscription-system.update');
+
+    Route::get('transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');
+    Route::get('transactions/export', [AdminTransactionController::class, 'export'])->name('transactions.export');
 
     Route::get('subscriptions', [AdminSubscriptionController::class, 'index'])->name('subscriptions.index');
 

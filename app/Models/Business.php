@@ -30,6 +30,11 @@ class Business extends Model
         'whatsapp_business_account_id',
         'whatsapp_access_token',
         'allow_overselling',
+        'commission_rate',
+        'paystack_subaccount_code',
+        'paystack_bank_code',
+        'paystack_account_number',
+        'paystack_account_name',
     ];
 
     protected function casts(): array
@@ -42,6 +47,7 @@ class Business extends Model
             // actual credentials are encrypted at rest.
             'whatsapp_business_account_id' => 'encrypted',
             'whatsapp_access_token' => 'encrypted',
+            'commission_rate' => 'float',
         ];
     }
 
@@ -160,6 +166,20 @@ class Business extends Model
     public function hasWhatsAppCloudApi(): bool
     {
         return filled($this->whatsapp_phone_number_id) && filled($this->whatsapp_access_token);
+    }
+
+    public function hasPaystackSubaccount(): bool
+    {
+        return filled($this->paystack_subaccount_code);
+    }
+
+    /**
+     * "Default platform commission" vs "Custom seller commission" — surfaced
+     * in the admin UI so it's always clear which one currently applies.
+     */
+    public function hasCustomCommissionRate(): bool
+    {
+        return $this->commission_rate !== null;
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Order;
-use App\Services\SubscriptionService;
+use App\Services\FeatureService;
 use App\Services\WhatsAppCloudApiService;
 use App\Services\WhatsAppMessageFormatter;
 use Illuminate\Bus\Queueable;
@@ -34,7 +34,7 @@ class SendWhatsAppOrderMessage implements ShouldQueue
         public readonly string $event,
     ) {}
 
-    public function handle(WhatsAppCloudApiService $whatsapp, WhatsAppMessageFormatter $formatter, SubscriptionService $subscriptions): void
+    public function handle(WhatsAppCloudApiService $whatsapp, WhatsAppMessageFormatter $formatter, FeatureService $features): void
     {
         $order = Order::withoutGlobalScopes()->with(['business', 'customer'])->find($this->orderId);
 
@@ -42,7 +42,7 @@ class SendWhatsAppOrderMessage implements ShouldQueue
             return;
         }
 
-        if (! $subscriptions->hasFeature($order->business, 'whatsapp_cloud_api')) {
+        if (! $features->enabled($order->business, 'whatsapp_cloud_api')) {
             return;
         }
 

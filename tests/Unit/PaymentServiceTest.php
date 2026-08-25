@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Services\PaymentService;
+use App\Services\PlatformSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -65,6 +66,71 @@ class PaymentServiceTest extends TestCase
         $this->assertEquals(500, $result['payment']->amount);
 
         Http::assertSent(fn ($request) => ($request['amount'] ?? null) === 50000); // minor units
+    }
+
+    public function test_commission_is_calculated_server_side_and_snapshotted_on_the_payment(): void
+    {
+        Http::fake(['api.paystack.co/*' => Http::response([
+            'status' => true,
+            'data' => ['authorization_url' => 'https://checkout.paystack.com/xyz', 'access_code' => 'code', 'reference' => 'ignored'],
+        ])]);
+
+        app(PlatformSettingsService::class)->set('commission.rate', 1.5);
+
+        $result = $this->service->initializeForOrder($this->order, 'buyer@example.com');
+
+        $payment = $result['payment']->fresh();
+        $this->assertSame(1.5, $payment->commission_rate);
+        // Order total is 500 (₦500 = 50000 kobo); 1.5% = 750 kobo.
+        $this->assertSame(750, $payment->commissionAmountInMinorUnits());
+        $this->assertSame(49250, $payment->sellerAmountInMinorUnits());
+    }
+
+    public function test_a_payments_commission_snapshot_is_unaffected_by_a_later_platform_rate_change(): void
+    {
+        Http::fake(['api.paystack.co/*' => Http::response([
+            'status' => true,
+            'data' => ['authorization_url' => 'https://checkout.paystack.com/xyz', 'access_code' => 'code', 'reference' => 'ignored'],
+        ])]);
+
+        $settings = app(PlatformSettingsService::class);
+        $settings->set('commission.rate', 1.5);
+
+        $result = $this->service->initializeForOrder($this->order, 'buyer@example.com');
+        $payment = $result['payment'];
+
+        $settings->set('commission.rate', 1.0); // simulates the rate changing months later
+
+        $this->assertSame(1.5, $payment->fresh()->commission_rate, 'A stored payment must keep the rate that applied when it was created.');
+    }
+
+    public function test_split_params_are_sent_when_the_business_has_a_connected_paystack_subaccount(): void
+    {
+        Http::fake(['api.paystack.co/*' => Http::response([
+            'status' => true,
+            'data' => ['authorization_url' => 'https://checkout.paystack.com/xyz', 'access_code' => 'code', 'reference' => 'ignored'],
+        ])]);
+
+        $this->business->update(['paystack_subaccount_code' => 'ACCT_test123']);
+        app(PlatformSettingsService::class)->set('commission.rate', 1.5);
+
+        $this->service->initializeForOrder($this->order->fresh(), 'buyer@example.com');
+
+        Http::assertSent(fn ($request) => ($request['subaccount'] ?? null) === 'ACCT_test123'
+            && ($request['bearer'] ?? null) === 'account'
+            && array_key_exists('transaction_charge', $request->data()));
+    }
+
+    public function test_no_split_params_are_sent_without_a_connected_subaccount(): void
+    {
+        Http::fake(['api.paystack.co/*' => Http::response([
+            'status' => true,
+            'data' => ['authorization_url' => 'https://checkout.paystack.com/xyz', 'access_code' => 'code', 'reference' => 'ignored'],
+        ])]);
+
+        $this->service->initializeForOrder($this->order, 'buyer@example.com');
+
+        Http::assertSent(fn ($request) => ! array_key_exists('subaccount', $request->data()));
     }
 
     public function test_handling_a_successful_verified_transaction_marks_payment_and_order_paid_and_deducts_stock(): void

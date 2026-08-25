@@ -3,23 +3,47 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Models\Feature;
 use App\Models\Plan;
+use App\Models\PlanFeature;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\PlatformSettingsService;
 use App\Services\SubscriptionService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Plan-tier limits only take effect once the platform-wide Subscription
+ * System setting is on — see FeatureService. Every test here turns it on
+ * explicitly, since that's what's actually being exercised.
+ */
 class PlanLimitEnforcementTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        app(PlatformSettingsService::class)->set('subscription.enabled', true);
+    }
+
+    private function planWithLimit(string $featureKey, ?int $value): Plan
+    {
+        $plan = Plan::create(['name' => 'Tiny', 'price' => 0]);
+        $feature = Feature::firstOrCreate(['key' => $featureKey], ['name' => $featureKey, 'type' => Feature::TYPE_LIMIT, 'is_enabled' => true]);
+        PlanFeature::create(['plan_id' => $plan->id, 'feature_id' => $feature->id, 'enabled' => true, 'value' => $value]);
+
+        return $plan;
+    }
 
     public function test_a_business_at_its_product_limit_cannot_create_another(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);
 
-        $plan = Plan::create(['name' => 'Tiny', 'price' => 0, 'max_products' => 1]);
+        $plan = $this->planWithLimit('products', 1);
         $business = Business::factory()->create();
         app(SubscriptionService::class)->subscribeToPlan($business, $plan);
         Product::factory()->create(['business_id' => $business->id]);
@@ -41,7 +65,7 @@ class PlanLimitEnforcementTest extends TestCase
 
     public function test_a_storefront_order_is_rejected_once_the_monthly_limit_is_reached(): void
     {
-        $plan = Plan::create(['name' => 'Tiny', 'price' => 0, 'max_orders_per_month' => 1]);
+        $plan = $this->planWithLimit('orders_per_month', 1);
         $business = Business::factory()->create();
         app(SubscriptionService::class)->subscribeToPlan($business, $plan);
         $customer = \App\Models\Customer::factory()->create(['business_id' => $business->id]);
@@ -63,7 +87,10 @@ class PlanLimitEnforcementTest extends TestCase
 
     public function test_paystack_checkout_is_rejected_when_the_plan_lacks_the_feature(): void
     {
-        $plan = Plan::create(['name' => 'NoPay', 'price' => 0, 'features' => ['paystack' => false]]);
+        $plan = Plan::create(['name' => 'NoPay', 'price' => 0]);
+        $feature = Feature::firstOrCreate(['key' => 'paystack'], ['name' => 'Paystack', 'type' => Feature::TYPE_BOOLEAN, 'is_enabled' => true]);
+        PlanFeature::create(['plan_id' => $plan->id, 'feature_id' => $feature->id, 'enabled' => false]);
+
         $business = Business::factory()->create();
         app(SubscriptionService::class)->subscribeToPlan($business, $plan);
         $product = Product::factory()->create(['business_id' => $business->id, 'stock_quantity' => 10]);
@@ -81,7 +108,7 @@ class PlanLimitEnforcementTest extends TestCase
     {
         $this->seed(RolesAndPermissionsSeeder::class);
 
-        $plan = Plan::create(['name' => 'Roomy', 'price' => 0, 'max_products' => 10]);
+        $plan = $this->planWithLimit('products', 10);
         $business = Business::factory()->create();
         app(SubscriptionService::class)->subscribeToPlan($business, $plan);
 

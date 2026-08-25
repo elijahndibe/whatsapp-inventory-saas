@@ -4,10 +4,13 @@ namespace Tests\Feature;
 
 use App\Models\Business;
 use App\Models\Customer;
+use App\Models\Feature;
 use App\Models\Order;
 use App\Models\Plan;
+use App\Models\PlanFeature;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\PlatformSettingsService;
 use App\Services\SubscriptionService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -65,9 +68,19 @@ class ReportsTest extends TestCase
         $response->assertSeeTextInOrder(['Popular Item', 'Rare Item']);
     }
 
+    private function planWithAdvancedAnalytics(bool $enabled): Plan
+    {
+        $plan = Plan::create(['name' => 'Test Plan', 'price' => 0]);
+        $feature = Feature::firstOrCreate(['key' => 'advanced_analytics'], ['name' => 'Advanced analytics', 'type' => Feature::TYPE_BOOLEAN, 'is_enabled' => true]);
+        PlanFeature::create(['plan_id' => $plan->id, 'feature_id' => $feature->id, 'enabled' => $enabled]);
+
+        return $plan;
+    }
+
     public function test_advanced_analytics_are_hidden_without_the_feature(): void
     {
-        $plan = Plan::create(['name' => 'Starter', 'price' => 0, 'features' => ['advanced_analytics' => false]]);
+        app(PlatformSettingsService::class)->set('subscription.enabled', true);
+        $plan = $this->planWithAdvancedAnalytics(false);
         app(SubscriptionService::class)->subscribeToPlan($this->business, $plan);
 
         $response = $this->actingAs($this->owner)->get(route('reports.index'));
@@ -78,7 +91,8 @@ class ReportsTest extends TestCase
 
     public function test_advanced_analytics_are_shown_with_the_feature(): void
     {
-        $plan = Plan::create(['name' => 'Business', 'price' => 0, 'features' => ['advanced_analytics' => true]]);
+        app(PlatformSettingsService::class)->set('subscription.enabled', true);
+        $plan = $this->planWithAdvancedAnalytics(true);
         app(SubscriptionService::class)->subscribeToPlan($this->business, $plan);
         $product = Product::factory()->create(['business_id' => $this->business->id, 'price' => 100]);
         $this->makePaidOrder($product, 1);

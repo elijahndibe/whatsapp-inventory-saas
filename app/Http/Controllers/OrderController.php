@@ -6,8 +6,8 @@ use App\Exceptions\InsufficientStockException;
 use App\Http\Requests\Order\UpdateOrderStatusRequest;
 use App\Http\Requests\Order\UpdatePaymentStatusRequest;
 use App\Models\Order;
+use App\Services\FeatureService;
 use App\Services\OrderService;
-use App\Services\SubscriptionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -16,7 +16,7 @@ class OrderController extends Controller
 {
     public function __construct(
         private readonly OrderService $orders,
-        private readonly SubscriptionService $subscriptions,
+        private readonly FeatureService $features,
     ) {}
 
     public function index(Request $request): View
@@ -45,7 +45,7 @@ class OrderController extends Controller
         $this->authorize('view', $order);
 
         $order->load(['items', 'customer', 'business']);
-        $canUseInvoices = $this->subscriptions->hasFeature($order->business, 'invoices');
+        $canUseInvoices = $this->features->enabled($order->business, 'invoices');
 
         return view('orders.show', compact('order', 'canUseInvoices'));
     }

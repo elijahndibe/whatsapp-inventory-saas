@@ -7,8 +7,14 @@ use App\Http\Requests\Admin\StorePlanRequest;
 use App\Http\Requests\Admin\UpdatePlanRequest;
 use App\Models\Plan;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
+/**
+ * Manages plan identity (name/price/duration) only. Feature access and
+ * numeric limits per plan are managed separately on Admin > Features,
+ * which edits the plan_features matrix directly — see FeatureController.
+ */
 class PlanController extends Controller
 {
     public function index(): View
@@ -25,7 +31,8 @@ class PlanController extends Controller
 
     public function store(StorePlanRequest $request): RedirectResponse
     {
-        Plan::create($this->normalizeFeatures($request->validated()));
+        $plan = Plan::create($request->validated());
+        $this->ensureSingleDefault($plan);
 
         return redirect()->route('admin.plans.index')->with('status', 'Plan created.');
     }
@@ -37,23 +44,16 @@ class PlanController extends Controller
 
     public function update(UpdatePlanRequest $request, Plan $plan): RedirectResponse
     {
-        $plan->update($this->normalizeFeatures($request->validated()));
+        $plan->update($request->validated());
+        $this->ensureSingleDefault($plan);
 
         return redirect()->route('admin.plans.index')->with('status', 'Plan updated.');
     }
 
-    /**
-     * Unchecked checkboxes simply aren't present in the request, so make
-     * every known feature explicit (true or false) rather than leaving
-     * previously-enabled features stuck on because their key was missing.
-     */
-    private function normalizeFeatures(array $data): array
+    private function ensureSingleDefault(Plan $plan): void
     {
-        $submitted = $data['features'] ?? [];
-        $data['features'] = collect(array_keys(Plan::FEATURES))
-            ->mapWithKeys(fn ($key) => [$key => (bool) ($submitted[$key] ?? false)])
-            ->all();
-
-        return $data;
+        if ($plan->is_default) {
+            DB::table('plans')->where('id', '!=', $plan->id)->update(['is_default' => false]);
+        }
     }
 }

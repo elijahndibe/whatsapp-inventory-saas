@@ -2,77 +2,78 @@
 
 namespace Database\Seeders;
 
+use App\Models\Feature;
 use App\Models\Plan;
+use App\Models\PlanFeature;
 use Illuminate\Database\Seeder;
 
 class PlansSeeder extends Seeder
 {
     public function run(): void
     {
-        Plan::updateOrCreate(['slug' => 'free'], [
+        $free = Plan::updateOrCreate(['slug' => 'free'], [
             'name' => 'Free',
+            'is_default' => true,
             'price' => 0,
             'currency' => 'NGN',
             'duration_days' => 36500, // effectively indefinite
-            'max_products' => 50,
-            'max_orders_per_month' => 20,
-            'max_staff' => 1,
-            'max_locations' => 1,
-            'features' => [
-                'whatsapp_ordering' => true,
-                'basic_inventory' => true,
-                'paystack' => false,
-                'invoices' => false,
-                'whatsapp_cloud_api' => false,
-                'advanced_analytics' => false,
-                'priority_support' => false,
-            ],
             'is_active' => true,
             'sort_order' => 1,
         ]);
 
-        Plan::updateOrCreate(['slug' => 'starter'], [
-            'name' => 'Starter',
+        $pro = Plan::updateOrCreate(['slug' => 'pro'], [
+            'name' => 'Pro',
+            'is_default' => false,
             'price' => 5000,
             'currency' => 'NGN',
             'duration_days' => 30,
-            'max_products' => 500,
-            'max_orders_per_month' => null,
-            'max_staff' => 3,
-            'max_locations' => 1,
-            'features' => [
-                'whatsapp_ordering' => true,
-                'basic_inventory' => true,
-                'paystack' => true,
-                'invoices' => true,
-                'whatsapp_cloud_api' => false,
-                'advanced_analytics' => false,
-                'priority_support' => false,
-            ],
             'is_active' => true,
             'sort_order' => 2,
         ]);
 
-        Plan::updateOrCreate(['slug' => 'business'], [
+        $business = Plan::updateOrCreate(['slug' => 'business'], [
             'name' => 'Business',
+            'is_default' => false,
             'price' => 15000,
             'currency' => 'NGN',
             'duration_days' => 30,
-            'max_products' => null,
-            'max_orders_per_month' => null,
-            'max_staff' => null,
-            'max_locations' => null,
-            'features' => [
-                'whatsapp_ordering' => true,
-                'basic_inventory' => true,
-                'paystack' => true,
-                'invoices' => true,
-                'whatsapp_cloud_api' => true,
-                'advanced_analytics' => true,
-                'priority_support' => true,
-            ],
             'is_active' => true,
             'sort_order' => 3,
         ]);
+
+        // Every seller — Free included — can accept Paystack payments: the
+        // commission model earns nothing if Free-tier sellers can't take
+        // online payments. Only genuinely advanced functionality is gated.
+        $matrix = [
+            'products' => ['free' => 50, 'pro' => 500, 'business' => null],
+            'orders_per_month' => ['free' => null, 'pro' => null, 'business' => null],
+            'staff' => ['free' => 0, 'pro' => 5, 'business' => 20],
+            'locations' => ['free' => 1, 'pro' => 3, 'business' => null],
+            'paystack' => ['free' => true, 'pro' => true, 'business' => true],
+            'invoices' => ['free' => true, 'pro' => true, 'business' => true],
+            'advanced_analytics' => ['free' => false, 'pro' => true, 'business' => true],
+            'advanced_reports' => ['free' => false, 'pro' => true, 'business' => true],
+            'whatsapp_cloud_api' => ['free' => false, 'pro' => false, 'business' => true],
+            'priority_support' => ['free' => false, 'pro' => false, 'business' => true],
+        ];
+
+        $plans = ['free' => $free, 'pro' => $pro, 'business' => $business];
+
+        foreach ($matrix as $featureKey => $byPlan) {
+            $feature = Feature::where('key', $featureKey)->first();
+
+            if (! $feature) {
+                continue; // FeaturesSeeder hasn't run yet in a non-standard call order
+            }
+
+            foreach ($byPlan as $slug => $value) {
+                PlanFeature::updateOrCreate(
+                    ['plan_id' => $plans[$slug]->id, 'feature_id' => $feature->id],
+                    $feature->type === Feature::TYPE_LIMIT
+                        ? ['enabled' => true, 'value' => $value]
+                        : ['enabled' => (bool) $value, 'value' => null],
+                );
+            }
+        }
     }
 }

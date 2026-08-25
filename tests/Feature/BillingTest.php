@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Business;
 use App\Models\Plan;
 use App\Models\User;
+use App\Services\PlatformSettingsService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -26,6 +27,10 @@ class BillingTest extends TestCase
         $this->business = Business::factory()->create();
         $this->owner = User::factory()->create(['business_id' => $this->business->id]);
         $this->owner->assignRole('Owner');
+
+        // Subscribing to a plan is only actionable once the platform-wide
+        // Subscription System is switched on (see BillingController).
+        app(PlatformSettingsService::class)->set('subscription.enabled', true);
     }
 
     public function test_owner_can_view_the_billing_page(): void

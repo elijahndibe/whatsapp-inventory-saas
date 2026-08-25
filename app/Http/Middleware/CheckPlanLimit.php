@@ -3,7 +3,8 @@
 namespace App\Http\Middleware;
 
 use App\Models\Business;
-use App\Services\SubscriptionService;
+use App\Models\Product;
+use App\Services\FeatureService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class CheckPlanLimit
 {
-    public function __construct(private readonly SubscriptionService $subscriptions) {}
+    public function __construct(private readonly FeatureService $features) {}
 
     public function handle(Request $request, Closure $next, string $limit): Response
     {
@@ -29,8 +30,11 @@ class CheckPlanLimit
         }
 
         $allowed = match ($limit) {
-            'products' => $this->subscriptions->canAddProduct($business),
-            'orders' => $this->subscriptions->canPlaceOrder($business),
+            'products' => $this->features->withinLimit($business, 'products', Product::forBusiness($business->id)->count()),
+            'orders' => $this->features->withinLimit($business, 'orders_per_month', \App\Models\Order::withoutGlobalScopes()
+                ->where('business_id', $business->id)
+                ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
+                ->count()),
             default => true,
         };
 

@@ -26,6 +26,14 @@ class DashboardController extends Controller
         $orderRevenue = Payment::withoutGlobalScopes()->where('status', 'success')->sum('amount') / 100;
         $subscriptionRevenue = Subscription::whereNotNull('paid_at')->sum('amount_paid') / 100;
 
+        $successfulPayments = Payment::withoutGlobalScopes()->where('status', 'success');
+        $revenue = [
+            'gmv' => (clone $successfulPayments)->sum('amount') / 100,
+            'commission' => (clone $successfulPayments)->sum('commission_amount') / 100,
+            'fees' => (clone $successfulPayments)->sum('payment_fee') / 100,
+            'seller' => (clone $successfulPayments)->sum('seller_amount') / 100,
+        ];
+
         $planCounts = Subscription::where('status', 'active')
             ->with('plan')
             ->get()
@@ -35,6 +43,6 @@ class DashboardController extends Controller
         $recentBusinesses = Business::latest('id')->limit(5)->get();
         $recentOrders = Order::withoutGlobalScopes()->with(['business', 'customer'])->latest('id')->limit(8)->get();
 
-        return view('admin.dashboard', compact('stats', 'orderRevenue', 'subscriptionRevenue', 'planCounts', 'recentBusinesses', 'recentOrders'));
+        return view('admin.dashboard', compact('stats', 'orderRevenue', 'subscriptionRevenue', 'revenue', 'planCounts', 'recentBusinesses', 'recentOrders'));
     }
 }

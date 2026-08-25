@@ -8,9 +8,9 @@ use App\Http\Requests\Storefront\CheckoutRequest;
 use App\Models\Business;
 use App\Models\Order;
 use App\Services\CartService;
+use App\Services\FeatureService;
 use App\Services\OrderService;
 use App\Services\PaymentService;
-use App\Services\SubscriptionService;
 use App\Services\WhatsAppMessageFormatter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -21,7 +21,7 @@ class CheckoutController extends Controller
         private readonly CartService $cart,
         private readonly OrderService $orders,
         private readonly PaymentService $payments,
-        private readonly SubscriptionService $subscriptions,
+        private readonly FeatureService $features,
     ) {}
 
     public function create(Business $business): View|RedirectResponse
@@ -39,7 +39,7 @@ class CheckoutController extends Controller
             'business' => $business,
             'items' => $items,
             'subtotal' => $items->sum('subtotal'),
-            'canPayOnline' => $this->subscriptions->hasFeature($business, 'paystack'),
+            'canPayOnline' => $this->features->enabled($business, 'paystack'),
         ]);
     }
 
@@ -60,7 +60,7 @@ class CheckoutController extends Controller
             }
         }
 
-        if ($request->validated('payment_method') === 'paystack' && ! $this->subscriptions->hasFeature($business, 'paystack')) {
+        if ($request->validated('payment_method') === 'paystack' && ! $this->features->enabled($business, 'paystack')) {
             return back()->withInput()->with('error', 'Online payment is not available for this store right now. Please order via WhatsApp instead.');
         }
 

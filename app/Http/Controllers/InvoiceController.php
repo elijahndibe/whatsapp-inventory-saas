@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Services\SubscriptionService;
+use App\Services\FeatureService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Symfony\Component\HttpFoundation\Response;
 
 class InvoiceController extends Controller
 {
-    public function __construct(private readonly SubscriptionService $subscriptions) {}
+    public function __construct(private readonly FeatureService $features) {}
 
     public function invoice(Order $order): Response
     {
@@ -32,9 +32,9 @@ class InvoiceController extends Controller
     private function authorizeInvoiceFeature(Order $order): void
     {
         abort_unless(
-            $this->subscriptions->hasFeature($order->business, 'invoices'),
+            $this->features->enabled($order->business, 'invoices'),
             403,
-            'Invoices and receipts require the Starter plan or higher.'
+            'Invoices and receipts require the Pro plan or higher.'
         );
     }
 

@@ -18,11 +18,7 @@ class StorePlanRequest extends FormRequest
             'price' => ['required', 'numeric', 'min:0'],
             'currency' => ['required', 'string', 'size:3'],
             'duration_days' => ['required', 'integer', 'min:1'],
-            'max_products' => ['nullable', 'integer', 'min:0'],
-            'max_orders_per_month' => ['nullable', 'integer', 'min:0'],
-            'max_staff' => ['nullable', 'integer', 'min:0'],
-            'max_locations' => ['nullable', 'integer', 'min:0'],
-            'features' => ['nullable', 'array'],
+            'is_default' => ['boolean'],
             'is_active' => ['boolean'],
             'sort_order' => ['integer'],
         ];

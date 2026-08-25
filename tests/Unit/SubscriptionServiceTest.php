@@ -4,12 +4,15 @@ namespace Tests\Unit;
 
 use App\Models\Business;
 use App\Models\Plan;
-use App\Models\Product;
 use App\Models\Subscription;
 use App\Services\SubscriptionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Subscription *lifecycle* only — feature/limit resolution is covered by
+ * FeatureServiceTest (see FeatureService, which now owns that logic).
+ */
 class SubscriptionServiceTest extends TestCase
 {
     use RefreshDatabase;
@@ -23,49 +26,11 @@ class SubscriptionServiceTest extends TestCase
         $this->service = app(SubscriptionService::class);
     }
 
-    public function test_a_business_with_no_subscription_is_unrestricted(): void
+    public function test_a_business_with_no_subscription_has_no_current_plan(): void
     {
         $business = Business::factory()->create();
 
         $this->assertNull($this->service->currentPlan($business));
-        $this->assertTrue($this->service->hasFeature($business, 'paystack'));
-        $this->assertTrue($this->service->canAddProduct($business));
-        $this->assertTrue($this->service->canPlaceOrder($business));
-    }
-
-    public function test_product_limit_is_enforced_once_the_plan_cap_is_reached(): void
-    {
-        $plan = Plan::create(['name' => 'Tiny', 'price' => 0, 'max_products' => 2]);
-        $business = Business::factory()->create();
-        $this->service->subscribeToPlan($business, $plan);
-
-        Product::factory()->count(2)->create(['business_id' => $business->id]);
-
-        $this->assertFalse($this->service->canAddProduct($business));
-    }
-
-    public function test_order_limit_is_enforced_only_within_the_current_calendar_month(): void
-    {
-        $plan = Plan::create(['name' => 'Tiny', 'price' => 0, 'max_orders_per_month' => 1]);
-        $business = Business::factory()->create();
-        $this->service->subscribeToPlan($business, $plan);
-        $customer = \App\Models\Customer::factory()->create(['business_id' => $business->id]);
-
-        \App\Models\Order::create([
-            'business_id' => $business->id, 'customer_id' => $customer->id,
-            'subtotal' => 100, 'total' => 100, 'currency' => 'NGN',
-        ]);
-
-        $this->assertFalse($this->service->canPlaceOrder($business));
-    }
-
-    public function test_a_feature_flag_is_read_from_the_active_plan(): void
-    {
-        $plan = Plan::create(['name' => 'NoPaystack', 'price' => 0, 'features' => ['paystack' => false]]);
-        $business = Business::factory()->create();
-        $this->service->subscribeToPlan($business, $plan);
-
-        $this->assertFalse($this->service->hasFeature($business, 'paystack'));
     }
 
     public function test_subscribing_to_a_new_plan_cancels_the_previous_active_subscription(): void

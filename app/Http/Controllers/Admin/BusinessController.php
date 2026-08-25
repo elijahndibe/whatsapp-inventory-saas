@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Business;
+use App\Services\AuditLogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class BusinessController extends Controller
 {
+    public function __construct(private readonly AuditLogService $audit) {}
+
     public function index(Request $request): View
     {
         $businesses = Business::withCount('users')
@@ -47,5 +50,22 @@ class BusinessController extends Controller
         $business->update(['status' => 'active']);
 
         return back()->with('status', "{$business->name} has been activated.");
+    }
+
+    public function updateCommission(Request $request, Business $business): RedirectResponse
+    {
+        $data = $request->validate([
+            'commission_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+        ]);
+
+        $old = $business->commission_rate;
+        $new = $data['commission_rate'] ?? null;
+
+        $business->update(['commission_rate' => $new]);
+        $this->audit->record($request->user(), "business.commission_rate.changed:{$business->id}", $old, $new);
+
+        return back()->with('status', $new === null
+            ? "{$business->name} now uses the default platform commission."
+            : "{$business->name} now has a custom commission rate of {$new}%.");
     }
 }

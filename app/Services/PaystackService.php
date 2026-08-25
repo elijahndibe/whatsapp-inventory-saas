@@ -54,6 +54,49 @@ class PaystackService
         return $response->json('data');
     }
 
+    /**
+     * Creates a Paystack subaccount for a seller so their share of each
+     * transaction can be split automatically at settlement — see
+     * PaymentService::initializeForOrder() for how the resulting
+     * subaccount_code is then used per-transaction.
+     *
+     * @param  array{business_name: string, settlement_bank: string, account_number: string}  $data
+     * @return array{subaccount_code: string, account_name: string}
+     */
+    public function createSubaccount(array $data): array
+    {
+        $response = $this->client()->post('/subaccount', [
+            'business_name' => $data['business_name'],
+            'settlement_bank' => $data['settlement_bank'],
+            'account_number' => $data['account_number'],
+            // We control the split per-transaction via transaction_charge on
+            // initializeTransaction() instead of a fixed percentage here, so
+            // an admin-adjusted commission rate never requires touching the
+            // seller's subaccount.
+            'percentage_charge' => 0,
+        ]);
+
+        if (! $response->successful() || ! ($response->json('status') === true)) {
+            throw new PaystackException('Paystack failed to create the subaccount: '.$response->json('message', 'unknown error'));
+        }
+
+        return $response->json('data');
+    }
+
+    /**
+     * @return array<int, array{name: string, code: string}>
+     */
+    public function listBanks(): array
+    {
+        $response = $this->client()->get('/bank', ['country' => 'nigeria', 'currency' => 'NGN']);
+
+        if (! $response->successful() || ! ($response->json('status') === true)) {
+            throw new PaystackException('Paystack failed to list banks: '.$response->json('message', 'unknown error'));
+        }
+
+        return $response->json('data');
+    }
+
     private function client(): \Illuminate\Http\Client\PendingRequest
     {
         return Http::baseUrl($this->baseUrl)

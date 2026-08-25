@@ -128,6 +128,36 @@
                 </div>
             </form>
 
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+                <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('Paystack Marketplace Account') }}</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                    {{ __('Connect your bank account so your share of every sale is paid out to you automatically. Platform commission is deducted before it reaches your account.') }}
+                </p>
+
+                @if ($business->hasPaystackSubaccount())
+                    <div class="text-sm text-green-700 dark:text-green-400">
+                        {{ __('Connected') }} — {{ $business->paystack_account_name }} ({{ $business->paystack_account_number }})
+                    </div>
+                @else
+                    <div class="mb-4 text-xs text-amber-600 dark:text-amber-400">{{ __('Not connected yet — payments currently settle to the platform account and your share is tracked for manual payout.') }}</div>
+
+                    <form method="POST" action="{{ route('settings.paystack.connect') }}" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        @csrf
+                        <div>
+                            <x-input-label for="settlement_bank" :value="__('Bank Code')" />
+                            <x-text-input id="settlement_bank" name="settlement_bank" type="text" class="block mt-1 w-full" placeholder="e.g. 058" required />
+                        </div>
+                        <div>
+                            <x-input-label for="account_number" :value="__('Account Number')" />
+                            <x-text-input id="account_number" name="account_number" type="text" class="block mt-1 w-full" required />
+                        </div>
+                        <div class="sm:col-span-2 flex justify-end">
+                            <x-primary-button>{{ __('Connect Paystack Account') }}</x-primary-button>
+                        </div>
+                    </form>
+                @endif
+            </div>
+
         </div>
     </div>
 </x-app-layout>

@@ -19,7 +19,10 @@
                             <div class="hidden sm:flex gap-6 text-sm">
                                 <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'text-white font-semibold' : 'text-gray-400 hover:text-white' }}">{{ __('Dashboard') }}</a>
                                 <a href="{{ route('admin.businesses.index') }}" class="{{ request()->routeIs('admin.businesses.*') ? 'text-white font-semibold' : 'text-gray-400 hover:text-white' }}">{{ __('Businesses') }}</a>
+                                <a href="{{ route('admin.monetization.index') }}" class="{{ request()->routeIs('admin.monetization.*') ? 'text-white font-semibold' : 'text-gray-400 hover:text-white' }}">{{ __('Monetization') }}</a>
+                                <a href="{{ route('admin.transactions.index') }}" class="{{ request()->routeIs('admin.transactions.*') ? 'text-white font-semibold' : 'text-gray-400 hover:text-white' }}">{{ __('Transactions') }}</a>
                                 <a href="{{ route('admin.plans.index') }}" class="{{ request()->routeIs('admin.plans.*') ? 'text-white font-semibold' : 'text-gray-400 hover:text-white' }}">{{ __('Plans') }}</a>
+                                <a href="{{ route('admin.features.index') }}" class="{{ request()->routeIs('admin.features.*') ? 'text-white font-semibold' : 'text-gray-400 hover:text-white' }}">{{ __('Features') }}</a>
                                 <a href="{{ route('admin.subscriptions.index') }}" class="{{ request()->routeIs('admin.subscriptions.*') ? 'text-white font-semibold' : 'text-gray-400 hover:text-white' }}">{{ __('Subscriptions') }}</a>
                                 <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'text-white font-semibold' : 'text-gray-400 hover:text-white' }}">{{ __('Users') }}</a>
                                 <a href="{{ route('admin.failed-jobs.index') }}" class="{{ request()->routeIs('admin.failed-jobs.*') ? 'text-white font-semibold' : 'text-gray-400 hover:text-white' }}">{{ __('Failed Jobs') }}</a>

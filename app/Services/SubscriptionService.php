@@ -3,18 +3,15 @@
 namespace App\Services;
 
 use App\Models\Business;
-use App\Models\Order;
 use App\Models\Plan;
-use App\Models\Product;
 use App\Models\Subscription;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
- * The single place plan limits and feature gates are evaluated. A business
- * with no subscription row at all is treated as unrestricted (fail open) —
- * this matters because subscriptions didn't exist before this phase, so
- * every business/test created earlier has no subscription record.
+ * Subscription *lifecycle* only (subscribing, activating from a verified
+ * payment, expiring). Feature access and numeric limits are evaluated by
+ * FeatureService, not here — see FeatureService for why.
  */
 class SubscriptionService
 {
@@ -27,68 +24,6 @@ class SubscriptionService
         }
 
         return $subscription->plan;
-    }
-
-    public function hasFeature(Business $business, string $feature): bool
-    {
-        $plan = $this->currentPlan($business);
-
-        // No plan on record at all => unrestricted, not "has no features".
-        if (! $plan) {
-            return true;
-        }
-
-        return $plan->hasFeature($feature);
-    }
-
-    public function canAddProduct(Business $business): bool
-    {
-        $plan = $this->currentPlan($business);
-
-        if (! $plan || $plan->max_products === null) {
-            return true;
-        }
-
-        return Product::forBusiness($business->id)->count() < $plan->max_products;
-    }
-
-    public function canPlaceOrder(Business $business): bool
-    {
-        $plan = $this->currentPlan($business);
-
-        if (! $plan || $plan->max_orders_per_month === null) {
-            return true;
-        }
-
-        $ordersThisMonth = Order::withoutGlobalScopes()
-            ->where('business_id', $business->id)
-            ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
-            ->count();
-
-        return $ordersThisMonth < $plan->max_orders_per_month;
-    }
-
-    public function canAddLocation(Business $business): bool
-    {
-        $plan = $this->currentPlan($business);
-
-        if (! $plan || $plan->max_locations === null) {
-            return true;
-        }
-
-        return $business->locations()->count() < $plan->max_locations;
-    }
-
-    public function canAddStaff(Business $business): bool
-    {
-        $plan = $this->currentPlan($business);
-
-        if (! $plan || $plan->max_staff === null) {
-            return true;
-        }
-
-        // The owner counts as one of the seats.
-        return $business->users()->count() < $plan->max_staff;
     }
 
     /**
