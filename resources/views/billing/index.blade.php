@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">{{ __('Billing & Plan') }}</h2>
+        <h2 class="text-[28px] leading-8 font-semibold text-ink dark:text-gray-100">{{ __('Billing & Plan') }}</h2>
     </x-slot>
 
     <div class="py-6 sm:py-12">
@@ -19,7 +19,7 @@
                 </div>
             @endunless
 
-            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                 <h3 class="font-semibold text-gray-800 dark:text-gray-200">{{ __('Current Plan') }}</h3>
                 @if ($currentPlan)
                     <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $currentPlan->name }}</p>
@@ -47,7 +47,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 @foreach ($plans as $plan)
                     <div @class([
-                        'bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 border-2',
+                        'bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6 border-2',
                         'border-brand-500' => $currentPlan?->id === $plan->id,
                         'border-transparent' => $currentPlan?->id !== $plan->id,
                     ])>
@@ -80,7 +80,7 @@
                             @else
                                 <form method="POST" action="{{ route('billing.subscribe', $plan) }}">
                                     @csrf
-                                    <button type="submit" class="w-full px-4 py-2 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 rounded-md font-semibold text-xs uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white">
+                                    <button type="submit" class="w-full px-4 py-2.5 bg-brand-700 text-white rounded-lg font-semibold text-sm hover:bg-brand-800">
                                         {{ $plan->isFree() ? __('Switch to Free') : __('Upgrade') }}
                                     </button>
                                 </form>

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            <h2 class="text-[28px] leading-8 font-semibold text-ink dark:text-gray-100">
                 {{ __('Order') }} <span class="font-mono">{{ $order->order_number }}</span>
             </h2>
             <div class="flex items-center gap-3 text-sm">
@@ -28,7 +28,7 @@
             @endif
 
             @if ($order->isFromWhatsApp())
-                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 border-l-4 border-green-500">
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-4 border-l-4 border-green-500">
                     <span class="text-xs font-semibold uppercase tracking-wide text-green-600 dark:text-green-400">{{ __('WhatsApp Order') }}</span>
 
                     @if ($order->payment_status === 'paid')
@@ -55,7 +55,7 @@
                                 </div>
                             @elseif (! $order->business->hasPaystackSubaccount())
                                 <p class="mt-1 mb-2 text-sm text-amber-600 dark:text-amber-400">{{ __('Connect Paystack to accept secure online payments and automatically process your commission.') }}</p>
-                                <a href="{{ route('settings.edit') }}" class="inline-block px-4 py-2 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 rounded-md text-sm font-semibold hover:bg-gray-700 dark:hover:bg-white">
+                                <a href="{{ route('settings.edit') }}" class="inline-block px-4 py-2 bg-brand-700 text-white rounded-md text-sm font-semibold hover:bg-brand-800">
                                     {{ __('Connect Paystack') }}
                                 </a>
                             @else
@@ -75,7 +75,7 @@
             @endif
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-4">
                     <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{{ __('Order Status') }}</div>
                     <x-order-status-badge :status="$order->order_status" />
                     @can('update', $order)
@@ -95,7 +95,7 @@
                     @endcan
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-4">
                     <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{{ __('Payment Status') }}</div>
                     <x-payment-status-badge :status="$order->payment_status" />
                     @can('update', $order)
@@ -113,7 +113,7 @@
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                 <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-3">{{ __('Customer') }}</h3>
                 <a href="{{ route('customers.show', $order->customer) }}" class="text-brand-600 dark:text-brand-400 hover:underline font-medium">{{ $order->customer->name }}</a>
                 <div class="mt-1 text-sm text-gray-500 dark:text-gray-400 space-y-0.5">
@@ -136,7 +136,7 @@
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
                         <thead class="bg-gray-50 dark:bg-gray-900/50">

@@ -1,8 +1,9 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">{{ __('Staff') }}</h2>
-            <a href="{{ route('staff.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white">
+            <h2 class="text-[28px] leading-8 font-semibold text-ink dark:text-gray-100">{{ __('Staff') }}</h2>
+            <a href="{{ route('staff.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-brand-700 border border-transparent rounded-md font-semibold text-sm text-white hover:bg-brand-800">
+                <x-icon name="plus" class="w-4 h-4" />
                 {{ __('Add Staff') }}
             </a>
         </div>
@@ -11,14 +12,18 @@
     <div class="py-6 sm:py-12">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
 
-            @if (session('status'))
-                <div class="rounded-md bg-green-50 dark:bg-green-900/30 px-4 py-3 text-sm text-green-700 dark:text-green-300 break-words">{{ session('status') }}</div>
-            @endif
-            @if (session('error'))
-                <div class="rounded-md bg-red-50 dark:bg-red-900/30 px-4 py-3 text-sm text-red-700 dark:text-red-300">{{ session('error') }}</div>
-            @endif
+            <x-flash-messages />
 
-            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+                @if ($staff->isEmpty())
+                    <x-empty-state icon="staff" :title="__('No staff members yet')" :description="__('Invite teammates to help manage orders, products and inventory.')">
+                        <x-slot name="action">
+                            <a href="{{ route('staff.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-brand-700 border border-transparent rounded-lg font-semibold text-sm text-white hover:bg-brand-800 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 transition">
+                                {{ __('Add staff') }}
+                            </a>
+                        </x-slot>
+                    </x-empty-state>
+                @else
                 <ul class="divide-y divide-gray-200 dark:divide-gray-700">
                     @foreach ($staff as $user)
                         <li class="px-6 py-4 flex items-center justify-between">
@@ -30,14 +35,8 @@
                                 @endif
                             </div>
                             <div class="flex items-center gap-3 text-sm">
-                                <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-brand-100 text-brand-800 dark:bg-brand-900/40 dark:text-brand-300">
-                                    {{ $user->roles->pluck('name')->first() ?? '—' }}
-                                </span>
-                                <span @class([
-                                    'inline-flex px-2 py-0.5 rounded-full text-xs font-medium',
-                                    'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' => $user->status === 'active',
-                                    'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300' => $user->status !== 'active',
-                                ])>{{ ucfirst($user->status) }}</span>
+                                <x-badge variant="brand">{{ $user->roles->pluck('name')->first() ?? '—' }}</x-badge>
+                                <x-badge :variant="$user->status === 'active' ? 'success' : 'neutral'">{{ ucfirst($user->status) }}</x-badge>
                                 @unless ($user->hasRole('Owner'))
                                     <a href="{{ route('staff.edit', $user) }}" class="text-brand-600 dark:text-brand-400 hover:underline">{{ __('Edit') }}</a>
                                 @endunless
@@ -45,6 +44,7 @@
                         </li>
                     @endforeach
                 </ul>
+                @endif
             </div>
         </div>
     </div>

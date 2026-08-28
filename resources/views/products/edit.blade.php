@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">{{ __('Edit Product') }}</h2>
+        <h2 class="text-[28px] leading-8 font-semibold text-ink dark:text-gray-100">{{ __('Edit Product') }}</h2>
     </x-slot>
 
     <div class="py-6 sm:py-12">
@@ -17,7 +17,7 @@
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                 <form method="POST" action="{{ route('products.update', $product) }}" enctype="multipart/form-data">
                     @method('PUT')
                     @include('products._form')
@@ -25,7 +25,7 @@
             </div>
 
             @can('adjustStock', $product)
-                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-semibold text-gray-800 dark:text-gray-200">
                             {{ __('Stock') }}: <span class="font-mono">{{ $product->stock_quantity }}</span>

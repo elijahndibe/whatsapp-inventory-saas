@@ -1,12 +1,12 @@
 <x-storefront-layout :business="$business">
 
-    <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ __('Checkout') }}</h1>
+    <h1 class="text-2xl font-semibold text-ink dark:text-gray-100 mb-4">{{ __('Checkout') }}</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="md:col-span-2">
             <form method="POST" action="{{ route('storefront.checkout.store', $business) }}"
                   x-data="{ paymentMethod: '{{ old('payment_method', 'whatsapp') }}' }"
-                  class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-4">
+                  class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 space-y-4">
                 @csrf
 
                 <div>
@@ -94,7 +94,7 @@
         </div>
 
         <div>
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6">
                 <h2 class="font-semibold text-gray-800 dark:text-gray-200 mb-3">{{ __('Order Summary') }}</h2>
                 <div class="space-y-2 text-sm">
                     @foreach ($items as $item)

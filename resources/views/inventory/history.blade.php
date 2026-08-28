@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="text-[28px] leading-8 font-semibold text-ink dark:text-gray-100">
             {{ __('Stock History') }} — {{ $product->name }}
         </h2>
     </x-slot>
@@ -10,15 +10,10 @@
 
             <a href="{{ route('products.edit', $product) }}" class="text-sm text-brand-600 dark:text-brand-400 hover:underline">&larr; {{ __('Back to product') }}</a>
 
-            @if (session('status'))
-                <div class="rounded-md bg-green-50 dark:bg-green-900/30 px-4 py-3 text-sm text-green-700 dark:text-green-300">{{ session('status') }}</div>
-            @endif
-            @if (session('error'))
-                <div class="rounded-md bg-red-50 dark:bg-red-900/30 px-4 py-3 text-sm text-red-700 dark:text-red-300">{{ session('error') }}</div>
-            @endif
+            <x-flash-messages />
 
             @if ($businessLocations->isNotEmpty())
-                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                     <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-3">{{ __('Stock by Location') }}</h3>
 
                     <table class="min-w-full text-sm mb-4">
@@ -76,9 +71,9 @@
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
                 @if ($transactions->isEmpty())
-                    <div class="p-8 text-center text-sm text-gray-500 dark:text-gray-400">{{ __('No stock movements recorded yet.') }}</div>
+                    <x-empty-state icon="inventory" :title="__('No stock movements recorded yet')" :description="__('Stock increases, decreases and transfers for this product will show up here.')" />
                 @else
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">

@@ -41,7 +41,7 @@
 
         <x-card class="!p-0 overflow-hidden">
             @if ($products->isEmpty())
-                <x-empty-state icon="products" title="{{ __('No products yet') }}" description="{{ __('Add your first product and start building your online catalogue.') }}">
+                <x-empty-state icon="products" :title="__('No products yet')" :description="__('Add your first product and start building your online catalogue.')">
                     @can('create', \App\Models\Product::class)
                         <x-slot name="action">
                             <a href="{{ route('products.create') }}">

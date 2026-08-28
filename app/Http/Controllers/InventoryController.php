@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Services\InventoryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use InvalidArgumentException;
 
@@ -25,7 +26,10 @@ class InventoryController extends Controller
         $lowStock = Product::lowStock()->orderBy('stock_quantity')->get();
         $outOfStock = Product::outOfStock()->orderBy('name')->get();
 
-        return view('inventory.index', compact('lowStock', 'outOfStock'));
+        $totalProducts = Product::count();
+        $inventoryValue = (Product::query()->sum(DB::raw('price * stock_quantity')) ?? 0) / 100;
+
+        return view('inventory.index', compact('lowStock', 'outOfStock', 'totalProducts', 'inventoryValue'));
     }
 
     public function history(Request $request, Product $product): View

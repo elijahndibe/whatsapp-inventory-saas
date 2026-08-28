@@ -1,6 +1,6 @@
 <x-admin-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200">{{ __('Subscriptions') }}</h2>
+        <h2 class="text-[28px] leading-8 font-semibold text-ink dark:text-gray-100">{{ __('Subscriptions') }}</h2>
     </x-slot>
 
     <div class="space-y-4">
@@ -14,7 +14,10 @@
             <button class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-sm">{{ __('Filter') }}</button>
         </form>
 
-        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+            @if ($subscriptions->isEmpty())
+                <x-empty-state icon="payments" :title="__('No subscriptions found')" :description="__('Try a different status filter, or check back once businesses start subscribing.')" />
+            @else
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
                     <thead class="bg-gray-50 dark:bg-gray-900/50">
@@ -32,7 +35,9 @@
                             <tr>
                                 <td class="px-4 py-3 text-gray-900 dark:text-gray-100">{{ $subscription->business?->name }}</td>
                                 <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ $subscription->plan?->name }}</td>
-                                <td class="px-4 py-3">{{ ucfirst($subscription->status) }}</td>
+                                <td class="px-4 py-3">
+                                    <x-badge :variant="match($subscription->status) { 'active' => 'success', 'cancelled' => 'danger', default => 'neutral' }">{{ ucfirst($subscription->status) }}</x-badge>
+                                </td>
                                 <td class="px-4 py-3 text-gray-500">{{ $subscription->starts_at->format('d M Y') }}</td>
                                 <td class="px-4 py-3 text-gray-500">{{ $subscription->ends_at?->format('d M Y') ?? '—' }}</td>
                                 <td class="px-4 py-3 text-gray-500">{{ $subscription->amount_paid ? number_format($subscription->amount_paid, 2) : '—' }}</td>
@@ -41,6 +46,7 @@
                     </tbody>
                 </table>
             </div>
+            @endif
         </div>
 
         {{ $subscriptions->links() }}

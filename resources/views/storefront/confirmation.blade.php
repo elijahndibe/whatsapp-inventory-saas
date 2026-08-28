@@ -1,16 +1,16 @@
 <x-storefront-layout :business="$business">
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 text-center">
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 text-center">
         @if ($order->payment_status === 'paid')
-            <div class="mx-auto h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center text-green-600 dark:text-green-400 text-2xl">
-                &check;
+            <div class="mx-auto h-12 w-12 rounded-full bg-success-bg dark:bg-green-900/40 flex items-center justify-center text-success dark:text-green-400">
+                <x-icon name="check-circle" class="w-6 h-6" />
             </div>
-            <h1 class="mt-4 text-xl font-bold text-gray-900 dark:text-gray-100">{{ __('Payment Received') }}</h1>
+            <h1 class="mt-4 text-xl font-semibold text-ink dark:text-gray-100">{{ __('Payment Received') }}</h1>
         @else
-            <div class="mx-auto h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400 text-2xl">
-                &hellip;
+            <div class="mx-auto h-12 w-12 rounded-full bg-warning-bg dark:bg-amber-900/40 flex items-center justify-center text-warning dark:text-amber-400">
+                <x-icon name="info" class="w-6 h-6" />
             </div>
-            <h1 class="mt-4 text-xl font-bold text-gray-900 dark:text-gray-100">{{ __('Order Received') }}</h1>
+            <h1 class="mt-4 text-xl font-semibold text-ink dark:text-gray-100">{{ __('Order Received') }}</h1>
         @endif
         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
             {{ __('Order') }} <span class="font-mono">#{{ $order->order_number }}</span>
@@ -31,7 +31,7 @@
                 </p>
                 <form method="POST" action="{{ route('storefront.payments.retry', [$business, $order->public_token]) }}" class="mt-4">
                     @csrf
-                    <button type="submit" class="inline-flex items-center justify-center px-6 py-3 bg-brand-600 border border-transparent rounded-md font-semibold text-sm text-white uppercase tracking-widest hover:bg-brand-700">
+                    <button type="submit" class="inline-flex items-center justify-center px-6 py-3 bg-brand-700 border border-transparent rounded-lg font-semibold text-sm text-white hover:bg-brand-800">
                         {{ __('Try Payment Again') }}
                     </button>
                 </form>
@@ -41,7 +41,8 @@
                 {{ __('One last step — send your order to :business on WhatsApp to confirm it.', ['business' => $business->name]) }}
             </p>
             <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener"
-               class="mt-4 inline-flex items-center justify-center px-6 py-3 bg-green-600 border border-transparent rounded-md font-semibold text-sm text-white uppercase tracking-widest hover:bg-green-700">
+               class="mt-4 inline-flex items-center justify-center gap-2 px-6 py-3 bg-whatsapp border border-transparent rounded-lg font-semibold text-sm text-white hover:bg-whatsapp-dark transition">
+                <x-icon name="whatsapp" class="w-5 h-5" />
                 {{ __('Send Order via WhatsApp') }}
             </a>
         @else
@@ -51,7 +52,7 @@
         @endif
     </div>
 
-    <div class="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+    <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6">
         <h2 class="font-semibold text-gray-800 dark:text-gray-200 mb-3">{{ __('Order Summary') }}</h2>
         <div class="space-y-2 text-sm">
             @foreach ($order->items as $item)

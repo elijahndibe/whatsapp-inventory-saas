@@ -20,10 +20,10 @@
 
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
             @php $todaysSales = $stats["Today's Sales"]; @endphp
-            <x-stat-card label="{{ __('Today\'s Sales') }}" value="{{ $business->currencySymbol() }}{{ number_format($todaysSales, 2) }}" icon="trending-up" />
-            <x-stat-card label="{{ __('Orders') }}" value="{{ $stats['Total Orders'] }}" icon="orders" />
-            <x-stat-card label="{{ __('Customers') }}" value="{{ $stats['Total Customers'] }}" icon="customers" />
-            <x-stat-card label="{{ __('Low stock items') }}" value="{{ $stats['Low Stock'] + $stats['Out of Stock'] }}" icon="alert-triangle" />
+            <x-stat-card :label="__('Today\'s Sales')" :value="$business->currencySymbol() . number_format($todaysSales, 2)" icon="trending-up" />
+            <x-stat-card :label="__('Orders')" :value="$stats['Total Orders']" icon="orders" />
+            <x-stat-card :label="__('Customers')" :value="$stats['Total Customers']" icon="customers" />
+            <x-stat-card :label="__('Low stock items')" :value="$stats['Low Stock'] + $stats['Out of Stock']" icon="alert-triangle" />
         </div>
 
         <x-card>
@@ -53,7 +53,7 @@
                     @endcan
                 </div>
                 @if ($recentOrders->isEmpty())
-                    <x-empty-state icon="orders" title="{{ __('No orders yet') }}" description="{{ __('Orders from your storefront and WhatsApp will show up here.') }}" />
+                    <x-empty-state icon="orders" :title="__('No orders yet')" :description="__('Orders from your storefront and WhatsApp will show up here.')" />
                 @else
                     <ul class="divide-y divide-gray-100 dark:divide-gray-700">
                         @foreach ($recentOrders as $order)
@@ -82,7 +82,7 @@
                     @endcan
                 </div>
                 @if ($lowStockProducts->isEmpty())
-                    <x-empty-state icon="box" title="{{ __('Stock levels look healthy') }}" description="{{ __('Nothing needs your attention right now.') }}" />
+                    <x-empty-state icon="box" :title="__('Stock levels look healthy')" :description="__('Nothing needs your attention right now.')" />
                 @else
                     <ul class="divide-y divide-gray-100 dark:divide-gray-700">
                         @foreach ($lowStockProducts as $product)

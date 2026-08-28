@@ -1,23 +1,18 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">{{ __('Business Settings') }}</h2>
+        <h2 class="text-[28px] leading-8 font-semibold text-ink dark:text-gray-100">{{ __('Business Settings') }}</h2>
     </x-slot>
 
     <div class="py-6 sm:py-12">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
-            @if (session('status'))
-                <div class="rounded-md bg-green-50 dark:bg-green-900/30 px-4 py-3 text-sm text-green-700 dark:text-green-300">{{ session('status') }}</div>
-            @endif
-            @if (session('error'))
-                <div class="rounded-md bg-red-50 dark:bg-red-900/30 px-4 py-3 text-sm text-red-700 dark:text-red-300">{{ session('error') }}</div>
-            @endif
+            <x-flash-messages />
 
             <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PUT')
 
-                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                     <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ __('Business Profile') }}</h3>
 
                     <div>
@@ -98,7 +93,7 @@
                     </div>
                 </div>
 
-                <details class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+                <details class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                     <summary class="cursor-pointer select-none font-semibold text-gray-800 dark:text-gray-200">{{ __('Advanced: connect WhatsApp manually') }}</summary>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 mb-4">
                         {{ __('Most stores should use the "Connect WhatsApp" button above instead. Only use this if you already have your own Meta Cloud API credentials.') }}
@@ -127,7 +122,7 @@
                 </div>
             </form>
 
-            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                 <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('WhatsApp Integration') }}</h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
                     {{ __('Connect your WhatsApp Business account to send and receive customer messages directly through the platform.') }}
@@ -287,7 +282,7 @@
                 @endif
             </div>
 
-            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                 <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('Paystack Marketplace Account') }}</h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
                     {{ __('Connect your bank account so your share of every sale is paid out to you automatically. Platform commission is deducted before it reaches your account.') }}

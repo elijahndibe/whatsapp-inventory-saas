@@ -8,9 +8,9 @@
         <x-flash-messages />
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <x-stat-card label="{{ __('Total Sales') }}" value="{{ auth()->user()->business->currencySymbol() }}{{ number_format($totals['sales'], 2) }}" icon="trending-up" />
-            <x-stat-card label="{{ __('Platform Fees') }}" value="-{{ auth()->user()->business->currencySymbol() }}{{ number_format($totals['fees'], 2) }}" icon="payments" />
-            <x-stat-card label="{{ __('Net Sales') }}" value="{{ auth()->user()->business->currencySymbol() }}{{ number_format($totals['net'], 2) }}" icon="box" />
+            <x-stat-card :label="__('Total Sales')" :value="auth()->user()->business->currencySymbol() . number_format($totals['sales'], 2)" icon="trending-up" />
+            <x-stat-card :label="__('Platform Fees')" :value="'-' . auth()->user()->business->currencySymbol() . number_format($totals['fees'], 2)" icon="payments" />
+            <x-stat-card :label="__('Net Sales')" :value="auth()->user()->business->currencySymbol() . number_format($totals['net'], 2)" icon="box" />
         </div>
 
         <x-card class="!p-0 overflow-hidden">
@@ -25,7 +25,7 @@
             </form>
 
             @if ($payments->isEmpty())
-                <x-empty-state icon="payments" title="{{ __('No transactions yet') }}" description="{{ __('Payments from your storefront and WhatsApp orders will show up here.') }}" />
+                <x-empty-state icon="payments" :title="__('No transactions yet')" :description="__('Payments from your storefront and WhatsApp orders will show up here.')" />
             @else
                 <div class="hidden sm:block overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-700 text-sm">

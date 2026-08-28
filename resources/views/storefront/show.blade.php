@@ -56,7 +56,7 @@
 
         @if ($products->isEmpty())
             <x-card>
-                <x-empty-state icon="products" title="{{ __('No products found') }}" description="{{ __('Try a different search or check back soon.') }}" />
+                <x-empty-state icon="products" :title="__('No products found')" :description="__('Try a different search or check back soon.')" />
             </x-card>
         @else
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">

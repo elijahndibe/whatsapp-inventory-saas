@@ -1,11 +1,11 @@
 <x-admin-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200">{{ __('Failed Jobs') }}</h2>
+        <h2 class="text-[28px] leading-8 font-semibold text-ink dark:text-gray-100">{{ __('Failed Jobs') }}</h2>
     </x-slot>
 
-    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
         @if ($failedJobs->isEmpty())
-            <div class="p-8 text-center text-sm text-gray-500 dark:text-gray-400">{{ __('No failed jobs. All clear.') }}</div>
+            <x-empty-state icon="check-circle" :title="__('No failed jobs')" :description="__('Everything is running smoothly.')" />
         @else
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">

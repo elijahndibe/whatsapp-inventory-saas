@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">{{ __('Orders') }}</h2>
+        <h2 class="text-[28px] leading-8 font-semibold text-ink dark:text-gray-100">{{ __('Orders') }}</h2>
     </x-slot>
 
     <div class="py-6 sm:py-12">
@@ -36,7 +36,7 @@
                 </button>
             </form>
 
-            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
                 @if ($orders->isEmpty())
                     <div class="p-8 text-center text-sm text-gray-500 dark:text-gray-400">{{ __('No orders found.') }}</div>
                 @else

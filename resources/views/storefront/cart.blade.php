@@ -4,7 +4,7 @@
 
     @if ($items->isEmpty())
         <x-card>
-            <x-empty-state icon="box" title="{{ __('Your cart is empty') }}" description="{{ __('Add a few things you like — they\'ll show up here.') }}">
+            <x-empty-state icon="box" :title="__('Your cart is empty')" :description="__('Add a few things you like — they\'ll show up here.')">
                 <x-slot name="action">
                     <a href="{{ route('storefront.show', $business) }}">
                         <x-primary-button type="button">{{ __('Browse Products') }}</x-primary-button>
