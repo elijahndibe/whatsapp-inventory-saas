@@ -27,6 +27,53 @@
                 <div class="rounded-md bg-red-50 dark:bg-red-900/30 px-4 py-3 text-sm text-red-700 dark:text-red-300">{{ session('error') }}</div>
             @endif
 
+            @if ($order->isFromWhatsApp())
+                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 border-l-4 border-green-500">
+                    <span class="text-xs font-semibold uppercase tracking-wide text-green-600 dark:text-green-400">{{ __('WhatsApp Order') }}</span>
+
+                    @if ($order->payment_status === 'paid')
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ __('Paid — this order is settled.') }}</p>
+                    @elseif ($order->order_status === 'cancelled')
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ __('This order was cancelled.') }}</p>
+                    @else
+                        @can('update', $order)
+                            @if ($pendingPayment)
+                                <p class="mt-1 mb-3 text-sm font-medium text-gray-800 dark:text-gray-200">{{ __('Payment link ready — send it to the customer to collect payment.') }}</p>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    @if ($paymentLinkWhatsAppUrl)
+                                        <a href="{{ $paymentLinkWhatsAppUrl }}" target="_blank" rel="noopener"
+                                           class="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-semibold hover:bg-green-700">
+                                            {{ __('Send payment link on WhatsApp') }}
+                                        </a>
+                                    @else
+                                        <span class="text-xs text-amber-600 dark:text-amber-400">{{ __('Add a phone number for this customer to send the link via WhatsApp.') }}</span>
+                                    @endif
+                                    <button type="button" onclick="navigator.clipboard.writeText('{{ $pendingPayment->authorization_url }}'); this.textContent = '{{ __('Copied!') }}'"
+                                            class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md text-sm font-semibold hover:bg-gray-200 dark:hover:bg-gray-600">
+                                        {{ __('Copy Payment Link') }}
+                                    </button>
+                                </div>
+                            @elseif (! $order->business->hasPaystackSubaccount())
+                                <p class="mt-1 mb-2 text-sm text-amber-600 dark:text-amber-400">{{ __('Connect Paystack to accept secure online payments and automatically process your commission.') }}</p>
+                                <a href="{{ route('settings.edit') }}" class="inline-block px-4 py-2 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 rounded-md text-sm font-semibold hover:bg-gray-700 dark:hover:bg-white">
+                                    {{ __('Connect Paystack') }}
+                                </a>
+                            @else
+                                <p class="mt-1 mb-3 text-sm text-gray-600 dark:text-gray-400">{{ __('Once you and the customer have confirmed the order details on WhatsApp, request payment here.') }}</p>
+                                <form method="POST" action="{{ route('orders.request-payment', $order) }}">
+                                    @csrf
+                                    <button class="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-semibold hover:bg-green-700">
+                                        {{ __('Confirm order & request payment') }}
+                                    </button>
+                                </form>
+                            @endif
+                        @else
+                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ __('Awaiting confirmation.') }}</p>
+                        @endcan
+                    @endif
+                </div>
+            @endif
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
                     <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{{ __('Order Status') }}</div>
@@ -37,7 +84,7 @@
                             @method('PATCH')
                             <select name="order_status" class="flex-1 rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm text-sm">
                                 @foreach (\App\Models\Order::STATUSES as $status)
-                                    <option value="{{ $status }}" @selected($order->order_status === $status)>{{ ucfirst($status) }}</option>
+                                    <option value="{{ $status }}" @selected($order->order_status === $status)>{{ ucfirst(str_replace('_', ' ', $status)) }}</option>
                                 @endforeach
                             </select>
                             <button class="px-3 py-1.5 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 rounded-md text-xs font-semibold uppercase">{{ __('Update') }}</button>

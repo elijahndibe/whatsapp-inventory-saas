@@ -33,6 +33,19 @@ class Order extends Model
         'customer_notes',
         'shipping_address',
         'inventory_deducted_at',
+        'source',
+    ];
+
+    /**
+     * Migration-level column defaults aren't reliably honored by SQLite
+     * (used in the test suite) — same reasoning as User::$attributes —
+     * so default order_status explicitly here too, on top of the DB
+     * column default.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'order_status' => 'pending',
     ];
 
     protected function casts(): array
@@ -42,9 +55,11 @@ class Order extends Model
         ];
     }
 
-    public const STATUSES = ['pending', 'confirmed', 'processing', 'ready', 'shipped', 'completed', 'cancelled', 'refunded'];
+    public const STATUSES = ['pending', 'awaiting_payment', 'confirmed', 'processing', 'ready', 'shipped', 'completed', 'cancelled', 'refunded'];
 
     public const PAYMENT_STATUSES = ['pending', 'paid', 'failed', 'refunded', 'partially_refunded'];
+
+    public const SOURCES = ['storefront', 'whatsapp'];
 
     protected static function booted(): void
     {
@@ -131,6 +146,11 @@ class Order extends Model
     public function currencySymbol(): string
     {
         return Business::currencySymbolFor($this->currency);
+    }
+
+    public function isFromWhatsApp(): bool
+    {
+        return $this->source === 'whatsapp';
     }
 
     /**

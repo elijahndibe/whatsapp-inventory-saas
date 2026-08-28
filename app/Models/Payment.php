@@ -19,6 +19,7 @@ class Payment extends Model
         'business_id',
         'order_id',
         'reference',
+        'authorization_url',
         'gateway',
         'amount',
         'currency',

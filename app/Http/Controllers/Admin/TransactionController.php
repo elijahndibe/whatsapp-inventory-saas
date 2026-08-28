@@ -32,13 +32,14 @@ class TransactionController extends Controller
     {
         $payments = $this->filtered($request)->with(['business', 'order.customer'])->latest('id')->get();
 
-        $csv = "Transaction ID,Seller,Order,Customer,Gross Amount,Commission Rate,Commission,Payment Fee,Seller Amount,Gateway,Status,Date\n";
+        $csv = "Transaction ID,Seller,Order,Source,Customer,Gross Amount,Commission Rate,Commission,Payment Fee,Seller Amount,Gateway,Status,Date\n";
 
         foreach ($payments as $payment) {
             $csv .= implode(',', [
                 $payment->reference,
                 '"'.str_replace('"', '""', $payment->business?->name ?? '').'"',
                 $payment->order?->order_number,
+                $payment->order?->source,
                 '"'.str_replace('"', '""', $payment->order?->customer?->name ?? '').'"',
                 $payment->amount,
                 $payment->commission_rate,

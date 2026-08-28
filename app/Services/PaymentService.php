@@ -63,7 +63,32 @@ class PaymentService
             ...$this->splitParams($order->business, $split['commission_amount']),
         ]);
 
+        // Persisted (not just returned) so a seller can revisit the order
+        // later — e.g. the WhatsApp payment-link flow — and re-send/copy
+        // the same link instead of a fresh Paystack transaction being
+        // generated on every page view.
+        $payment->update(['authorization_url' => $result['authorization_url']]);
+
         return ['payment' => $payment, 'authorization_url' => $result['authorization_url']];
+    }
+
+    /**
+     * Reuses an order's most recent still-pending payment attempt if one
+     * exists (so re-clicking "request payment" doesn't spawn a new
+     * Paystack transaction every time), otherwise starts a new one. Used
+     * by the WhatsApp seller-initiated payment-link flow — direct
+     * storefront checkout always starts fresh via initializeForOrder()
+     * since a customer paying immediately has no "come back later" case.
+     */
+    public function initializeOrReuseForOrder(Order $order, string $email): array
+    {
+        $pending = $order->payments()->where('status', 'pending')->whereNotNull('authorization_url')->latest('id')->first();
+
+        if ($pending) {
+            return ['payment' => $pending, 'authorization_url' => $pending->authorization_url];
+        }
+
+        return $this->initializeForOrder($order, $email);
     }
 
     /**

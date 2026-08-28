@@ -20,7 +20,7 @@
                 <select name="order_status" class="rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm text-sm">
                     <option value="">{{ __('All Statuses') }}</option>
                     @foreach (\App\Models\Order::STATUSES as $status)
-                        <option value="{{ $status }}" @selected(request('order_status') === $status)>{{ ucfirst($status) }}</option>
+                        <option value="{{ $status }}" @selected(request('order_status') === $status)>{{ ucfirst(str_replace('_', ' ', $status)) }}</option>
                     @endforeach
                 </select>
 
@@ -45,6 +45,7 @@
                             <thead class="bg-gray-50 dark:bg-gray-900/50">
                                 <tr>
                                     <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400 uppercase text-xs">{{ __('Order') }}</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400 uppercase text-xs">{{ __('Source') }}</th>
                                     <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400 uppercase text-xs">{{ __('Customer') }}</th>
                                     <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400 uppercase text-xs">{{ __('Total') }}</th>
                                     <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400 uppercase text-xs">{{ __('Status') }}</th>
@@ -56,6 +57,13 @@
                                 @foreach ($orders as $order)
                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-900/40 cursor-pointer" onclick="window.location='{{ route('orders.show', $order) }}'">
                                         <td class="px-4 py-3 font-mono text-gray-900 dark:text-gray-100">{{ $order->order_number }}</td>
+                                        <td class="px-4 py-3">
+                                            @if ($order->isFromWhatsApp())
+                                                <span class="inline-flex items-center gap-1 text-xs font-medium text-green-600 dark:text-green-400">&#9679; {{ __('WhatsApp') }}</span>
+                                            @else
+                                                <span class="text-xs text-gray-400">{{ __('Storefront') }}</span>
+                                            @endif
+                                        </td>
                                         <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $order->customer->name }}</td>
                                         <td class="px-4 py-3 text-gray-900 dark:text-gray-100">{{ $order->currencySymbol() }}{{ number_format($order->total, 2) }}</td>
                                         <td class="px-4 py-3"><x-order-status-badge :status="$order->order_status" /></td>

@@ -34,7 +34,7 @@
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
                     <thead class="bg-gray-50 dark:bg-gray-900/50">
                         <tr>
-                            @foreach (['Transaction ID', 'Seller', 'Order', 'Customer', 'Gross', 'Rate', 'Commission', 'Fee', 'Seller Amount', 'Gateway', 'Status', 'Date'] as $col)
+                            @foreach (['Transaction ID', 'Seller', 'Order', 'Source', 'Customer', 'Gross', 'Rate', 'Commission', 'Fee', 'Seller Amount', 'Gateway', 'Status', 'Date'] as $col)
                                 <th class="px-3 py-3 text-left font-medium text-gray-500 dark:text-gray-400 uppercase text-xs">{{ __($col) }}</th>
                             @endforeach
                         </tr>
@@ -45,6 +45,7 @@
                                 <td class="px-3 py-3 font-mono text-xs text-gray-700 dark:text-gray-300">{{ $payment->reference }}</td>
                                 <td class="px-3 py-3 text-gray-600 dark:text-gray-300">{{ $payment->business?->name }}</td>
                                 <td class="px-3 py-3 text-gray-600 dark:text-gray-300">{{ $payment->order?->order_number }}</td>
+                                <td class="px-3 py-3 text-gray-600 dark:text-gray-300">{{ $payment->order?->source ? ucfirst($payment->order->source) : '—' }}</td>
                                 <td class="px-3 py-3 text-gray-600 dark:text-gray-300">{{ $payment->order?->customer?->name }}</td>
                                 <td class="px-3 py-3 text-gray-900 dark:text-gray-100">{{ number_format($payment->amount, 2) }}</td>
                                 <td class="px-3 py-3 text-gray-600 dark:text-gray-300">{{ $payment->commission_rate !== null ? $payment->commission_rate.'%' : '—' }}</td>
@@ -56,7 +57,7 @@
                                 <td class="px-3 py-3 text-gray-500 dark:text-gray-400">{{ $payment->created_at?->format('d M Y') }}</td>
                             </tr>
                         @empty
-                            <tr><td colspan="12" class="px-3 py-6 text-center text-gray-400">{{ __('No transactions yet.') }}</td></tr>
+                            <tr><td colspan="13" class="px-3 py-6 text-center text-gray-400">{{ __('No transactions yet.') }}</td></tr>
                         @endforelse
                     </tbody>
                 </table>

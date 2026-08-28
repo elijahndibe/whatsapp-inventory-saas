@@ -43,6 +43,8 @@ class OrderService
             $subtotal = (float) $cartItems->sum('subtotal');
             $deliveryFee = (float) ($customerData['delivery_fee'] ?? 0);
 
+            $paymentMethod = $customerData['payment_method'] ?? 'whatsapp';
+
             $order = Order::create([
                 'business_id' => $business->id,
                 'customer_id' => $customer->id,
@@ -50,9 +52,14 @@ class OrderService
                 'delivery_fee' => $deliveryFee,
                 'total' => $subtotal + $deliveryFee,
                 'currency' => $business->currency,
-                'payment_method' => $customerData['payment_method'] ?? 'whatsapp',
+                'payment_method' => $paymentMethod,
                 'customer_notes' => $customerData['notes'] ?? null,
                 'shipping_address' => $customerData['address'] ?? null,
+                // Origin, not payment method — kept distinct because a
+                // WhatsApp-originated order can still end up paid via
+                // Paystack (see requestPayment()/markAsPaidViaGateway()),
+                // and reporting needs to keep showing its true channel.
+                'source' => $paymentMethod === 'paystack' ? 'storefront' : 'whatsapp',
             ]);
 
             foreach ($cartItems as $item) {
@@ -77,9 +84,16 @@ class OrderService
      * Moves an order to a new status, deducting or restocking inventory
      * exactly once as needed:
      *
-     * - Leaving 'pending' for any non-cancelled status (business confirms
-     *   the order) deducts stock, per spec: "For WhatsApp/manual orders:
-     *   Business confirms order → inventory deducted."
+     * - Leaving 'pending' for any non-cancelled, non-awaiting_payment
+     *   status (business confirms the order) deducts stock, per spec:
+     *   "For WhatsApp/manual orders: Business confirms order → inventory
+     *   deducted."
+     * - Moving to 'awaiting_payment' (seller generated a Paystack payment
+     *   link for a WhatsApp order — see OrderController::requestPayment())
+     *   deliberately does NOT deduct stock yet: payment hasn't happened,
+     *   so this follows the same "payment confirmed → inventory deducted"
+     *   rule as the direct-checkout path, via markAsPaidViaGateway() once
+     *   the customer actually pays.
      * - Moving to 'cancelled' after stock was deducted restocks it.
      *
      * inventory_deducted_at is the idempotency guard in both directions,
@@ -102,7 +116,7 @@ class OrderService
                     $this->restockItems($order);
                     $order->inventory_deducted_at = null;
                 }
-            } elseif (! $order->inventory_deducted_at) {
+            } elseif ($status !== 'awaiting_payment' && ! $order->inventory_deducted_at) {
                 $this->deductItems($order);
                 $order->inventory_deducted_at = now();
             }
@@ -169,7 +183,7 @@ class OrderService
                 $locked->payment_reference = $context['reference'];
             }
 
-            if ($locked->order_status === 'pending') {
+            if (in_array($locked->order_status, ['pending', 'awaiting_payment'], true)) {
                 $locked->order_status = 'confirmed';
             }
 

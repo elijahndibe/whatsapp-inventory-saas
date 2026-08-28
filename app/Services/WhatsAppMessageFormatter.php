@@ -70,6 +70,44 @@ class WhatsAppMessageFormatter
     }
 
     /**
+     * The reverse direction of chatUrl(): opened from the seller's own
+     * dashboard to message the customer (not the other way around) — used
+     * for "Send payment link on WhatsApp" (see OrderController and
+     * orders/show.blade.php). Targets the customer's own phone number,
+     * never the business's.
+     */
+    public function customerChatUrl(Order $order, string $message): ?string
+    {
+        $order->loadMissing('customer');
+        $raw = $order->customer?->phone;
+
+        if (! $raw) {
+            return null;
+        }
+
+        $number = preg_replace('/\D+/', '', $raw);
+
+        return 'https://wa.me/'.$number.'?text='.rawurlencode($message);
+    }
+
+    /**
+     * The message a seller sends the customer after generating a Paystack
+     * payment link for a WhatsApp order — see section 8 of the product
+     * spec this implements.
+     */
+    public function paymentRequestMessage(Order $order, string $paymentUrl): string
+    {
+        $order->loadMissing('business');
+        $symbol = $order->currencySymbol();
+
+        return "Your order #{$order->order_number} has been confirmed.\n\n"
+            ."Total: {$symbol}".number_format($order->total, 2)."\n\n"
+            ."Please complete your payment securely using the link below:\n\n"
+            ."{$paymentUrl}\n\n"
+            .'Thank you for shopping with '.$order->business->name.'.';
+    }
+
+    /**
      * Business-initiated status update sent to the customer via the
      * WhatsApp Cloud API (as opposed to forOrder(), which is the
      * customer-initiated click-to-chat message).

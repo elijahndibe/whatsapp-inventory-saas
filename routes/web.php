@@ -74,6 +74,7 @@ Route::middleware('auth')->group(function () {
     Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status.update');
     Route::patch('orders/{order}/payment-status', [OrderController::class, 'updatePaymentStatus'])->name('orders.payment-status.update');
+    Route::post('orders/{order}/request-payment', [OrderController::class, 'requestPayment'])->name('orders.request-payment');
     Route::get('orders/{order}/invoice', [InvoiceController::class, 'invoice'])->name('orders.invoice');
     Route::get('orders/{order}/receipt', [InvoiceController::class, 'receipt'])->name('orders.receipt');
 
