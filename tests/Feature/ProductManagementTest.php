@@ -165,4 +165,86 @@ class ProductManagementTest extends TestCase
         $response->assertRedirect(route('products.index'));
         $this->assertModelMissing($product);
     }
+
+    public function test_owner_can_create_a_product_with_a_brand_new_category_without_leaving_the_form(): void
+    {
+        $response = $this->actingAs($this->owner)->post(route('products.store'), [
+            'category_id' => 'new',
+            'new_category_name' => 'Sneakers',
+            'name' => 'Air Max',
+            'price' => 25000,
+            'stock_quantity' => 5,
+            'low_stock_threshold' => 2,
+            'status' => 'active',
+        ]);
+
+        $product = Product::where('name', 'Air Max')->firstOrFail();
+        $response->assertRedirect(route('products.edit', $product));
+
+        $category = Category::where('business_id', $this->business->id)->where('name', 'Sneakers')->firstOrFail();
+        $this->assertSame($category->id, $product->category_id);
+        $this->assertSame('active', $category->status);
+    }
+
+    public function test_submitting_the_same_new_category_name_twice_reuses_it_instead_of_duplicating(): void
+    {
+        $this->actingAs($this->owner)->post(route('products.store'), [
+            'category_id' => 'new', 'new_category_name' => 'Sneakers',
+            'name' => 'Air Max', 'price' => 25000, 'stock_quantity' => 5, 'low_stock_threshold' => 2, 'status' => 'active',
+        ]);
+        $this->actingAs($this->owner)->post(route('products.store'), [
+            'category_id' => 'new', 'new_category_name' => 'Sneakers',
+            'name' => 'Air Force 1', 'price' => 20000, 'stock_quantity' => 5, 'low_stock_threshold' => 2, 'status' => 'active',
+        ]);
+
+        $this->assertSame(1, Category::where('business_id', $this->business->id)->where('name', 'Sneakers')->count());
+        $this->assertSame(2, Product::where('business_id', $this->business->id)->count());
+    }
+
+    public function test_a_new_category_name_is_required_when_add_new_category_is_selected(): void
+    {
+        $response = $this->actingAs($this->owner)->post(route('products.store'), [
+            'category_id' => 'new',
+            'name' => 'Air Max',
+            'price' => 25000,
+            'stock_quantity' => 5,
+            'low_stock_threshold' => 2,
+            'status' => 'active',
+        ]);
+
+        $response->assertSessionHasErrors('new_category_name');
+        $this->assertSame(0, Product::where('name', 'Air Max')->count());
+    }
+
+    public function test_owner_can_reassign_a_product_to_a_brand_new_category_when_editing(): void
+    {
+        $existingCategory = Category::factory()->create(['business_id' => $this->business->id]);
+        $product = Product::factory()->create(['business_id' => $this->business->id, 'category_id' => $existingCategory->id]);
+
+        $this->actingAs($this->owner)->put(route('products.update', $product), [
+            'category_id' => 'new',
+            'new_category_name' => 'Footwear',
+            'name' => $product->name,
+            'price' => $product->price,
+            'low_stock_threshold' => 5,
+            'status' => 'active',
+        ]);
+
+        $newCategory = Category::where('business_id', $this->business->id)->where('name', 'Footwear')->firstOrFail();
+        $this->assertSame($newCategory->id, $product->fresh()->category_id);
+    }
+
+    public function test_a_new_category_created_inline_is_scoped_to_the_current_business_only(): void
+    {
+        $otherBusiness = Business::factory()->create();
+        Category::factory()->create(['business_id' => $otherBusiness->id, 'name' => 'Sneakers']);
+
+        $this->actingAs($this->owner)->post(route('products.store'), [
+            'category_id' => 'new', 'new_category_name' => 'Sneakers',
+            'name' => 'Air Max', 'price' => 25000, 'stock_quantity' => 5, 'low_stock_threshold' => 2, 'status' => 'active',
+        ]);
+
+        $this->assertSame(1, Category::where('business_id', $this->business->id)->where('name', 'Sneakers')->count());
+        $this->assertSame(1, Category::withoutGlobalScopes()->where('business_id', $otherBusiness->id)->where('name', 'Sneakers')->count());
+    }
 }

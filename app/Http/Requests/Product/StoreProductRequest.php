@@ -18,10 +18,22 @@ class StoreProductRequest extends FormRequest
         $businessId = $this->user()->business_id;
 
         return [
+            // 'new' is a sentinel, not a real id — see the "+ Add new
+            // category" option in products/_form.blade.php and
+            // ProductController::resolveCategoryId(), which turns it into
+            // an actual Category before the product is ever saved.
             'category_id' => [
                 'nullable',
-                Rule::exists('categories', 'id')->where('business_id', $businessId),
+                function ($attribute, $value, $fail) use ($businessId) {
+                    if ($value === 'new' || blank($value)) {
+                        return;
+                    }
+                    if (! \App\Models\Category::where('business_id', $businessId)->where('id', $value)->exists()) {
+                        $fail('The selected category is invalid.');
+                    }
+                },
             ],
+            'new_category_name' => ['nullable', 'string', 'max:255', Rule::requiredIf(fn () => $this->input('category_id') === 'new')],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],
             'sku' => [

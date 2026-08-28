@@ -1,6 +1,6 @@
 @csrf
 
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4" x-data="{ categorySelection: '{{ old('category_id', $product->category_id ?? '') }}' }">
     <div>
         <x-input-label for="name" :value="__('Name')" />
         <x-text-input id="name" name="name" type="text" class="block mt-1 w-full" :value="old('name', $product->name ?? '')" required autofocus />
@@ -9,13 +9,22 @@
 
     <div>
         <x-input-label for="category_id" :value="__('Category')" />
-        <select id="category_id" name="category_id" class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+        <select id="category_id" name="category_id" x-model="categorySelection" class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
             <option value="">{{ __('Uncategorized') }}</option>
             @foreach ($categories as $category)
-                <option value="{{ $category->id }}" @selected(old('category_id', $product->category_id ?? '') == $category->id)>{{ $category->name }}</option>
+                <option value="{{ $category->id }}">{{ $category->name }}</option>
             @endforeach
+            <option value="new">{{ __('+ Add new category…') }}</option>
         </select>
         <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
+
+        <div x-show="categorySelection === 'new'" x-cloak class="mt-2">
+            <x-text-input id="new_category_name" name="new_category_name" type="text"
+                          class="block w-full" :value="old('new_category_name')"
+                          placeholder="{{ __('New category name') }}"
+                          x-bind:required="categorySelection === 'new'" />
+            <x-input-error :messages="$errors->get('new_category_name')" class="mt-2" />
+        </div>
     </div>
 </div>
 

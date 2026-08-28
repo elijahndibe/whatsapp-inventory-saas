@@ -50,6 +50,7 @@ class ProductController extends Controller
         $data = $request->validated();
         $initialStock = $data['stock_quantity'] ?? 0;
         unset($data['stock_quantity'], $data['images']);
+        $this->resolveCategoryId($data, $request->user()->business_id);
 
         $product = DB::transaction(function () use ($data, $request, $initialStock) {
             $product = Product::create($data + ['stock_quantity' => 0]);
@@ -82,6 +83,7 @@ class ProductController extends Controller
     {
         $data = $request->validated();
         unset($data['images']);
+        $this->resolveCategoryId($data, $product->business_id);
 
         DB::transaction(function () use ($data, $request, $product) {
             $product->update($data);
@@ -113,6 +115,33 @@ class ProductController extends Controller
         $image->delete();
 
         return back()->with('status', 'Image removed.');
+    }
+
+    /**
+     * Turns the "+ Add new category" sentinel ('new' — see
+     * products/_form.blade.php and StoreProductRequest/
+     * UpdateProductRequest) into a real, business-scoped Category before
+     * the product is saved, so a seller never has to leave the product
+     * form to create a category first. find-or-create by name so
+     * accidentally submitting the same new name twice (e.g. a double
+     * form submit) reuses the category rather than creating a duplicate.
+     */
+    private function resolveCategoryId(array &$data, int $businessId): void
+    {
+        $isNew = ($data['category_id'] ?? null) === 'new';
+        $name = trim($data['new_category_name'] ?? '');
+        unset($data['new_category_name']);
+
+        if (! $isNew) {
+            return;
+        }
+
+        $category = Category::firstOrCreate(
+            ['business_id' => $businessId, 'name' => $name],
+            ['status' => 'active'],
+        );
+
+        $data['category_id'] = $category->id;
     }
 
     private function storeImages(Product $product, Request $request): void
