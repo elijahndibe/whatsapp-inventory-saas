@@ -13,7 +13,7 @@
                 @method('PUT')
                 <div class="flex items-center">
                     <input id="commission_enabled" name="commission_enabled" type="checkbox" value="1" @checked($commissionEnabled)
-                           class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                           class="rounded border-gray-300 dark:border-gray-700 text-brand-600 shadow-sm focus:ring-brand-500" />
                     <label for="commission_enabled" class="ms-2 text-sm text-gray-700 dark:text-gray-300">{{ __('Enabled') }}</label>
                 </div>
                 <div>
@@ -51,7 +51,7 @@
                 @method('PUT')
                 <div class="flex items-center">
                     <input id="subscription_enabled" name="subscription_enabled" type="checkbox" value="1" @checked($subscriptionEnabled)
-                           class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                           class="rounded border-gray-300 dark:border-gray-700 text-brand-600 shadow-sm focus:ring-brand-500" />
                     <label for="subscription_enabled" class="ms-2 text-sm text-gray-700 dark:text-gray-300">{{ __('Subscription System ON') }}</label>
                 </div>
                 <x-primary-button>{{ __('Save') }}</x-primary-button>
@@ -65,8 +65,8 @@
             <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
                 <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('Plans & Features') }}</h3>
                 <div class="mt-2 flex gap-4 text-sm">
-                    <a href="{{ route('admin.plans.index') }}" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Manage Plans') }}</a>
-                    <a href="{{ route('admin.features.index') }}" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Manage Features') }}</a>
+                    <a href="{{ route('admin.plans.index') }}" class="text-brand-600 dark:text-brand-400 hover:underline">{{ __('Manage Plans') }}</a>
+                    <a href="{{ route('admin.features.index') }}" class="text-brand-600 dark:text-brand-400 hover:underline">{{ __('Manage Features') }}</a>
                 </div>
             </div>
             <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">

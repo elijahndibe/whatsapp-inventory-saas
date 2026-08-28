@@ -20,7 +20,7 @@
             </div>
             <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Platform Commission') }}</p>
-                <p class="mt-1 text-xl font-semibold text-indigo-600 dark:text-indigo-400">₦{{ number_format($revenue['commission'], 2) }}</p>
+                <p class="mt-1 text-xl font-semibold text-brand-600 dark:text-brand-400">₦{{ number_format($revenue['commission'], 2) }}</p>
             </div>
             <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4">
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Payment Fees') }}</p>
@@ -57,7 +57,7 @@
                 <ul class="divide-y divide-gray-100 dark:divide-gray-700">
                     @foreach ($recentBusinesses as $business)
                         <li class="px-4 py-3 flex justify-between text-sm">
-                            <a href="{{ route('admin.businesses.show', $business) }}" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ $business->name }}</a>
+                            <a href="{{ route('admin.businesses.show', $business) }}" class="text-brand-600 dark:text-brand-400 hover:underline">{{ $business->name }}</a>
                             <span class="text-gray-400">{{ $business->created_at->format('d M Y') }}</span>
                         </li>
                     @endforeach

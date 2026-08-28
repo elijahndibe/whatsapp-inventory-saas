@@ -16,16 +16,19 @@ use App\Http\Controllers\PaystackConnectController;
 use App\Http\Controllers\WhatsAppConnectController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\HelpController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentTransactionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\WhatsAppDashboardController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\PaymentController;
@@ -96,6 +99,10 @@ Route::middleware('auth')->group(function () {
 
     Route::post('notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
     Route::post('notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
+
+    Route::get('payments', [PaymentTransactionController::class, 'index'])->name('payments.index');
+    Route::get('whatsapp', [WhatsAppDashboardController::class, 'index'])->name('whatsapp.index');
+    Route::get('help', [HelpController::class, 'index'])->name('help.index');
 });
 
 Route::prefix('store/{business:slug}')->name('storefront.')->group(function () {

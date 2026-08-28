@@ -1,4 +1,7 @@
 <x-guest-layout>
+    <h1 class="text-xl font-semibold text-ink dark:text-gray-100 mb-1">{{ __('Create your store') }}</h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{{ __('Free to start — no credit card required.') }}</p>
+
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
@@ -53,14 +56,13 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Create Business Account') }}
-            </x-primary-button>
-        </div>
+        <x-primary-button class="w-full justify-center mt-6">
+            {{ __('Create your store') }}
+        </x-primary-button>
     </form>
+
+    <p class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+        {{ __('Already registered?') }}
+        <a href="{{ route('login') }}" class="font-medium text-brand-700 dark:text-brand-400 hover:underline">{{ __('Sign in') }}</a>
+    </p>
 </x-guest-layout>

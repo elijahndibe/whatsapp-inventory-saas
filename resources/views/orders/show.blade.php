@@ -6,9 +6,9 @@
             </h2>
             <div class="flex items-center gap-3 text-sm">
                 @if ($canUseInvoices)
-                    <a href="{{ route('orders.invoice', $order) }}" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Invoice') }}</a>
+                    <a href="{{ route('orders.invoice', $order) }}" target="_blank" class="text-brand-600 dark:text-brand-400 hover:underline">{{ __('Invoice') }}</a>
                     @if ($order->payment_status === 'paid')
-                        <a href="{{ route('orders.receipt', $order) }}" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Receipt') }}</a>
+                        <a href="{{ route('orders.receipt', $order) }}" target="_blank" class="text-brand-600 dark:text-brand-400 hover:underline">{{ __('Receipt') }}</a>
                     @endif
                 @else
                     <a href="{{ route('billing.index') }}" class="text-xs text-amber-600 dark:text-amber-400 hover:underline">{{ __('Upgrade for invoices') }}</a>
@@ -115,7 +115,7 @@
 
             <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
                 <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-3">{{ __('Customer') }}</h3>
-                <a href="{{ route('customers.show', $order->customer) }}" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">{{ $order->customer->name }}</a>
+                <a href="{{ route('customers.show', $order->customer) }}" class="text-brand-600 dark:text-brand-400 hover:underline font-medium">{{ $order->customer->name }}</a>
                 <div class="mt-1 text-sm text-gray-500 dark:text-gray-400 space-y-0.5">
                     <div>{{ __('Phone') }}: {{ $order->customer->phone }}</div>
                     @if ($order->customer->email)

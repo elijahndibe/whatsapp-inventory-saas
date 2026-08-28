@@ -14,19 +14,19 @@
                     <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <label @class([
                             'flex items-center gap-2 border rounded-md px-4 py-3 text-sm cursor-pointer',
-                            'border-indigo-500 ring-1 ring-indigo-500' => old('payment_method', 'whatsapp') === 'whatsapp',
+                            'border-brand-500 ring-1 ring-brand-500' => old('payment_method', 'whatsapp') === 'whatsapp',
                             'border-gray-300 dark:border-gray-700' => old('payment_method', 'whatsapp') !== 'whatsapp',
                         ])>
-                            <input type="radio" name="payment_method" value="whatsapp" x-model="paymentMethod" class="text-indigo-600">
+                            <input type="radio" name="payment_method" value="whatsapp" x-model="paymentMethod" class="text-brand-600">
                             <span class="text-gray-900 dark:text-gray-100">{{ __('Order via WhatsApp') }}</span>
                         </label>
                         @if ($canPayOnline)
                             <label @class([
                                 'flex items-center gap-2 border rounded-md px-4 py-3 text-sm cursor-pointer',
-                                'border-indigo-500 ring-1 ring-indigo-500' => old('payment_method') === 'paystack',
+                                'border-brand-500 ring-1 ring-brand-500' => old('payment_method') === 'paystack',
                                 'border-gray-300 dark:border-gray-700' => old('payment_method') !== 'paystack',
                             ])>
-                                <input type="radio" name="payment_method" value="paystack" x-model="paymentMethod" class="text-indigo-600">
+                                <input type="radio" name="payment_method" value="paystack" x-model="paymentMethod" class="text-brand-600">
                                 <span class="text-gray-900 dark:text-gray-100">{{ __('Pay Online Now') }}</span>
                             </label>
                         @endif
@@ -75,7 +75,7 @@
                 <div>
                     <x-input-label for="notes" :value="__('Order Notes (optional)')" />
                     <textarea id="notes" name="notes" rows="2"
-                              class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('notes') }}</textarea>
+                              class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-brand-500 focus:ring-brand-500">{{ old('notes') }}</textarea>
                     <x-input-error :messages="$errors->get('notes')" class="mt-2" />
                 </div>
 

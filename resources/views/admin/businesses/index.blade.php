@@ -31,7 +31,7 @@
                         @foreach ($businesses as $business)
                             <tr>
                                 <td class="px-4 py-3">
-                                    <a href="{{ route('admin.businesses.show', $business) }}" class="font-medium text-indigo-600 dark:text-indigo-400 hover:underline">{{ $business->name }}</a>
+                                    <a href="{{ route('admin.businesses.show', $business) }}" class="font-medium text-brand-600 dark:text-brand-400 hover:underline">{{ $business->name }}</a>
                                     <div class="text-xs text-gray-400">{{ $business->slug }}</div>
                                 </td>
                                 <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ $business->subscriptions->first()?->plan?->name ?? '—' }}</td>

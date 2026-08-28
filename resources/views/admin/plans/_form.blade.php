@@ -31,19 +31,19 @@
 <div class="mt-4 flex items-center gap-6">
     <div class="flex items-center">
         <input id="is_active" name="is_active" type="checkbox" value="1" @checked(old('is_active', $plan->is_active ?? true))
-               class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+               class="rounded border-gray-300 dark:border-gray-700 text-brand-600 shadow-sm focus:ring-brand-500" />
         <label for="is_active" class="ms-2 text-sm text-gray-700 dark:text-gray-300">{{ __('Active (visible to businesses)') }}</label>
     </div>
     <div class="flex items-center">
         <input id="is_default" name="is_default" type="checkbox" value="1" @checked(old('is_default', $plan->is_default ?? false))
-               class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+               class="rounded border-gray-300 dark:border-gray-700 text-brand-600 shadow-sm focus:ring-brand-500" />
         <label for="is_default" class="ms-2 text-sm text-gray-700 dark:text-gray-300">{{ __('Default plan (assigned to businesses with no active subscription)') }}</label>
     </div>
 </div>
 
 <p class="mt-4 text-xs text-gray-500 dark:text-gray-400">
     {{ __('Feature access and numeric limits (products, staff, locations, etc.) for this plan are managed on the') }}
-    <a href="{{ route('admin.features.index') }}" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Features') }}</a> {{ __('page.') }}
+    <a href="{{ route('admin.features.index') }}" class="text-brand-600 dark:text-brand-400 hover:underline">{{ __('Features') }}</a> {{ __('page.') }}
 </p>
 
 <div class="flex items-center justify-end mt-6 gap-3">

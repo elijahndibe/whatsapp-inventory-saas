@@ -84,6 +84,10 @@ return [
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
+    // Shown on the seller Help page (resources/views/help/index.blade.php)
+    // as a WhatsApp support link when configured.
+    'support_phone' => env('APP_SUPPORT_PHONE'),
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key

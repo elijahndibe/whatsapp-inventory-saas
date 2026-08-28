@@ -5,7 +5,7 @@
                 {{ __('Categories') }}
             </h2>
             @can('create', \App\Models\Category::class)
-                <a href="{{ route('categories.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition">
+                <a href="{{ route('categories.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 transition">
                     {{ __('New Category') }}
                 </a>
             @endcan
@@ -28,7 +28,7 @@
 
             <form method="GET" class="flex gap-2">
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('Search categories...') }}"
-                       class="block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm" />
+                       class="block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-brand-500 focus:ring-brand-500 text-sm" />
                 <button class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200">
                     {{ __('Search') }}
                 </button>
@@ -63,7 +63,7 @@
                                             ])>{{ ucfirst($category->status) }}</span>
                                         </td>
                                         <td class="px-4 py-3 text-right space-x-3 whitespace-nowrap">
-                                            <a href="{{ route('categories.edit', $category) }}" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Edit') }}</a>
+                                            <a href="{{ route('categories.edit', $category) }}" class="text-brand-600 dark:text-brand-400 hover:underline">{{ __('Edit') }}</a>
                                             @can('delete', $category)
                                                 <form method="POST" action="{{ route('categories.destroy', $category) }}" class="inline" onsubmit="return confirm('{{ __('Delete this category?') }}')">
                                                     @csrf

@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">{{ $customer->name }}</h2>
             @can('update', $customer)
-                <a href="{{ route('customers.edit', $customer) }}" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Edit') }}</a>
+                <a href="{{ route('customers.edit', $customer) }}" class="text-sm text-brand-600 dark:text-brand-400 hover:underline">{{ __('Edit') }}</a>
             @endcan
         </div>
     </x-slot>

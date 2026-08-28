@@ -21,7 +21,7 @@
             @if ($unreadCount > 0)
                 <form method="POST" action="{{ route('notifications.read-all') }}">
                     @csrf
-                    <button class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Mark all read') }}</button>
+                    <button class="text-xs text-brand-700 dark:text-brand-400 hover:underline">{{ __('Mark all read') }}</button>
                 </form>
             @endif
         </div>
@@ -35,7 +35,7 @@
                         @csrf
                         <button type="submit" @class([
                             'w-full text-left px-4 py-3 text-sm border-b border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-600',
-                            'bg-indigo-50/50 dark:bg-indigo-900/10' => is_null($notification->read_at),
+                            'bg-brand-50/50 dark:bg-brand-900/10' => is_null($notification->read_at),
                         ])>
                             <div class="text-gray-700 dark:text-gray-200">{{ $notification->data['message'] ?? 'Notification' }}</div>
                             <div class="text-xs text-gray-400 mt-0.5">{{ $notification->created_at->diffForHumans() }}</div>

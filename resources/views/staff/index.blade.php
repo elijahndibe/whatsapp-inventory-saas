@@ -30,7 +30,7 @@
                                 @endif
                             </div>
                             <div class="flex items-center gap-3 text-sm">
-                                <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300">
+                                <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-brand-100 text-brand-800 dark:bg-brand-900/40 dark:text-brand-300">
                                     {{ $user->roles->pluck('name')->first() ?? '—' }}
                                 </span>
                                 <span @class([
@@ -39,7 +39,7 @@
                                     'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300' => $user->status !== 'active',
                                 ])>{{ ucfirst($user->status) }}</span>
                                 @unless ($user->hasRole('Owner'))
-                                    <a href="{{ route('staff.edit', $user) }}" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Edit') }}</a>
+                                    <a href="{{ route('staff.edit', $user) }}" class="text-brand-600 dark:text-brand-400 hover:underline">{{ __('Edit') }}</a>
                                 @endunless
                             </div>
                         </li>

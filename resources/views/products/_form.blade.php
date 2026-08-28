@@ -9,7 +9,7 @@
 
     <div>
         <x-input-label for="category_id" :value="__('Category')" />
-        <select id="category_id" name="category_id" x-model="categorySelection" class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+        <select id="category_id" name="category_id" x-model="categorySelection" class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-brand-500 focus:ring-brand-500">
             <option value="">{{ __('Uncategorized') }}</option>
             @foreach ($categories as $category)
                 <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -31,7 +31,7 @@
 <div class="mt-4">
     <x-input-label for="description" :value="__('Description')" />
     <textarea id="description" name="description" rows="3"
-              class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description', $product->description ?? '') }}</textarea>
+              class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-brand-500 focus:ring-brand-500">{{ old('description', $product->description ?? '') }}</textarea>
     <x-input-error :messages="$errors->get('description')" class="mt-2" />
 </div>
 
@@ -72,7 +72,7 @@
 
     <div>
         <x-input-label for="status" :value="__('Status')" />
-        <select id="status" name="status" class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+        <select id="status" name="status" class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-brand-500 focus:ring-brand-500">
             @foreach (['active' => 'Active', 'inactive' => 'Inactive', 'archived' => 'Archived'] as $value => $label)
                 <option value="{{ $value }}" @selected(old('status', $product->status ?? 'active') === $value)>{{ __($label) }}</option>
             @endforeach
@@ -83,7 +83,7 @@
 
 <div class="mt-4 flex items-center">
     <input id="featured" name="featured" type="checkbox" value="1" @checked(old('featured', $product->featured ?? false))
-           class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+           class="rounded border-gray-300 dark:border-gray-700 text-brand-600 shadow-sm focus:ring-brand-500" />
     <label for="featured" class="ms-2 text-sm text-gray-700 dark:text-gray-300">{{ __('Feature this product on the storefront') }}</label>
 </div>
 
@@ -96,7 +96,7 @@
                     <div class="relative group">
                         <img src="{{ $image->url() }}" class="h-20 w-20 rounded object-cover border border-gray-200 dark:border-gray-700" alt="">
                         @if ($image->is_primary)
-                            <span class="absolute top-0 left-0 bg-indigo-600 text-white text-[10px] px-1 rounded-br">{{ __('Primary') }}</span>
+                            <span class="absolute top-0 left-0 bg-brand-600 text-white text-[10px] px-1 rounded-br">{{ __('Primary') }}</span>
                         @endif
                         <form method="POST" action="{{ route('products.images.destroy', [$product, $image]) }}" onsubmit="return confirm('{{ __('Remove this image?') }}')">
                             @csrf

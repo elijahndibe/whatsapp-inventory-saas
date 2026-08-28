@@ -48,10 +48,18 @@ class DashboardController extends Controller
             'net_sales' => (clone $successfulPayments)->sum('seller_amount') / 100,
         ];
 
+        $recentOrders = Order::with('customer')->latest('id')->limit(5)->get();
+        $lowStockProducts = Product::where(fn ($q) => $q->lowStock()->orWhere(fn ($q) => $q->outOfStock()))
+            ->orderBy('stock_quantity')
+            ->limit(5)
+            ->get();
+
         return view('dashboard', [
             'business' => $business,
             'stats' => $stats,
             'earnings' => $earnings,
+            'recentOrders' => $recentOrders,
+            'lowStockProducts' => $lowStockProducts,
         ]);
     }
 }

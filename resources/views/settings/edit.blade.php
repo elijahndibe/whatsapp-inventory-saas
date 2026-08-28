@@ -29,7 +29,7 @@
                     <div class="mt-4">
                         <x-input-label for="description" :value="__('Description')" />
                         <textarea id="description" name="description" rows="3"
-                                  class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description', $business->description) }}</textarea>
+                                  class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-brand-500 focus:ring-brand-500">{{ old('description', $business->description) }}</textarea>
                     </div>
 
                     <div class="mt-4">
@@ -93,7 +93,7 @@
 
                     <div class="mt-4 flex items-center">
                         <input id="allow_overselling" name="allow_overselling" type="checkbox" value="1" @checked(old('allow_overselling', $business->allow_overselling))
-                               class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                               class="rounded border-gray-300 dark:border-gray-700 text-brand-600 shadow-sm focus:ring-brand-500" />
                         <label for="allow_overselling" class="ms-2 text-sm text-gray-700 dark:text-gray-300">{{ __('Allow selling below zero stock (overselling)') }}</label>
                     </div>
                 </div>

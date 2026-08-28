@@ -31,7 +31,7 @@
                 </p>
                 <form method="POST" action="{{ route('storefront.payments.retry', [$business, $order->public_token]) }}" class="mt-4">
                     @csrf
-                    <button type="submit" class="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 border border-transparent rounded-md font-semibold text-sm text-white uppercase tracking-widest hover:bg-indigo-700">
+                    <button type="submit" class="inline-flex items-center justify-center px-6 py-3 bg-brand-600 border border-transparent rounded-md font-semibold text-sm text-white uppercase tracking-widest hover:bg-brand-700">
                         {{ __('Try Payment Again') }}
                     </button>
                 </form>
@@ -79,7 +79,7 @@
         </div>
     </div>
 
-    <a href="{{ route('storefront.show', $business) }}" class="mt-6 block text-center text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
+    <a href="{{ route('storefront.show', $business) }}" class="mt-6 block text-center text-sm text-brand-600 dark:text-brand-400 hover:underline">
         &larr; {{ __('Continue shopping') }}
     </a>
 

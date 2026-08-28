@@ -39,7 +39,7 @@
                             @foreach (\Database\Seeders\RolesAndPermissionsSeeder::PERMISSIONS as $permission)
                                 <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                                     <input type="checkbox" name="permissions[]" value="{{ $permission }}" @checked(in_array($permission, old('permissions', $currentPermissions)))
-                                           class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                                           class="rounded border-gray-300 dark:border-gray-700 text-brand-600 shadow-sm focus:ring-brand-500" />
                                     {{ ucfirst($permission) }}
                                 </label>
                             @endforeach
@@ -53,7 +53,7 @@
                                 @foreach ($locations as $location)
                                     <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                                         <input type="checkbox" name="locations[]" value="{{ $location->id }}" @checked(in_array($location->id, old('locations', $currentLocations)))
-                                               class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                                               class="rounded border-gray-300 dark:border-gray-700 text-brand-600 shadow-sm focus:ring-brand-500" />
                                         {{ $location->name }}
                                     </label>
                                 @endforeach

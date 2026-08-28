@@ -29,14 +29,14 @@
                                     <div class="font-medium text-gray-900 dark:text-gray-100">
                                         {{ $location->name }}
                                         @if ($location->is_default)
-                                            <span class="ml-1 text-xs text-indigo-600 dark:text-indigo-400">({{ __('default') }})</span>
+                                            <span class="ml-1 text-xs text-brand-600 dark:text-brand-400">({{ __('default') }})</span>
                                         @endif
                                     </div>
                                     <div class="text-sm text-gray-500 dark:text-gray-400">{{ $location->address }}</div>
                                 </div>
                                 <div class="flex items-center gap-3 text-sm">
                                     <span class="text-gray-400">{{ $location->stock_count }} {{ __('products stocked') }}</span>
-                                    <a href="{{ route('locations.edit', $location) }}" class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Edit') }}</a>
+                                    <a href="{{ route('locations.edit', $location) }}" class="text-brand-600 dark:text-brand-400 hover:underline">{{ __('Edit') }}</a>
                                     @unless ($location->is_default)
                                         <form method="POST" action="{{ route('locations.destroy', $location) }}" onsubmit="return confirm('{{ __('Delete this location?') }}')">
                                             @csrf

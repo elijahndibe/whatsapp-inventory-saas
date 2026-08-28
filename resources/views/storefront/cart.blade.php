@@ -1,26 +1,29 @@
 <x-storefront-layout :business="$business">
 
-    <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ __('Your Cart') }}</h1>
+    <h1 class="text-xl font-semibold text-ink dark:text-gray-100 mb-4">{{ __('Your Cart') }}</h1>
 
     @if ($items->isEmpty())
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 text-center">
-            <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Your cart is empty.') }}</p>
-            <a href="{{ route('storefront.show', $business) }}" class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
-                {{ __('Browse Products') }}
-            </a>
-        </div>
+        <x-card>
+            <x-empty-state icon="box" title="{{ __('Your cart is empty') }}" description="{{ __('Add a few things you like — they\'ll show up here.') }}">
+                <x-slot name="action">
+                    <a href="{{ route('storefront.show', $business) }}">
+                        <x-primary-button type="button">{{ __('Browse Products') }}</x-primary-button>
+                    </a>
+                </x-slot>
+            </x-empty-state>
+        </x-card>
     @else
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm divide-y divide-gray-200 dark:divide-gray-700">
+        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
             @foreach ($items as $item)
                 <div class="p-4 flex items-center gap-4">
-                    <div class="h-16 w-16 rounded bg-gray-100 dark:bg-gray-700 shrink-0 overflow-hidden">
+                    <div class="h-16 w-16 rounded-lg bg-gray-50 dark:bg-gray-700 shrink-0 overflow-hidden">
                         @if ($item->product->primaryImageUrl())
                             <img src="{{ $item->product->primaryImageUrl() }}" class="w-full h-full object-cover" alt="">
                         @endif
                     </div>
 
                     <div class="flex-1 min-w-0">
-                        <a href="{{ route('storefront.products.show', [$business, $item->product->slug]) }}" class="font-medium text-gray-900 dark:text-gray-100 hover:underline">
+                        <a href="{{ route('storefront.products.show', [$business, $item->product->slug]) }}" class="font-medium text-ink dark:text-gray-100 hover:underline">
                             {{ $item->product->name }}
                         </a>
                         <div class="text-sm text-gray-500 dark:text-gray-400">
@@ -32,29 +35,29 @@
                         @csrf
                         @method('PATCH')
                         <input type="number" name="quantity" value="{{ $item->quantity }}" min="0" max="999"
-                               class="w-16 rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm text-sm" />
-                        <button type="submit" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Update') }}</button>
+                               class="w-16 rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm text-sm" />
+                        <button type="submit" class="text-xs text-brand-700 dark:text-brand-400 hover:underline">{{ __('Update') }}</button>
                     </form>
 
-                    <div class="w-24 text-right font-medium text-gray-900 dark:text-gray-100">
+                    <div class="w-24 text-right font-medium text-ink dark:text-gray-100">
                         {{ $business->currencySymbol() }}{{ number_format($item->subtotal, 2) }}
                     </div>
 
                     <form method="POST" action="{{ route('storefront.cart.destroy', [$business, $item->product]) }}">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="text-red-600 dark:text-red-400 hover:underline text-sm">{{ __('Remove') }}</button>
+                        <button type="submit" class="text-danger hover:underline text-sm">{{ __('Remove') }}</button>
                     </form>
                 </div>
             @endforeach
         </div>
 
-        <div class="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 flex items-center justify-between">
+        <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between">
             <span class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Subtotal') }}</span>
-            <span class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ $business->currencySymbol() }}{{ number_format($subtotal, 2) }}</span>
+            <span class="text-lg font-semibold text-ink dark:text-gray-100">{{ $business->currencySymbol() }}{{ number_format($subtotal, 2) }}</span>
         </div>
 
-        <a href="{{ route('storefront.checkout.create', $business) }}" class="mt-4 block text-center w-full px-4 py-3 bg-indigo-600 border border-transparent rounded-md font-semibold text-sm text-white uppercase tracking-widest hover:bg-indigo-700">
+        <a href="{{ route('storefront.checkout.create', $business) }}" class="mt-4 block text-center w-full px-4 py-3 bg-brand-700 border border-transparent rounded-lg font-semibold text-sm text-white hover:bg-brand-800 transition">
             {{ __('Proceed to Checkout') }}
         </a>
     @endif

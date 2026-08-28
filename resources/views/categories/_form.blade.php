@@ -9,7 +9,7 @@
 <div class="mt-4">
     <x-input-label for="description" :value="__('Description')" />
     <textarea id="description" name="description" rows="3"
-              class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description', $category->description ?? '') }}</textarea>
+              class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-brand-500 focus:ring-brand-500">{{ old('description', $category->description ?? '') }}</textarea>
     <x-input-error :messages="$errors->get('description')" class="mt-2" />
 </div>
 
@@ -25,7 +25,7 @@
 
 <div class="mt-4">
     <x-input-label for="status" :value="__('Status')" />
-    <select id="status" name="status" class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+    <select id="status" name="status" class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-brand-500 focus:ring-brand-500">
         <option value="active" @selected(old('status', $category->status ?? 'active') === 'active')>{{ __('Active') }}</option>
         <option value="inactive" @selected(old('status', $category->status ?? 'active') === 'inactive')>{{ __('Inactive') }}</option>
     </select>

@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200">{{ __('Plans') }}</h2>
             <div class="flex items-center gap-3">
-                <a href="{{ route('admin.features.index') }}" class="text-xs font-semibold uppercase text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Manage Features') }}</a>
+                <a href="{{ route('admin.features.index') }}" class="text-xs font-semibold uppercase text-brand-600 dark:text-brand-400 hover:underline">{{ __('Manage Features') }}</a>
                 <a href="{{ route('admin.plans.create') }}" class="px-3 py-1.5 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 rounded-md text-xs font-semibold uppercase">{{ __('New Plan') }}</a>
             </div>
         </div>
@@ -31,7 +31,7 @@
                             <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ $plan->subscriptions_count }}</td>
                             <td class="px-4 py-3">{{ $plan->is_active ? __('Yes') : __('No') }}</td>
                             <td class="px-4 py-3 text-right">
-                                <a href="{{ route('admin.plans.edit', $plan) }}" class="text-indigo-600 dark:text-indigo-400 hover:underline text-xs">{{ __('Edit') }}</a>
+                                <a href="{{ route('admin.plans.edit', $plan) }}" class="text-brand-600 dark:text-brand-400 hover:underline text-xs">{{ __('Edit') }}</a>
                             </td>
                         </tr>
                     @endforeach

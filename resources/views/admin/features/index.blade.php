@@ -33,7 +33,7 @@
                                     </td>
                                     <td class="px-4 py-3">
                                         <input type="checkbox" name="features[{{ $feature->id }}][global_enabled]" value="1" @checked($feature->is_enabled)
-                                               class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                                               class="rounded border-gray-300 dark:border-gray-700 text-brand-600 shadow-sm focus:ring-brand-500" />
                                     </td>
                                     @foreach ($plans as $plan)
                                         @php $pf = ($planFeatures["{$plan->id}-{$feature->id}"] ?? collect())->first(); @endphp
@@ -44,7 +44,7 @@
                                                        class="w-24 rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm text-sm" />
                                             @else
                                                 <input type="checkbox" name="features[{{ $feature->id }}][plans][{{ $plan->id }}][enabled]" value="1" @checked($pf?->enabled)
-                                                       class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                                                       class="rounded border-gray-300 dark:border-gray-700 text-brand-600 shadow-sm focus:ring-brand-500" />
                                             @endif
                                         </td>
                                     @endforeach

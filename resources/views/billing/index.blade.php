@@ -14,7 +14,7 @@
             @endif
 
             @unless ($subscriptionSystemEnabled)
-                <div class="rounded-md bg-indigo-50 dark:bg-indigo-900/30 px-4 py-3 text-sm text-indigo-700 dark:text-indigo-300">
+                <div class="rounded-md bg-brand-50 dark:bg-brand-900/30 px-4 py-3 text-sm text-brand-700 dark:text-brand-300">
                     {{ __('Subscriptions are not required right now — your account already has full access to every feature listed below, free of charge. The platform earns a small commission on successful sales instead.') }}
                 </div>
             @endunless
@@ -48,7 +48,7 @@
                 @foreach ($plans as $plan)
                     <div @class([
                         'bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 border-2',
-                        'border-indigo-500' => $currentPlan?->id === $plan->id,
+                        'border-brand-500' => $currentPlan?->id === $plan->id,
                         'border-transparent' => $currentPlan?->id !== $plan->id,
                     ])>
                         <h4 class="font-semibold text-gray-800 dark:text-gray-200">{{ $plan->name }}</h4>
@@ -76,7 +76,7 @@
                             @if (! $subscriptionSystemEnabled)
                                 <span class="block text-center text-xs font-semibold uppercase tracking-widest text-gray-400 py-2">{{ __('Included Free') }}</span>
                             @elseif ($currentPlan?->id === $plan->id)
-                                <span class="block text-center text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 py-2">{{ __('Current Plan') }}</span>
+                                <span class="block text-center text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400 py-2">{{ __('Current Plan') }}</span>
                             @else
                                 <form method="POST" action="{{ route('billing.subscribe', $plan) }}">
                                     @csrf

@@ -5,11 +5,12 @@ namespace App\Http\Controllers\Storefront;
 use App\Http\Controllers\Controller;
 use App\Models\Business;
 use App\Models\Product;
+use App\Services\WhatsAppMessageFormatter;
 use Illuminate\View\View;
 
 class StorefrontProductController extends Controller
 {
-    public function show(Business $business, string $productSlug): View
+    public function show(Business $business, string $productSlug, WhatsAppMessageFormatter $formatter): View
     {
         abort_unless($business->isActive(), 404);
 
@@ -22,6 +23,8 @@ class StorefrontProductController extends Controller
             ->with(['images', 'category'])
             ->firstOrFail();
 
-        return view('storefront.product', compact('business', 'product'));
+        $whatsappUrl = $formatter->productInquiryUrl($product, $business);
+
+        return view('storefront.product', compact('business', 'product', 'whatsappUrl'));
     }
 }

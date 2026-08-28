@@ -45,7 +45,7 @@
             <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('Commission Rate') }}</h3>
             <p class="text-xs mb-4">
                 @if ($business->hasCustomCommissionRate())
-                    <span class="text-indigo-600 dark:text-indigo-400 font-semibold">{{ __('Custom seller commission') }}: {{ $business->commission_rate }}%</span>
+                    <span class="text-brand-600 dark:text-brand-400 font-semibold">{{ __('Custom seller commission') }}: {{ $business->commission_rate }}%</span>
                 @else
                     <span class="text-gray-500 dark:text-gray-400">{{ __('Default platform commission') }}</span>
                 @endif

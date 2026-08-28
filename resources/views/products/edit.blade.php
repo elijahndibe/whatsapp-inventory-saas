@@ -30,7 +30,7 @@
                         <h3 class="font-semibold text-gray-800 dark:text-gray-200">
                             {{ __('Stock') }}: <span class="font-mono">{{ $product->stock_quantity }}</span>
                         </h3>
-                        <a href="{{ route('products.inventory.history', $product) }}" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
+                        <a href="{{ route('products.inventory.history', $product) }}" class="text-sm text-brand-600 dark:text-brand-400 hover:underline">
                             {{ __('View history') }}
                         </a>
                     </div>

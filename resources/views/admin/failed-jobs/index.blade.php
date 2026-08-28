@@ -27,7 +27,7 @@
                                 <td class="px-4 py-3 text-right space-x-3">
                                     <form method="POST" action="{{ route('admin.failed-jobs.retry', $job->uuid) }}" class="inline">
                                         @csrf
-                                        <button class="text-indigo-600 dark:text-indigo-400 hover:underline text-xs">{{ __('Retry') }}</button>
+                                        <button class="text-brand-600 dark:text-brand-400 hover:underline text-xs">{{ __('Retry') }}</button>
                                     </form>
                                     <form method="POST" action="{{ route('admin.failed-jobs.destroy', $job->uuid) }}" class="inline" onsubmit="return confirm('{{ __('Delete this failed job?') }}')">
                                         @csrf

@@ -8,7 +8,7 @@
     <div class="py-6 sm:py-12">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
 
-            <a href="{{ route('products.edit', $product) }}" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">&larr; {{ __('Back to product') }}</a>
+            <a href="{{ route('products.edit', $product) }}" class="text-sm text-brand-600 dark:text-brand-400 hover:underline">&larr; {{ __('Back to product') }}</a>
 
             @if (session('status'))
                 <div class="rounded-md bg-green-50 dark:bg-green-900/30 px-4 py-3 text-sm text-green-700 dark:text-green-300">{{ session('status') }}</div>

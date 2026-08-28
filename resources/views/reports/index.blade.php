@@ -67,7 +67,7 @@
                     <p class="text-sm text-gray-600 dark:text-gray-400">
                         {{ __('Sales by category and payment method breakdowns are available on the Business plan.') }}
                     </p>
-                    <a href="{{ route('billing.index') }}" class="mt-2 inline-block text-sm text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Upgrade') }} &rarr;</a>
+                    <a href="{{ route('billing.index') }}" class="mt-2 inline-block text-sm text-brand-700 dark:text-brand-400 hover:underline">{{ __('Upgrade') }} &rarr;</a>
                 </div>
             @endif
 
@@ -84,7 +84,7 @@
                 type: 'line',
                 data: {
                     labels,
-                    datasets: [{ label: 'Sales', data: timeline.map(d => d.sales), borderColor: '#4f46e5', backgroundColor: 'rgba(79,70,229,0.1)', fill: true, tension: 0.3 }],
+                    datasets: [{ label: 'Sales', data: timeline.map(d => d.sales), borderColor: '#6D28D9', backgroundColor: 'rgba(109,40,217,0.1)', fill: true, tension: 0.3 }],
                 },
                 options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } },
             });
@@ -93,7 +93,7 @@
                 type: 'bar',
                 data: {
                     labels,
-                    datasets: [{ label: 'Orders', data: timeline.map(d => d.orders), backgroundColor: '#6366f1' }],
+                    datasets: [{ label: 'Orders', data: timeline.map(d => d.orders), backgroundColor: '#8B5CF6' }],
                 },
                 options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
             });
@@ -104,7 +104,7 @@
                     type: 'doughnut',
                     data: {
                         labels: categoryData.map(c => c.category),
-                        datasets: [{ data: categoryData.map(c => c.revenue), backgroundColor: ['#4f46e5','#6366f1','#818cf8','#a5b4fc','#c7d2fe','#e0e7ff'] }],
+                        datasets: [{ data: categoryData.map(c => c.revenue), backgroundColor: ['#6D28D9','#8B5CF6','#A78BFA','#C4B5FD','#DDD6FE','#EDE9FE'] }],
                     },
                 });
             @endif

@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Business;
 use App\Models\Order;
+use App\Models\Product;
 
 /**
  * Builds the plain-text order message shared by the wa.me click-to-chat
@@ -11,6 +13,29 @@ use App\Models\Order;
  */
 class WhatsAppMessageFormatter
 {
+    /**
+     * A single-product inquiry, opened straight from the product detail
+     * page's "Order via WhatsApp" button — a lighter-weight path than
+     * building a cart first, for a customer who already knows what they
+     * want.
+     */
+    public function productInquiryUrl(Product $product, Business $business): ?string
+    {
+        $number = $business->whatsappChatNumber();
+
+        if (! $number) {
+            return null;
+        }
+
+        $symbol = $business->currencySymbolFor($business->currency);
+        $message = "Hello, I'd like to order this:\n\n"
+            ."{$product->name}\n"
+            .'Price: '.$symbol.number_format($product->price, 2)."\n\n"
+            .'Is this available?';
+
+        return 'https://wa.me/'.$number.'?text='.rawurlencode($message);
+    }
+
     public function forOrder(Order $order): string
     {
         $order->loadMissing('items', 'customer', 'business');
