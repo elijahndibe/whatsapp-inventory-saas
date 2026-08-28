@@ -2,7 +2,7 @@
      for the actions a seller reaches for most. The "More" tab opens the
      full nav as a slide-over rather than trying to cram everything into
      five tabs. --}}
-<header x-data="{ menuOpen: false }" class="lg:hidden sticky top-0 z-40 bg-gray-900">
+<header x-data="{ menuOpen: false }" @keydown.escape.window="menuOpen = false" class="lg:hidden sticky top-0 z-40 bg-gray-900">
     <div class="flex items-center justify-between h-14 px-4">
         <x-zwenko-wordmark variant="white" text-class="text-lg" mark-class="h-7 w-7" />
         <div class="flex items-center gap-1">
@@ -13,14 +13,14 @@
         </div>
     </div>
 
-    <div x-show="menuOpen" x-cloak class="fixed inset-0 z-50" x-transition.opacity>
+    <div x-show="menuOpen" x-cloak class="fixed inset-0 z-50" x-transition.opacity role="dialog" aria-modal="true" :aria-hidden="!menuOpen">
         <div class="absolute inset-0 bg-black/50" @click="menuOpen = false"></div>
         <div class="absolute inset-y-0 right-0 w-72 bg-gray-900 shadow-xl overflow-y-auto"
              x-transition:enter="transition ease-out duration-200" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
              x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full">
             <div class="flex items-center justify-between px-4 py-4 border-b border-white/10">
                 <x-zwenko-wordmark variant="white" />
-                <button @click="menuOpen = false" class="p-1 text-gray-300"><x-icon name="x" class="w-5 h-5" /></button>
+                <button @click="menuOpen = false" class="p-1 text-gray-300" aria-label="{{ __('Close menu') }}"><x-icon name="x" class="w-5 h-5" /></button>
             </div>
             <div class="p-3">
                 @include('layouts.sidebar-nav-items')

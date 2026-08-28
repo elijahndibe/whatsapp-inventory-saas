@@ -65,20 +65,20 @@
                             <div class="rounded-lg border border-gray-100 p-3">
                                 <p class="text-[10px] text-gray-500 uppercase">{{ __("Today's sales") }}</p>
                                 <p class="text-lg font-semibold text-ink">₦185,000</p>
-                                <p class="text-[11px] text-success">↑ 12.5% {{ __('vs yesterday') }}</p>
+                                <p class="text-[11px] text-success-strong">↑ 12.5% {{ __('vs yesterday') }}</p>
                             </div>
                             <div class="rounded-lg border border-gray-100 p-3">
                                 <p class="text-[10px] text-gray-500 uppercase">{{ __('Orders') }}</p>
                                 <p class="text-lg font-semibold text-ink">24</p>
-                                <p class="text-[11px] text-success">↑ 8.2% {{ __('vs yesterday') }}</p>
+                                <p class="text-[11px] text-success-strong">↑ 8.2% {{ __('vs yesterday') }}</p>
                             </div>
                         </div>
                         <div class="rounded-lg border border-gray-100 p-3">
                             <p class="text-[11px] font-medium text-gray-600 mb-2">{{ __('Recent orders') }}</p>
                             <div class="space-y-1.5 text-xs">
-                                <div class="flex justify-between"><span class="text-gray-600">#ORD-1025 John Doe</span><span class="text-success font-medium">{{ __('Paid') }}</span></div>
-                                <div class="flex justify-between"><span class="text-gray-600">#ORD-1024 Maryam Yusuf</span><span class="text-success font-medium">{{ __('Paid') }}</span></div>
-                                <div class="flex justify-between"><span class="text-gray-600">#ORD-1023 James Okafor</span><span class="text-warning font-medium">{{ __('Processing') }}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">#ORD-1025 John Doe</span><span class="text-success-strong font-medium">{{ __('Paid') }}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">#ORD-1024 Maryam Yusuf</span><span class="text-success-strong font-medium">{{ __('Paid') }}</span></div>
+                                <div class="flex justify-between"><span class="text-gray-600">#ORD-1023 James Okafor</span><span class="text-warning-strong font-medium">{{ __('Processing') }}</span></div>
                             </div>
                         </div>
                     </div>

@@ -44,7 +44,7 @@
                         @foreach ($lowStock as $product)
                             <li class="px-6 py-3 flex items-center justify-between text-sm">
                                 <a href="{{ route('products.edit', $product) }}" class="text-gray-900 dark:text-gray-100 hover:underline">{{ $product->name }}</a>
-                                <span class="text-warning font-medium">{{ $product->stock_quantity }} / {{ $product->low_stock_threshold }}</span>
+                                <span class="text-warning-strong font-medium">{{ $product->stock_quantity }} / {{ $product->low_stock_threshold }}</span>
                             </li>
                         @endforeach
                     </ul>

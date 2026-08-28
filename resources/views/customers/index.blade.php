@@ -36,8 +36,13 @@
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                 @foreach ($customers as $customer)
+                                    {{-- The onclick makes the whole row clickable for mouse users;
+                                         the <a> below is the real, keyboard/screen-reader-reachable
+                                         link so the row isn't a click-only trap. --}}
                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-900/40 cursor-pointer" onclick="window.location='{{ route('customers.show', $customer) }}'">
-                                        <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{{ $customer->name }}</td>
+                                        <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">
+                                            <a href="{{ route('customers.show', $customer) }}" class="focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded">{{ $customer->name }}</a>
+                                        </td>
                                         <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $customer->phone }}</td>
                                         <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $customer->orders_count }}</td>
                                         <td class="px-4 py-3 text-gray-900 dark:text-gray-100">{{ auth()->user()->business->currencySymbol() }}{{ number_format(($customer->orders_sum_total ?? 0) / 100, 2) }}</td>

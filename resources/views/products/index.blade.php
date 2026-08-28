@@ -86,7 +86,7 @@
                                         <span @class([
                                             'font-medium',
                                             'text-danger' => $product->isOutOfStock(),
-                                            'text-warning' => $product->isLowStock(),
+                                            'text-warning-strong' => $product->isLowStock(),
                                             'text-ink dark:text-gray-100' => ! $product->isOutOfStock() && ! $product->isLowStock(),
                                         ])>{{ $product->stock_quantity }}</span>
                                         @if ($product->isOutOfStock())

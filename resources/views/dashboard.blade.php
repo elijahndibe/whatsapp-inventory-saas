@@ -35,11 +35,11 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 dark:text-gray-400 uppercase">{{ __('Platform Fees') }}</p>
-                    <p class="mt-1 text-lg font-semibold text-warning">-{{ $business->currencySymbol() }}{{ number_format($earnings['platform_fees'], 2) }}</p>
+                    <p class="mt-1 text-lg font-semibold text-warning-strong">-{{ $business->currencySymbol() }}{{ number_format($earnings['platform_fees'], 2) }}</p>
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 dark:text-gray-400 uppercase">{{ __('Net Sales') }}</p>
-                    <p class="mt-1 text-lg font-semibold text-success">{{ $business->currencySymbol() }}{{ number_format($earnings['net_sales'], 2) }}</p>
+                    <p class="mt-1 text-lg font-semibold text-success-strong">{{ $business->currencySymbol() }}{{ number_format($earnings['net_sales'], 2) }}</p>
                 </div>
             </div>
         </x-card>

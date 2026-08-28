@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,6 +11,10 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-surface dark:bg-gray-900 text-ink dark:text-gray-100">
+        <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-md focus:bg-brand-700 focus:text-white focus:text-sm focus:font-medium">
+            {{ __('Skip to content') }}
+        </a>
+
         @php
             $adminNav = [
                 ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'match' => 'admin.dashboard', 'icon' => 'home'],
@@ -56,18 +60,18 @@
             </aside>
 
             <div class="flex-1 min-w-0">
-                <header x-data="{ menuOpen: false }" class="lg:hidden sticky top-0 z-40 bg-gray-900">
+                <header x-data="{ menuOpen: false }" @keydown.escape.window="menuOpen = false" class="lg:hidden sticky top-0 z-40 bg-gray-900">
                     <div class="flex items-center justify-between h-14 px-4">
                         <x-zwenko-wordmark variant="white" text-class="text-lg" mark-class="h-7 w-7" />
-                        <button @click="menuOpen = true" class="p-2 rounded-md text-gray-300 hover:bg-white/10"><x-icon name="menu" class="w-6 h-6" /></button>
+                        <button @click="menuOpen = true" class="p-2 rounded-md text-gray-300 hover:bg-white/10" aria-label="{{ __('Open menu') }}"><x-icon name="menu" class="w-6 h-6" /></button>
                     </div>
-                    <div x-show="menuOpen" x-cloak class="fixed inset-0 z-50" x-transition.opacity>
+                    <div x-show="menuOpen" x-cloak class="fixed inset-0 z-50" x-transition.opacity role="dialog" aria-modal="true" :aria-hidden="!menuOpen">
                         <div class="absolute inset-0 bg-black/50" @click="menuOpen = false"></div>
                         <div class="absolute inset-y-0 right-0 w-72 bg-gray-900 shadow-xl overflow-y-auto p-3"
                              x-transition:enter="transition ease-out duration-200" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0">
                             <div class="flex items-center justify-between px-2 py-3">
                                 <x-zwenko-wordmark variant="white" />
-                                <button @click="menuOpen = false" class="p-1 text-gray-300"><x-icon name="x" class="w-5 h-5" /></button>
+                                <button @click="menuOpen = false" class="p-1 text-gray-300" aria-label="{{ __('Close menu') }}"><x-icon name="x" class="w-5 h-5" /></button>
                             </div>
                             @foreach ($adminNav as $item)
                                 <x-sidebar-link :href="route($item['route'])" :active="request()->routeIs($item['match'])" :icon="$item['icon']">
@@ -86,7 +90,7 @@
                     </header>
                 @endisset
 
-                <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <main id="main-content" tabindex="-1" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <x-flash-messages />
                     {{ $slot }}
                 </main>

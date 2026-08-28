@@ -12,7 +12,7 @@
     @if ($change)
         <p @class([
             'mt-1 text-xs font-medium flex items-center gap-1',
-            'text-success' => $trend === 'up',
+            'text-success-strong' => $trend === 'up',
             'text-danger' => $trend === 'down',
             'text-gray-500 dark:text-gray-400' => ! in_array($trend, ['up', 'down']),
         ])>

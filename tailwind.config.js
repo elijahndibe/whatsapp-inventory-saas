@@ -41,9 +41,17 @@ export default {
                 muted: '#6B7280',
                 surface: '#F8FAFC',
                 border: '#E5E7EB',
-                success: { DEFAULT: '#16A34A', bg: '#F0FDF4' },
-                warning: { DEFAULT: '#F59E0B', bg: '#FFFBEB' },
-                danger: { DEFAULT: '#DC2626', bg: '#FEF2F2' },
+                // `strong` is a darker shade of the same hue for use as small
+                // TEXT on a light/tinted surface — the spec's DEFAULT tones
+                // read at roughly WhatsApp-green-on-white contrast when used
+                // as body text (e.g. warning #F59E0B on white is ~2.1:1,
+                // success #16A34A on its own bg-success-bg tint is ~3.2:1),
+                // both below the 4.5:1 WCAG AA text minimum. DEFAULT stays
+                // exactly as specified for icons, dots, and solid buttons
+                // where only the 3:1 non-text threshold applies.
+                success: { DEFAULT: '#16A34A', bg: '#F0FDF4', strong: '#15803D' },
+                warning: { DEFAULT: '#F59E0B', bg: '#FFFBEB', strong: '#B45309' },
+                danger: { DEFAULT: '#DC2626', bg: '#FEF2F2', strong: '#B91C1C' },
                 info: { DEFAULT: '#2563EB', bg: '#EFF6FF' },
             },
             boxShadow: {

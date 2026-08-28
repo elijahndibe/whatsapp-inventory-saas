@@ -71,7 +71,7 @@
             </div>
             <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                 <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('Payment Settings') }}</h3>
-                <p class="text-sm mt-2 {{ $paystackConfigured ? 'text-success' : 'text-warning' }}">
+                <p class="text-sm mt-2 {{ $paystackConfigured ? 'text-success-strong' : 'text-warning-strong' }}">
                     {{ $paystackConfigured ? __('Paystack Connected') : __('Paystack Not Connected') }}
                 </p>
             </div>

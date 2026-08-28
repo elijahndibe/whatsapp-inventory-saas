@@ -55,8 +55,13 @@
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                 @foreach ($orders as $order)
+                                    {{-- The onclick makes the whole row clickable for mouse users;
+                                         the <a> below is the real, keyboard/screen-reader-reachable
+                                         link so the row isn't a click-only trap. --}}
                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-900/40 cursor-pointer" onclick="window.location='{{ route('orders.show', $order) }}'">
-                                        <td class="px-4 py-3 font-mono text-gray-900 dark:text-gray-100">{{ $order->order_number }}</td>
+                                        <td class="px-4 py-3 font-mono text-gray-900 dark:text-gray-100">
+                                            <a href="{{ route('orders.show', $order) }}" class="focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded">{{ $order->order_number }}</a>
+                                        </td>
                                         <td class="px-4 py-3">
                                             @if ($order->isFromWhatsApp())
                                                 <span class="inline-flex items-center gap-1 text-xs font-medium text-green-600 dark:text-green-400">&#9679; {{ __('WhatsApp') }}</span>

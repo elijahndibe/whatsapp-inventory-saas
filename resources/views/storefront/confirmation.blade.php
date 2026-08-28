@@ -7,7 +7,7 @@
             </div>
             <h1 class="mt-4 text-xl font-semibold text-ink dark:text-gray-100">{{ __('Payment Received') }}</h1>
         @else
-            <div class="mx-auto h-12 w-12 rounded-full bg-warning-bg dark:bg-amber-900/40 flex items-center justify-center text-warning dark:text-amber-400">
+            <div class="mx-auto h-12 w-12 rounded-full bg-warning-bg dark:bg-amber-900/40 flex items-center justify-center text-warning-strong dark:text-amber-400">
                 <x-icon name="info" class="w-6 h-6" />
             </div>
             <h1 class="mt-4 text-xl font-semibold text-ink dark:text-gray-100">{{ __('Order Received') }}</h1>

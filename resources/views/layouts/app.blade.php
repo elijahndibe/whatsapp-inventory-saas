@@ -14,6 +14,10 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-surface dark:bg-gray-900 text-ink dark:text-gray-100">
+        <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-md focus:bg-brand-700 focus:text-white focus:text-sm focus:font-medium">
+            {{ __('Skip to content') }}
+        </a>
+
         <div class="lg:flex min-h-screen">
             @include('layouts.sidebar-nav')
 
@@ -28,7 +32,7 @@
                     </header>
                 @endisset
 
-                <main>
+                <main id="main-content" tabindex="-1">
                     {{ $slot }}
                 </main>
             </div>

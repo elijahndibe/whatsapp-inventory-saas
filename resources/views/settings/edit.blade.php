@@ -196,16 +196,16 @@
                                 {{ __('Connected number') }}: <span class="font-mono">{{ $business->whatsapp_display_phone_number }}</span>
                             </p>
                         @endif
-                        <ul class="text-sm text-success space-y-1 mb-4">
+                        <ul class="text-sm text-success-strong space-y-1 mb-4">
                             <li>&check; {{ __('WhatsApp connected') }}</li>
                             <li>&check; {{ __('Messages enabled') }}</li>
                         </ul>
                         <form method="POST" action="{{ route('settings.whatsapp.disconnect') }}" onsubmit="return confirm('{{ __('Disconnect WhatsApp? Automated messages will stop until you reconnect.') }}')">
                             @csrf
-                            <button type="submit" class="px-4 py-2 bg-danger-bg dark:bg-red-900/30 text-danger dark:text-red-300 rounded-md text-sm font-semibold hover:bg-red-100 dark:hover:bg-red-900/50">{{ __('Disconnect WhatsApp') }}</button>
+                            <button type="submit" class="px-4 py-2 bg-danger-bg dark:bg-red-900/30 text-danger-strong dark:text-red-300 rounded-md text-sm font-semibold hover:bg-red-100 dark:hover:bg-red-900/50">{{ __('Disconnect WhatsApp') }}</button>
                         </form>
                     @elseif (! config('services.whatsapp.app_id') || ! config('services.whatsapp.embedded_signup_config_id'))
-                        <div class="text-sm text-warning">
+                        <div class="text-sm text-warning-strong">
                             {{ __('WhatsApp connection isn\'t set up on this platform yet. Contact support.') }}
                         </div>
                     @else
@@ -219,7 +219,7 @@
                         <div id="whatsapp-connect-error" class="hidden mb-4 text-sm text-danger"></div>
 
                         @unless (request()->secure())
-                            <div class="mb-4 text-sm text-warning">
+                            <div class="mb-4 text-sm text-warning-strong">
                                 {{ __('WhatsApp connection requires a secure (HTTPS) connection — Meta blocks it on plain HTTP, including on localhost. This won\'t work until the site is served over HTTPS.') }}
                             </div>
                         @endunless
@@ -348,11 +348,11 @@
                     </p>
 
                     @if ($business->hasPaystackSubaccount())
-                        <div class="text-sm text-success">
+                        <div class="text-sm text-success-strong">
                             {{ __('Connected') }} — {{ $business->paystack_account_name }} ({{ $business->paystack_account_number }})
                         </div>
                     @else
-                        <div class="mb-4 text-xs text-warning">{{ __('Not connected yet — payments currently settle to the platform account and your share is tracked for manual payout.') }}</div>
+                        <div class="mb-4 text-xs text-warning-strong">{{ __('Not connected yet — payments currently settle to the platform account and your share is tracked for manual payout.') }}</div>
 
                         <form method="POST" action="{{ route('settings.paystack.connect') }}" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             @csrf
