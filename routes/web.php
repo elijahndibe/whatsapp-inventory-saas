@@ -18,6 +18,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\NotificationPreferencesController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InvoiceController;
@@ -92,6 +94,11 @@ Route::middleware('auth')->group(function () {
 
     Route::post('settings/whatsapp/connect', [WhatsAppConnectController::class, 'connect'])->name('settings.whatsapp.connect');
     Route::post('settings/whatsapp/disconnect', [WhatsAppConnectController::class, 'disconnect'])->name('settings.whatsapp.disconnect');
+
+    Route::put('settings/notification-preferences', [NotificationPreferencesController::class, 'update'])->name('notification-preferences.update');
+
+    Route::get('onboarding', [OnboardingController::class, 'show'])->name('onboarding.show');
+    Route::post('onboarding/finish', [OnboardingController::class, 'finish'])->name('onboarding.finish');
 
     Route::get('billing', [BillingController::class, 'index'])->name('billing.index');
     Route::post('billing/subscribe/{plan}', [BillingController::class, 'subscribe'])->name('billing.subscribe');

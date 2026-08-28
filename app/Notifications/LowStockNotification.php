@@ -16,7 +16,13 @@ class LowStockNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        $channels = ['database'];
+
+        if (! method_exists($notifiable, 'wantsEmailNotification') || $notifiable->wantsEmailNotification('low_stock')) {
+            $channels[] = 'mail';
+        }
+
+        return $channels;
     }
 
     public function toMail(object $notifiable): MailMessage

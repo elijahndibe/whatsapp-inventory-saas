@@ -6,7 +6,7 @@
     <div class="py-6 sm:py-12">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6"
              x-data="{
-                tab: (['business', 'storefront', 'payments', 'whatsapp', 'locations', 'staff'].includes(window.location.hash.slice(1)))
+                tab: (['business', 'storefront', 'payments', 'whatsapp', 'locations', 'staff', 'notifications', 'security'].includes(window.location.hash.slice(1)))
                     ? window.location.hash.slice(1)
                     : 'business',
              }"
@@ -25,6 +25,8 @@
                         'whatsapp' => __('WhatsApp'),
                         'locations' => __('Locations'),
                         'staff' => __('Staff'),
+                        'notifications' => __('Notifications'),
+                        'security' => __('Security'),
                     ] as $key => $label)
                         <button type="button" role="tab" :aria-selected="tab === '{{ $key }}'"
                                 @click="tab = '{{ $key }}'"
@@ -392,6 +394,51 @@
                         {{ __('Manage Staff') }}
                     </a>
                 </div>
+
+            {{-- Notifications: per-user email toggles for the notification types
+                 that already exist (App\Notifications\*). The in-app bell is
+                 always on — only email delivery is optional. --}}
+            <div x-show="tab === 'notifications'" x-cloak class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+                <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('Email Notifications') }}</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                    {{ __('You\'ll always see these in your notification bell — choose which ones also go to your email.') }}
+                </p>
+
+                <form method="POST" action="{{ route('notification-preferences.update') }}" class="space-y-3">
+                    @csrf
+                    @method('PUT')
+
+                    @foreach ([
+                        'new_order' => [__('New orders'), __('When a customer places an order via your storefront or WhatsApp.')],
+                        'payment_received' => [__('Payments received'), __('When an order is paid for.')],
+                        'low_stock' => [__('Low stock alerts'), __('When a product runs low or goes out of stock.')],
+                    ] as $type => [$label, $description])
+                        <label class="flex items-start gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-700 cursor-pointer">
+                            <input type="checkbox" name="email[]" value="{{ $type }}" @checked(auth()->user()->wantsEmailNotification($type))
+                                   class="mt-0.5 rounded border-gray-300 dark:border-gray-700 text-brand-600 shadow-sm focus:ring-brand-500" />
+                            <span>
+                                <span class="block text-sm font-medium text-gray-900 dark:text-gray-100">{{ $label }}</span>
+                                <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $description }}</span>
+                            </span>
+                        </label>
+                    @endforeach
+
+                    <div class="flex justify-end pt-2">
+                        <x-primary-button>{{ __('Save') }}</x-primary-button>
+                    </div>
+                </form>
+            </div>
+
+            {{-- Security: reuses the exact same password form as the Profile page
+                 (same route, same validation) rather than duplicating it. Signing
+                 out other sessions and two-factor authentication aren't built —
+                 both would need new, security-sensitive infrastructure (global
+                 session-invalidation middleware; TOTP secrets, recovery codes and
+                 a second login step) that deserves its own dedicated review
+                 rather than being folded into this settings reorganization. --}}
+            <div x-show="tab === 'security'" x-cloak class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+                @include('profile.partials.update-password-form')
+            </div>
 
         </div>
     </div>

@@ -26,6 +26,7 @@ class Business extends Model
         'currency',
         'timezone',
         'status',
+        'onboarding_completed_at',
         'whatsapp_phone_number_id',
         'whatsapp_business_account_id',
         'whatsapp_access_token',
@@ -52,6 +53,7 @@ class Business extends Model
             // encrypted at rest.
             'whatsapp_access_token' => 'encrypted',
             'whatsapp_connected_at' => 'datetime',
+            'onboarding_completed_at' => 'datetime',
             'commission_rate' => 'float',
         ];
     }

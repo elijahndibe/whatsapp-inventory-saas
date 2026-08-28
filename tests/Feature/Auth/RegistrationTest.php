@@ -38,7 +38,7 @@ class RegistrationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('onboarding.show', absolute: false));
     }
 
     public function test_registering_creates_a_business_and_assigns_the_owner_role(): void

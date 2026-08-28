@@ -27,7 +27,14 @@ class User extends Authenticatable
         'email',
         'password',
         'status',
+        'notification_preferences',
     ];
+
+    /**
+     * Keys this user can toggle off email delivery for. The in-app bell
+     * (database channel) is never gated by these — only 'mail'.
+     */
+    public const EMAIL_NOTIFICATION_TYPES = ['new_order', 'payment_received', 'low_stock'];
 
     /**
      * Migration-level column defaults aren't reliably honored by SQLite
@@ -60,7 +67,18 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_super_admin' => 'boolean',
+            'notification_preferences' => 'array',
         ];
+    }
+
+    /**
+     * Whether this user should be emailed for a given notification type
+     * (one of self::EMAIL_NOTIFICATION_TYPES). Missing key = enabled, so
+     * existing users default to "on" without a data migration.
+     */
+    public function wantsEmailNotification(string $type): bool
+    {
+        return (bool) ($this->notification_preferences[$type] ?? true);
     }
 
     public function business(): BelongsTo
