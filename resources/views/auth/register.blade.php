@@ -56,6 +56,21 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
+        <!-- Terms agreement -->
+        <div class="mt-4">
+            <label class="inline-flex items-start gap-2">
+                <input type="checkbox" name="terms" value="1" @checked(old('terms'))
+                       class="mt-0.5 rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-brand-600 shadow-sm focus:ring-brand-500 dark:focus:ring-brand-600 dark:focus:ring-offset-gray-800" />
+                <span class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ __('I agree to the') }}
+                    <a href="{{ route('legal.terms') }}" target="_blank" class="text-brand-700 dark:text-brand-400 hover:underline">{{ __('Terms of Service') }}</a>
+                    {{ __('and') }}
+                    <a href="{{ route('legal.privacy') }}" target="_blank" class="text-brand-700 dark:text-brand-400 hover:underline">{{ __('Privacy Policy') }}</a>.
+                </span>
+            </label>
+            <x-input-error :messages="$errors->get('terms')" class="mt-2" />
+        </div>
+
         <x-primary-button class="w-full justify-center mt-6">
             {{ __('Create your store') }}
         </x-primary-button>

@@ -26,6 +26,14 @@ class RegisterBusinessRequest extends FormRequest
             // platform, exactly like it is in this dev environment.
             'phone' => ['required', 'string', 'max:30', new PhoneIsVerified],
             'password' => ['required', 'confirmed', Password::defaults()],
+            'terms' => ['accepted'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'terms.accepted' => 'You must agree to the Terms of Service and Privacy Policy to create a store.',
         ];
     }
 }

@@ -152,7 +152,11 @@
     <footer class="py-10 border-t border-gray-100">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <x-zwenko-wordmark markClass="h-6 w-6" textClass="text-base" />
-            <p class="text-xs text-gray-400">&copy; {{ date('Y') }} Zwenko. {{ __('All rights reserved.') }}</p>
+            <div class="flex items-center gap-4 text-xs text-gray-400">
+                <a href="{{ route('legal.terms') }}" class="hover:text-gray-600">{{ __('Terms') }}</a>
+                <a href="{{ route('legal.privacy') }}" class="hover:text-gray-600">{{ __('Privacy') }}</a>
+                <span>&copy; {{ date('Y') }} Zwenko. {{ __('All rights reserved.') }}</span>
+            </div>
         </div>
     </footer>
 

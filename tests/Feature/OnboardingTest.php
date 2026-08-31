@@ -79,6 +79,7 @@ class OnboardingTest extends TestCase
             'phone' => '+2348011112222',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'terms' => 1,
         ]);
 
         $response->assertRedirect(route('onboarding.show', absolute: false));

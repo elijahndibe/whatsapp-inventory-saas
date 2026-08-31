@@ -17,6 +17,7 @@ use App\Http\Controllers\WhatsAppConnectController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HelpController;
+use App\Http\Controllers\LegalController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\NotificationPreferencesController;
 use App\Http\Controllers\OnboardingController;
@@ -43,7 +44,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
+
+Route::get('/terms', [LegalController::class, 'terms'])->name('legal.terms');
+Route::get('/privacy', [LegalController::class, 'privacy'])->name('legal.privacy');
 
 Route::get('/dashboard', DashboardController::class)
     ->middleware(['auth', 'verified'])

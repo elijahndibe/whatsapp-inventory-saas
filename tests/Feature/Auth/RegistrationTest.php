@@ -35,6 +35,7 @@ class RegistrationTest extends TestCase
             'phone' => '+2348012345678',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'terms' => 1,
         ]);
 
         $this->assertAuthenticated();
@@ -50,6 +51,7 @@ class RegistrationTest extends TestCase
             'phone' => '+2348012345678',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'terms' => 1,
         ]);
 
         $business = Business::first();
@@ -71,6 +73,7 @@ class RegistrationTest extends TestCase
             'email' => 'amaka@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'terms' => 1,
         ]);
 
         $response->assertSessionHasErrors('business_name');
@@ -85,6 +88,7 @@ class RegistrationTest extends TestCase
             'email' => 'amaka@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'terms' => 1,
         ]);
 
         $response->assertSessionHasErrors('phone');
@@ -106,6 +110,7 @@ class RegistrationTest extends TestCase
             'phone' => '+2348012345678',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'terms' => 1,
         ]);
 
         $response->assertSessionDoesntHaveErrors();
@@ -126,9 +131,27 @@ class RegistrationTest extends TestCase
             'phone' => '+2348012345678',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'terms' => 1,
         ]);
 
         $response->assertSessionHasErrors('phone');
+        $this->assertGuest();
+        $this->assertNull(Business::first());
+    }
+
+    public function test_agreeing_to_the_terms_is_required_to_register(): void
+    {
+        $response = $this->post('/register', [
+            'business_name' => "Amaka's Fashion Store",
+            'name' => 'Amaka Okafor',
+            'email' => 'amaka@example.com',
+            'phone' => '+2348012345678',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            // 'terms' intentionally omitted
+        ]);
+
+        $response->assertSessionHasErrors('terms');
         $this->assertGuest();
         $this->assertNull(Business::first());
     }
@@ -154,6 +177,7 @@ class RegistrationTest extends TestCase
             'phone' => '+2348012345678',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'terms' => 1,
         ]);
 
         $response->assertSessionDoesntHaveErrors();
