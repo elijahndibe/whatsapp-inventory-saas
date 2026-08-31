@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Sentry\Laravel\Integration;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -26,5 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: ['webhooks/paystack', 'webhooks/whatsapp']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // No-op when SENTRY_LARAVEL_DSN is blank — same "fails open, not
+        // closed" convention as the rest of this app's optional
+        // integrations (WhatsApp Embedded Signup, phone verification):
+        // an unconfigured DSN means errors just aren't reported anywhere,
+        // never that the app breaks.
+        Integration::handles($exceptions);
     })->create();

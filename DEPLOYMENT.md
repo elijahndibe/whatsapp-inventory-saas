@@ -67,6 +67,7 @@ The `queue` and `scheduler` services in `docker-compose.yml` run continuously �
 - `PAYSTACK_WEBHOOK_SECRET` matches what's configured in the Paystack dashboard
 - Register the two webhook URLs with their respective providers once the domain is live: `https://your-domain/webhooks/paystack` and `https://your-domain/webhooks/whatsapp`
 - `MAIL_MAILER` set to a real transport — `log`/`array` mean password-reset and notification emails silently never send
+- `SENTRY_LARAVEL_DSN` set — without it, an error in production only shows the user a generic page and writes a line to a log file nobody's watching; with it, you actually find out. Free tier at sentry.io is enough to start. Blank is safe (no errors reported anywhere, not a broken app) but shouldn't stay blank once real users are on it.
 - Database backups scheduled (not covered by this app — use your host's managed backup or a `mysqldump` cron)
 
 ## Verifying a deploy
