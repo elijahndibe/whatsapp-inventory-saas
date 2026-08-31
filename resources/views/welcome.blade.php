@@ -51,7 +51,8 @@
                     {{ __('Stop selling out of') }}<br>{{ __('your ') }}<span class="text-brand-700">{{ __('DMs.') }}</span>
                 </h1>
                 <p class="mt-5 text-lg text-gray-600 max-w-lg">
-                    {{ __('Zwenko turns your WhatsApp sales into a real online store — a proper catalog, inventory that updates itself, and payments that land in your account. Customers still order the way they already do; everything behind it just stops being chaos.') }}
+                    {{ __('Zwenko turns your WhatsApp sales into a real online business — with your own storefront, organized orders, live inventory and secure payments.') }}
+                    {{ __('Customers still order right where they already message you; everything behind it just stops being chaos.') }}
                 </p>
                 <div class="mt-8 flex flex-wrap items-center gap-3">
                     <a href="{{ route('register') }}"><x-primary-button type="button" class="!px-6 !py-3.5 !text-base">{{ __('Start your store for free') }}</x-primary-button></a>
@@ -114,9 +115,9 @@
     <section class="border-y border-gray-100 py-6 bg-white">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-sm text-gray-400">
             <span class="flex items-center gap-1.5 font-medium text-gray-500"><x-icon name="payments" class="w-4 h-4" /> {{ __('Secure payments') }}</span>
-            <span class="flex items-center gap-1.5 font-medium text-gray-500"><x-icon name="whatsapp" class="w-4 h-4" /> {{ __('WhatsApp built-in') }}</span>
+            <span class="flex items-center gap-1.5 font-medium text-gray-500"><x-icon name="whatsapp" class="w-4 h-4" /> {{ __('WhatsApp ordering') }}</span>
             <span>{{ __('Built for growing businesses across Africa') }}</span>
-            <span>{{ __('Bank-level security') }}</span>
+            <span>{{ __('Secure online payments') }}</span>
         </div>
     </section>
 
@@ -151,7 +152,7 @@
                         'Every order sitting in one organized list, always',
                         'A real catalog customers browse and order from themselves',
                         'One tap to send a secure payment link — no more copy-pasting',
-                        'Stock that updates itself the moment something sells',
+                        'Stock that updates itself the moment you confirm an order',
                         'A checkout customers actually trust, backed by real payment security',
                         'A storefront link that makes you look like the real business you are',
                     ] as $win)
@@ -186,6 +187,89 @@
         </div>
     </section>
 
+    {{-- The mechanism: this is Zwenko's actual differentiator (WhatsApp
+         ordering wired straight into a real payment + inventory system),
+         so it gets its own section rather than being buried in a single
+         feature-grid card. Deliberately says "secure payment link", never
+         the underlying processor by name — matches how every seller-facing
+         screen in the app itself already talks about payments. --}}
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center max-w-2xl mx-auto mb-14">
+            <h2 class="text-3xl font-bold tracking-tight">{{ __('From WhatsApp message to paid order') }}</h2>
+            <p class="mt-3 text-gray-600">{{ __('The part that actually makes Zwenko different from just having a WhatsApp number.') }}</p>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4">
+            @foreach ([
+                ['icon' => 'whatsapp', 'title' => 'Customer orders', 'desc' => 'They find a product on your store and tap "Order via WhatsApp" — no app to download.'],
+                ['icon' => 'orders', 'title' => 'It lands in your dashboard', 'desc' => 'The order appears in Zwenko automatically — nothing for you to copy down by hand.'],
+                ['icon' => 'payments', 'title' => 'You send a payment link', 'desc' => 'Confirm the order and Zwenko generates a secure payment link in one tap, ready to send in the same chat.'],
+                ['icon' => 'check-circle', 'title' => 'You get paid', 'desc' => 'Once they pay, Zwenko verifies it, marks the order paid, and updates your stock — automatically.'],
+            ] as $i => $step)
+                <div class="relative">
+                    <div class="rounded-2xl border border-gray-100 p-5 h-full">
+                        <div class="flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-lg bg-brand-50 text-brand-700 flex items-center justify-center shrink-0"><x-icon :name="$step['icon']" class="w-4 h-4" /></span>
+                            <span class="text-xs font-semibold text-gray-300">0{{ $i + 1 }}</span>
+                        </div>
+                        <p class="mt-3 font-semibold">{{ __($step['title']) }}</p>
+                        <p class="mt-1 text-sm text-gray-500">{{ __($step['desc']) }}</p>
+                    </div>
+                    @if (! $loop->last)
+                        <x-icon name="chevron-right" class="hidden lg:block absolute top-1/2 -right-6 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    </section>
+
+    {{-- Shows the customer's side, not just the seller's dashboard — a CSS
+         mockup matching the real storefront (not a captured screenshot),
+         same treatment as the hero's dashboard mockup. --}}
+    <section class="bg-gray-50 py-20 overflow-hidden">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-3xl font-bold tracking-tight">{{ __('Give customers somewhere better to shop') }}</h2>
+                <p class="mt-4 text-gray-600">{{ __('Share one link and your customers get a proper storefront — your products, your prices, your photos — where they can browse, order via WhatsApp, or pay online. Not a chat history they have to scroll through.') }}</p>
+                <a href="{{ route('register') }}" class="inline-block mt-6">
+                    <x-outline-button type="button">{{ __('Start your store for free') }}</x-outline-button>
+                </a>
+            </div>
+            <div class="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+                <div class="bg-gradient-to-br from-brand-700 via-brand-800 to-gray-900 p-5">
+                    <div class="h-9 w-9 rounded-full bg-white/15 border border-white/30"></div>
+                    <p class="mt-3 text-white font-semibold">{{ __('Bella Fashion') }}</p>
+                    <p class="text-white/70 text-xs">{{ __('Lagos, Nigeria') }}</p>
+                </div>
+                <div class="p-4 grid grid-cols-2 gap-3">
+                    @foreach ([['n' => 'Ankara Maxi Dress', 'p' => '₦15,000'], ['n' => 'Leather Handbag', 'p' => '₦22,000'], ['n' => 'Beaded Sandals', 'p' => '₦8,500'], ['n' => 'Silk Headwrap', 'p' => '₦4,000']] as $product)
+                        <div class="rounded-lg border border-gray-100 overflow-hidden">
+                            <div class="aspect-square bg-gray-50"></div>
+                            <div class="p-2">
+                                <p class="text-[11px] font-medium text-ink truncate">{{ $product['n'] }}</p>
+                                <p class="text-[11px] text-gray-500">{{ $product['p'] }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- Not a hard restriction — Zwenko is category-agnostic — but naming
+         concrete categories helps a visitor place themselves ("this is for
+         people like me") faster than an abstract capability list does. --}}
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+        <h2 class="text-3xl font-bold tracking-tight">{{ __('Made for businesses like yours') }}</h2>
+        <p class="mt-3 text-gray-600 max-w-xl mx-auto">{{ __('Whatever you sell, if you\'re already selling it on WhatsApp, Zwenko can handle it.') }}</p>
+        <div class="mt-10 flex flex-wrap justify-center gap-3">
+            @foreach ([['e' => '👗', 't' => 'Fashion'], ['e' => '💄', 't' => 'Beauty'], ['e' => '📱', 't' => 'Electronics'], ['e' => '🍔', 't' => 'Food'], ['e' => '🏠', 't' => 'Home & Lifestyle'], ['e' => '🛍️', 't' => 'Retail']] as $cat)
+                <span class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-gray-200 text-sm font-medium text-gray-700 bg-white">
+                    <span>{{ $cat['e'] }}</span> {{ __($cat['t']) }}
+                </span>
+            @endforeach
+        </div>
+    </section>
+
     <section id="features" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div class="text-center max-w-2xl mx-auto mb-12">
             <h2 class="text-3xl font-bold tracking-tight">{{ __('Everything a real store needs — nothing it doesn\'t') }}</h2>
@@ -195,7 +279,7 @@
             @foreach ([
                 ['icon' => 'whatsapp', 'color' => 'success', 'title' => 'WhatsApp ordering', 'desc' => 'Customers order in one tap, no app to download. You confirm and request payment right inside the chat.'],
                 ['icon' => 'store', 'color' => 'brand', 'title' => 'A real storefront', 'desc' => 'One clean, shareable link with your products, prices and photos — built to be sent, not scrolled through.'],
-                ['icon' => 'inventory', 'color' => 'info', 'title' => 'Inventory that updates itself', 'desc' => 'Stock drops automatically with every sale, across as many locations as you sell from.'],
+                ['icon' => 'inventory', 'color' => 'info', 'title' => 'Inventory that stays in sync', 'desc' => 'Stock updates automatically with every order you confirm — across as many locations as you sell from.'],
                 ['icon' => 'payments', 'color' => 'warning', 'title' => 'Secure payments', 'desc' => 'Cards, bank transfer and USSD, handled securely — money lands in your account, not your inbox.'],
                 ['icon' => 'customers', 'color' => 'brand', 'title' => 'Customers, remembered', 'desc' => 'Every buyer and their order history saved automatically — no more scrolling to find who ordered what.'],
                 ['icon' => 'tag', 'color' => 'success', 'title' => 'Coupon codes', 'desc' => 'Launch a promo, reward repeat customers, or run a limited-time discount in minutes.'],
@@ -222,13 +306,13 @@
     <section id="pricing" class="bg-gray-50 py-20">
         <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <span class="inline-flex px-3 py-1 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold uppercase tracking-wide">{{ __('Simple pricing') }}</span>
-            <h2 class="mt-4 text-3xl sm:text-4xl font-bold tracking-tight">{{ __('Pay when you sell.') }}<br><span class="text-brand-700">{{ __('Nothing when you don\'t.') }}</span></h2>
-            <p class="mt-3 text-gray-600">{{ __('No monthly subscription, no setup cost, no card required to start. Just a small commission on sales that actually happen.') }}</p>
+            <h2 class="mt-4 text-3xl sm:text-4xl font-bold tracking-tight">{{ __('Pay when you sell.') }}<br><span class="text-brand-700">{{ __('No monthly subscription.') }}</span></h2>
+            <p class="mt-3 text-gray-600">{{ __('Start free and pay a small Zwenko commission only when you receive a successful online payment. No setup cost, no card required to start, nothing to pay if you don\'t sell.') }}</p>
 
             <div class="mt-10 bg-white rounded-2xl border border-gray-100 shadow-card p-8 text-left">
-                <p class="text-sm font-medium text-gray-500">{{ __('Commission') }}</p>
+                <p class="text-sm font-medium text-gray-500">{{ __('Zwenko commission') }}</p>
                 <p class="mt-1 text-5xl font-bold text-brand-700">1.5%</p>
-                <p class="text-sm text-gray-500">{{ __('on every successful sale — that\'s it') }}</p>
+                <p class="text-sm text-gray-500">{{ __('on successful online sales — that\'s the only fee. We cover the rest.') }}</p>
                 <ul class="mt-6 space-y-2.5 text-sm text-gray-600">
                     @foreach (['No monthly fees, ever', 'No setup or hidden costs', 'Full storefront & product catalog', 'WhatsApp ordering, always free', 'Secure card, bank & USSD payments', 'Orders, customers, inventory & reports'] as $item)
                         <li class="flex items-center gap-2"><x-icon name="check" class="w-4 h-4 text-success shrink-0" /> {{ __($item) }}</li>
