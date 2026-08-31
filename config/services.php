@@ -63,6 +63,17 @@ return [
         // Business at that point) — no per-business token needed or
         // stored. See Business::whatsappAccessToken().
         'system_user_token' => env('WHATSAPP_SYSTEM_USER_TOKEN'),
+        // The platform's OWN WhatsApp Business number (a Zwenko-owned
+        // number, not any tenant's) — used only to send phone-verification
+        // codes, since that has to work before a business/tenant even
+        // exists yet to send from. Sending to a number outside an open
+        // conversation window requires a Meta-approved "Authentication"
+        // category message template; see WHATSAPP_SETUP.md. Left blank,
+        // phone verification is treated as not configured — registration
+        // and Settings fall back to not requiring it rather than blocking
+        // every signup on infrastructure that was never set up.
+        'platform_phone_number_id' => env('WHATSAPP_PLATFORM_PHONE_NUMBER_ID'),
+        'otp_template_name' => env('WHATSAPP_OTP_TEMPLATE_NAME', 'phone_verification'),
     ],
 
 ];

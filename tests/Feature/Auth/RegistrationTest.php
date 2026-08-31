@@ -77,46 +77,86 @@ class RegistrationTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_the_detected_country_currency_and_timezone_are_saved_when_submitted(): void
+    public function test_phone_is_required_to_register(): void
     {
-        $this->post('/register', [
-            'business_name' => 'Accra Traders',
-            'name' => 'Kwame Mensah',
-            'email' => 'kwame@example.com',
-            'phone' => '+233241234567',
-            'country' => 'Ghana',
-            'currency' => 'GHS',
-            'timezone' => 'Africa/Accra',
+        $response = $this->post('/register', [
+            'business_name' => "Amaka's Fashion Store",
+            'name' => 'Amaka Okafor',
+            'email' => 'amaka@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
         ]);
 
-        $business = Business::first();
-
-        $this->assertSame('Ghana', $business->country);
-        $this->assertSame('GHS', $business->currency);
-        $this->assertSame('Africa/Accra', $business->timezone);
-        $this->assertSame('+233241234567', $business->phone);
+        $response->assertSessionHasErrors('phone');
+        $this->assertGuest();
     }
 
-    public function test_omitting_country_currency_and_timezone_falls_back_to_the_column_defaults(): void
+    public function test_registration_still_works_when_phone_verification_is_not_configured(): void
     {
-        // Simulates JS-disabled registration, or a browser whose timezone
-        // isn't in the curated country list — the fields simply aren't
-        // submitted, and the businesses table's own defaults (Nigeria/
-        // NGN/Africa/Lagos) apply exactly as they did before this feature.
-        $this->post('/register', [
-            'business_name' => 'No JS Store',
-            'name' => 'Tola Adeyemi',
-            'email' => 'tola@example.com',
+        // The default state — nothing in .env.example's
+        // WHATSAPP_PLATFORM_PHONE_NUMBER_ID/WHATSAPP_OTP_TEMPLATE_NAME is
+        // set. Feature-off must never block signups, only enforce once
+        // someone has actually turned it on (see PhoneIsVerified).
+        config(['services.whatsapp.platform_phone_number_id' => null]);
+
+        $response = $this->post('/register', [
+            'business_name' => "Amaka's Fashion Store",
+            'name' => 'Amaka Okafor',
+            'email' => 'amaka@example.com',
+            'phone' => '+2348012345678',
             'password' => 'password',
             'password_confirmation' => 'password',
         ]);
 
-        $business = Business::first();
+        $response->assertSessionDoesntHaveErrors();
+        $this->assertNotNull(Business::first());
+    }
 
-        $this->assertSame('Nigeria', $business->country);
-        $this->assertSame('NGN', $business->currency);
-        $this->assertSame('Africa/Lagos', $business->timezone);
+    public function test_registration_is_blocked_when_phone_verification_is_configured_but_not_completed(): void
+    {
+        config([
+            'services.whatsapp.platform_phone_number_id' => 'fake_platform_number_id',
+            'services.whatsapp.system_user_token' => 'fake_token',
+        ]);
+
+        $response = $this->post('/register', [
+            'business_name' => "Amaka's Fashion Store",
+            'name' => 'Amaka Okafor',
+            'email' => 'amaka@example.com',
+            'phone' => '+2348012345678',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $response->assertSessionHasErrors('phone');
+        $this->assertGuest();
+        $this->assertNull(Business::first());
+    }
+
+    public function test_registration_succeeds_once_the_phone_has_been_verified(): void
+    {
+        config([
+            'services.whatsapp.platform_phone_number_id' => 'fake_platform_number_id',
+            'services.whatsapp.system_user_token' => 'fake_token',
+        ]);
+
+        \App\Models\PhoneVerification::create([
+            'phone' => '+2348012345678',
+            'code' => '123456',
+            'expires_at' => now()->addMinutes(10),
+            'verified_at' => now(),
+        ]);
+
+        $response = $this->post('/register', [
+            'business_name' => "Amaka's Fashion Store",
+            'name' => 'Amaka Okafor',
+            'email' => 'amaka@example.com',
+            'phone' => '+2348012345678',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $response->assertSessionDoesntHaveErrors();
+        $this->assertSame('+2348012345678', Business::first()->phone);
     }
 }

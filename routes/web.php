@@ -20,6 +20,7 @@ use App\Http\Controllers\HelpController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\NotificationPreferencesController;
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\PhoneVerificationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InvoiceController;
@@ -47,6 +48,14 @@ Route::get('/', function () {
 Route::get('/dashboard', DashboardController::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+// Deliberately outside 'auth' — Registration verifies a phone before an
+// account exists. throttle:10,1 is a coarse per-IP backstop on top of
+// PhoneVerificationService's own per-phone rate limiting.
+Route::middleware('throttle:10,1')->group(function () {
+    Route::post('phone-verification/send', [PhoneVerificationController::class, 'send'])->name('phone-verification.send');
+    Route::post('phone-verification/verify', [PhoneVerificationController::class, 'verify'])->name('phone-verification.verify');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

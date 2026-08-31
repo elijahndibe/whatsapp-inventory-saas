@@ -21,6 +21,12 @@ export default function geoPicker({
     // local number by matching the longest known dial code prefix, since
     // dial codes vary from 1 to 4 digits and there's no delimiter stored.
     phone = '',
+    // Full URLs (route('phone-verification.send') etc.), not hardcoded
+    // paths — this app doesn't always run at the domain root (e.g. a
+    // /public subdirectory under XAMPP), so a root-relative '/phone-...'
+    // path would 404 there.
+    sendCodeUrl = '/phone-verification/send',
+    verifyCodeUrl = '/phone-verification/verify',
 }) {
     return {
         countries,
@@ -31,10 +37,42 @@ export default function geoPicker({
         phoneNumber: '',
         timezoneOptions: [],
         autoDetected: false,
+        sendCodeUrl,
+        verifyCodeUrl,
+
+        // Phone verification (WhatsApp one-time code) — see
+        // PhoneVerificationController/PhoneVerificationService.
+        originalPhone: phone,
+        verified: false,
+        codeSent: false,
+        codeInput: '',
+        sending: false,
+        verifying: false,
+        feedback: '',
+        feedbackIsError: false,
+        resendIn: 0,
 
         init() {
             this.timezoneOptions = this.buildTimezoneOptions();
             this.splitPhone(phone);
+
+            // A number already on file (Settings loading an existing
+            // business) is trusted as-is — only a number that's actually
+            // changed from what was saved needs a fresh code. Registration
+            // starts with an empty originalPhone, so anything typed there
+            // counts as "changed" and needs verifying.
+            this.verified = phone !== '' && phone === this.originalPhone;
+
+            this.$watch('fullPhone', (value) => {
+                // Matches the original value again (e.g. the user typed
+                // something else and backspaced back) — still trusted,
+                // exactly as it was on load. Anything else needs a fresh
+                // code.
+                this.verified = value !== '' && value === this.originalPhone;
+                this.codeSent = false;
+                this.codeInput = '';
+                this.feedback = '';
+            });
 
             // Never override a value that's already set — that's either a
             // value the user already typed this submission, or (on
@@ -145,6 +183,75 @@ export default function geoPicker({
                 return '';
             }
             return this.dialCode + this.phoneNumber.replace(/^0/, '');
+        },
+
+        csrfToken() {
+            return document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+        },
+
+        async sendVerificationCode() {
+            if (!this.fullPhone || this.sending || this.resendIn > 0) {
+                return;
+            }
+            this.sending = true;
+            this.feedback = '';
+
+            try {
+                const response = await fetch(this.sendCodeUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrfToken(), 'Accept': 'application/json' },
+                    body: JSON.stringify({ phone: this.fullPhone }),
+                });
+                const data = await response.json();
+
+                this.feedback = data.message;
+                this.feedbackIsError = !response.ok;
+                this.codeSent = response.ok;
+
+                if (response.ok) {
+                    this.startResendCooldown();
+                }
+            } catch (e) {
+                this.feedback = 'Something went wrong sending the code. Please try again.';
+                this.feedbackIsError = true;
+            } finally {
+                this.sending = false;
+            }
+        },
+
+        async submitVerificationCode() {
+            if (!this.codeInput || this.verifying) {
+                return;
+            }
+            this.verifying = true;
+
+            try {
+                const response = await fetch(this.verifyCodeUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrfToken(), 'Accept': 'application/json' },
+                    body: JSON.stringify({ phone: this.fullPhone, code: this.codeInput }),
+                });
+                const data = await response.json();
+
+                this.feedback = data.message;
+                this.feedbackIsError = !response.ok;
+                this.verified = response.ok;
+            } catch (e) {
+                this.feedback = 'Something went wrong verifying the code. Please try again.';
+                this.feedbackIsError = true;
+            } finally {
+                this.verifying = false;
+            }
+        },
+
+        startResendCooldown() {
+            this.resendIn = 60;
+            const interval = setInterval(() => {
+                this.resendIn -= 1;
+                if (this.resendIn <= 0) {
+                    clearInterval(interval);
+                }
+            }, 1000);
         },
     };
 }

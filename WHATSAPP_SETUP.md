@@ -106,6 +106,40 @@ Until this is approved, the "Connect WhatsApp" button will work for
 Meta-registered testers on the app but not for the general public — this is
 a Meta policy requirement, not something fixable in this codebase.
 
+## 6. Phone verification (Registration + Settings)
+
+Separate from Embedded Signup — this is the **platform's own** WhatsApp
+number, used only to send a one-time code when someone registers or
+changes their phone number in Settings. See `PhoneVerificationService`,
+`WhatsAppCloudApiService::sendOtpTemplate()`, and
+`resources/js/geo.js`/`components/geo-fields.blade.php` for the send/verify
+UI. **Optional**: if left unconfigured, verification is simply not
+enforced (`PhoneIsVerified` passes everything) — registrations and Settings
+saves still work exactly as before, just without a verified phone number.
+
+1. Get (or use an existing) real phone number for the platform itself and
+   add it under App Dashboard → **WhatsApp → API Setup** → **Add phone
+   number**. This is a genuine business phone number Meta will text/call to
+   verify — it cannot be a tenant's number, and it's separate from any
+   store's connected number.
+2. Copy that number's **Phone Number ID** → `WHATSAPP_PLATFORM_PHONE_NUMBER_ID`.
+3. App Dashboard → **WhatsApp → Message Templates** → **Create Template**:
+   - Category: **Authentication**.
+   - Add a body with a single variable, e.g. `*{{1}}* is your Zwenko
+     verification code. It expires in 10 minutes.`
+   - Submit for approval (Authentication templates are typically approved
+     quickly, often within minutes, but can take longer).
+   - Once approved, put the template's name → `WHATSAPP_OTP_TEMPLATE_NAME`
+     (defaults to `phone_verification` if you name it that).
+4. This reuses `WHATSAPP_SYSTEM_USER_TOKEN` from step 4 above — no separate
+   token needed, as long as that System User also has messaging permission
+   on the platform's own WABA (it does automatically, since it's the same
+   Business that owns the number).
+
+Sending to a number outside an open 24-hour conversation **must** use an
+approved template — Meta rejects free-text messages otherwise. This is why
+`sendOtpTemplate()` sends a `type: "template"` message, not `type: "text"`.
+
 ## Environment variables this depends on
 
 All of these are read in `config/services.php` under `services.whatsapp.*`
@@ -118,6 +152,8 @@ and are documented inline in `.env.example`:
 | `WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID` | WhatsApp → Configuration → Embedded Signup Configuration ID |
 | `WHATSAPP_WEBHOOK_VERIFY_TOKEN` | Any string you choose; must match what you enter in the webhook's Verify Token field |
 | `WHATSAPP_SYSTEM_USER_TOKEN` | Business Settings → System Users → generated token |
+| `WHATSAPP_PLATFORM_PHONE_NUMBER_ID` | Optional — WhatsApp → API Setup → your platform number's Phone Number ID (phone verification) |
+| `WHATSAPP_OTP_TEMPLATE_NAME` | Optional — your approved Authentication template's name (phone verification) |
 | `WHATSAPP_API_VERSION` | Optional, defaults to `v20.0` — bump as Meta deprecates old versions |
 
 Nothing above is ever sent to the browser or shown to a store owner — the

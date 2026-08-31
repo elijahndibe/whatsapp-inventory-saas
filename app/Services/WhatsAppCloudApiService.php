@@ -68,6 +68,60 @@ class WhatsAppCloudApiService
     }
 
     /**
+     * Sends a one-time code from the platform's OWN WhatsApp number
+     * (config('services.whatsapp.platform_phone_number_id')) — used only
+     * for phone verification, since that has to work before any tenant
+     * business exists to send from its own connected number.
+     *
+     * Messages to a number outside an open 24-hour conversation window
+     * must use a Meta-approved template (free-text 'text' messages are
+     * rejected/blocked outside that window) — this sends the "Authentication"
+     * category template configured via WHATSAPP_OTP_TEMPLATE_NAME, with the
+     * code as the single body parameter. See WHATSAPP_SETUP.md.
+     *
+     * Returns false (never throws) when the platform number isn't
+     * configured — callers treat that as "verification isn't available
+     * right now" rather than a hard failure.
+     */
+    public function sendOtpTemplate(string $toPhone, string $code): bool
+    {
+        $phoneNumberId = config('services.whatsapp.platform_phone_number_id');
+        $token = config('services.whatsapp.system_user_token');
+        $template = config('services.whatsapp.otp_template_name');
+
+        if (! $phoneNumberId || ! $token) {
+            return false;
+        }
+
+        $to = preg_replace('/\D+/', '', $toPhone);
+
+        $response = Http::withToken($token)
+            ->acceptJson()
+            ->timeout(15)
+            ->post("https://graph.facebook.com/{$this->apiVersion}/{$phoneNumberId}/messages", [
+                'messaging_product' => 'whatsapp',
+                'to' => $to,
+                'type' => 'template',
+                'template' => [
+                    'name' => $template,
+                    'language' => ['code' => 'en_US'],
+                    'components' => [
+                        ['type' => 'body', 'parameters' => [['type' => 'text', 'text' => $code]]],
+                    ],
+                ],
+            ]);
+
+        if (! $response->successful()) {
+            Log::warning('WhatsApp OTP send failed', [
+                'status' => $response->status(),
+                'body' => $response->json(),
+            ]);
+        }
+
+        return $response->successful();
+    }
+
+    /**
      * Step 1 of Embedded Signup: exchange the short-lived authorization
      * code the frontend got from FB.login() for an access token scoped to
      * the WABA the user just shared with our Meta app. We only need this

@@ -79,6 +79,68 @@ class BusinessSettingsTest extends TestCase
         $this->assertSame('Africa/Accra', $fresh->timezone);
     }
 
+    public function test_changing_the_phone_number_is_blocked_without_verification_when_configured(): void
+    {
+        config([
+            'services.whatsapp.platform_phone_number_id' => 'fake_platform_number_id',
+            'services.whatsapp.system_user_token' => 'fake_token',
+        ]);
+        $this->business->update(['phone' => '+2348011110000']);
+
+        $response = $this->actingAs($this->owner)->put(route('settings.update'), [
+            'name' => $this->business->name,
+            'phone' => '+2348022220000',
+            'currency' => 'NGN',
+            'timezone' => 'Africa/Lagos',
+        ]);
+
+        $response->assertSessionHasErrors('phone');
+        $this->assertSame('+2348011110000', $this->business->fresh()->phone);
+    }
+
+    public function test_changing_to_a_verified_phone_number_succeeds(): void
+    {
+        config([
+            'services.whatsapp.platform_phone_number_id' => 'fake_platform_number_id',
+            'services.whatsapp.system_user_token' => 'fake_token',
+        ]);
+        $this->business->update(['phone' => '+2348011110000']);
+        \App\Models\PhoneVerification::create([
+            'phone' => '+2348022220000',
+            'code' => '123456',
+            'expires_at' => now()->addMinutes(10),
+            'verified_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->owner)->put(route('settings.update'), [
+            'name' => $this->business->name,
+            'phone' => '+2348022220000',
+            'currency' => 'NGN',
+            'timezone' => 'Africa/Lagos',
+        ]);
+
+        $response->assertSessionDoesntHaveErrors();
+        $this->assertSame('+2348022220000', $this->business->fresh()->phone);
+    }
+
+    public function test_saving_settings_without_changing_the_phone_number_never_requires_verification(): void
+    {
+        config([
+            'services.whatsapp.platform_phone_number_id' => 'fake_platform_number_id',
+            'services.whatsapp.system_user_token' => 'fake_token',
+        ]);
+        $this->business->update(['phone' => '+2348011110000']);
+
+        $response = $this->actingAs($this->owner)->put(route('settings.update'), [
+            'name' => 'Renamed while keeping the same phone',
+            'phone' => '+2348011110000',
+            'currency' => 'NGN',
+            'timezone' => 'Africa/Lagos',
+        ]);
+
+        $response->assertSessionDoesntHaveErrors();
+    }
+
     public function test_admin_cannot_access_settings(): void
     {
         $admin = User::factory()->create(['business_id' => $this->business->id]);

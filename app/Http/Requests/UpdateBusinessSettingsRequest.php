@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\PhoneIsVerified;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateBusinessSettingsRequest extends FormRequest
 {
@@ -13,11 +15,17 @@ class UpdateBusinessSettingsRequest extends FormRequest
 
     public function rules(): array
     {
+        // Only a *changed* phone number needs a fresh WhatsApp code — the
+        // number already on file was verified when it was first saved (or
+        // predates this feature and is trusted as-is), so re-verifying it
+        // unchanged on every settings save would be pure friction.
+        $phoneChanged = $this->filled('phone') && $this->input('phone') !== $this->user()->business->phone;
+
         return [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
             'email' => ['nullable', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:30'],
+            'phone' => ['nullable', 'string', 'max:30', Rule::when($phoneChanged, [new PhoneIsVerified])],
             'whatsapp_number' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string', 'max:500'],
             'city' => ['nullable', 'string', 'max:255'],

@@ -26,9 +26,11 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <!-- WhatsApp / Phone Number, Country, Currency, Timezone — auto-detected, always editable -->
+        <!-- WhatsApp / Phone Number — verified via a WhatsApp code before the
+             form can submit. Country/currency/timezone aren't collected
+             here; a business sets those in Settings once it exists. -->
         <div class="mt-4">
-            <x-geo-fields :country="old('country')" :currency="old('currency')" :timezone="old('timezone')" :phone="old('phone')" />
+            <x-geo-fields :phone="old('phone')" :show-locale="false" />
         </div>
 
         <!-- Password -->

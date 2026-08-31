@@ -18,19 +18,15 @@ class RegisterBusinessAction
     public function execute(array $data): User
     {
         return DB::transaction(function () use ($data) {
-            // country/currency/timezone are auto-detected client-side
-            // (resources/js/geo.js) but only ever sent when non-empty —
-            // omitting the key here rather than passing an explicit null
-            // lets the businesses table's own column defaults apply
-            // exactly as they did before this field existed.
-            $business = Business::create(array_filter([
+            // country/currency/timezone aren't collected at registration —
+            // the businesses table's own defaults (Nigeria/NGN/Africa/Lagos)
+            // apply, and Settings already has its own detect-and-select
+            // fields for a business to correct them afterward.
+            $business = Business::create([
                 'name' => $data['business_name'],
-                'phone' => $data['phone'] ?? null,
-                'whatsapp_number' => $data['phone'] ?? null,
-                'country' => $data['country'] ?? null,
-                'currency' => $data['currency'] ?? null,
-                'timezone' => $data['timezone'] ?? null,
-            ], fn ($value) => $value !== null && $value !== ''));
+                'phone' => $data['phone'],
+                'whatsapp_number' => $data['phone'],
+            ]);
 
             $user = User::create([
                 'business_id' => $business->id,
