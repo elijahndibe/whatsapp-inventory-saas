@@ -3,6 +3,18 @@ import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+    // Every screen has `dark:` variants sprinkled in, but dark mode was
+    // never actually designed or reviewed against the approved purple
+    // mockup — Tailwind's default 'media' strategy silently switches the
+    // whole app into that unreviewed dark theme for anyone with a dark
+    // OS/browser preference (very common on Windows), which reads as an
+    // "ash" background instead of the crisp white/purple design.
+    // 'selector' only activates dark: classes under an explicit `.dark`
+    // class — nothing in the app adds one, so this forces light mode
+    // everywhere until dark mode gets its own real design pass.
+    // (darkMode: false is deprecated as of Tailwind 3.4 and silently
+    // falls back to 'media' — confirmed against the installed version.)
+    darkMode: 'selector',
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
