@@ -6,7 +6,10 @@ use App\Models\Business;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Scopes\BusinessScope;
+use App\Notifications\RefundProcessedNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -163,6 +166,73 @@ class PaymentService
 
             return $payment;
         });
+    }
+
+    /**
+     * Applies a refund reported by Paystack (refund.processed webhook) to
+     * our records. Deliberately does NOT touch inventory — a refund
+     * doesn't necessarily mean the item came back, so the seller adjusts
+     * stock manually via Inventory if it did — and does NOT touch
+     * commission_amount/seller_amount, which stay exactly what they were
+     * snapshotted as at the time of the original charge: the platform's
+     * commission on a sale it already facilitated isn't clawed back.
+     *
+     * Idempotent the same way handleVerifiedTransaction() is — Paystack
+     * can resend the same webhook, and a partial refund can later be
+     * topped up to a full one, so this only ever moves refunded_amount
+     * forward, never backward, and a repeat of an already-recorded amount
+     * is a no-op.
+     */
+    public function handleRefund(string $transactionReference, int $refundedAmountMinorUnits): Payment
+    {
+        return DB::transaction(function () use ($transactionReference, $refundedAmountMinorUnits) {
+            $payment = Payment::withoutGlobalScope(BusinessScope::class)
+                ->where('reference', $transactionReference)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $payment) {
+                Log::warning('Refund webhook received for an unknown payment reference.', ['reference' => $transactionReference]);
+                throw new RuntimeException("No payment found for reference: {$transactionReference}");
+            }
+
+            if ($payment->status !== 'success') {
+                // A refund can't apply to a charge we never recorded as
+                // successful — nothing to do, and nothing to retry.
+                Log::warning('Refund webhook received for a payment that was never successful.', [
+                    'reference' => $transactionReference,
+                    'status' => $payment->status,
+                ]);
+
+                return $payment;
+            }
+
+            $originalAmount = (int) $payment->getRawOriginal('amount');
+            $alreadyRefunded = (int) ($payment->getRawOriginal('refunded_amount') ?? 0);
+            $newRefundedAmount = min($originalAmount, max($alreadyRefunded, $refundedAmountMinorUnits));
+
+            if ($newRefundedAmount === $alreadyRefunded) {
+                return $payment; // duplicate webhook — already recorded
+            }
+
+            $payment->refunded_amount = $newRefundedAmount / 100;
+            $payment->refunded_at = now();
+            $payment->save();
+
+            $order = Order::withoutGlobalScope(BusinessScope::class)->findOrFail($payment->order_id);
+            $isFullRefund = $newRefundedAmount >= $originalAmount;
+            $this->orders->updatePaymentStatus($order, $isFullRefund ? 'refunded' : 'partially_refunded');
+
+            $this->notifyRefundProcessed($order, $isFullRefund);
+
+            return $payment;
+        });
+    }
+
+    private function notifyRefundProcessed(Order $order, bool $isFullRefund): void
+    {
+        $business = $order->business ?? Business::withoutGlobalScope(BusinessScope::class)->find($order->business_id);
+        Notification::send($business->staffWithPermission('view orders'), new RefundProcessedNotification($order, $isFullRefund));
     }
 
     private function generateReference(): string

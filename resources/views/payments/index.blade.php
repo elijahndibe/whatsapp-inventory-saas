@@ -44,7 +44,7 @@
                                     <td class="px-4 py-3 text-ink dark:text-gray-100 font-medium">{{ number_format($payment->amount, 2) }}</td>
                                     <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $payment->commission_amount !== null ? number_format($payment->commission_amount, 2) : '—' }}</td>
                                     <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ $payment->seller_amount !== null ? number_format($payment->seller_amount, 2) : '—' }}</td>
-                                    <td class="px-4 py-3"><x-payment-status-badge :status="$payment->status" /></td>
+                                    <td class="px-4 py-3"><x-payment-status-badge :status="$payment->effectiveStatus()" /></td>
                                     <td class="px-4 py-3 text-gray-400 whitespace-nowrap">{{ $payment->created_at?->format('d M Y') }}</td>
                                 </tr>
                             @endforeach
@@ -57,7 +57,7 @@
                         <div class="p-4">
                             <div class="flex items-center justify-between">
                                 <span class="font-mono text-xs text-gray-500">{{ $payment->order?->order_number }}</span>
-                                <x-payment-status-badge :status="$payment->status" />
+                                <x-payment-status-badge :status="$payment->effectiveStatus()" />
                             </div>
                             <p class="mt-1 font-medium text-ink dark:text-gray-100">{{ $payment->order?->customer?->name }}</p>
                             <div class="mt-2 flex justify-between text-sm">

@@ -412,6 +412,7 @@
                     @foreach ([
                         'new_order' => [__('New orders'), __('When a customer places an order via your storefront or WhatsApp.')],
                         'payment_received' => [__('Payments received'), __('When an order is paid for.')],
+                        'refund_processed' => [__('Refunds'), __('When a refund is recorded on one of your orders.')],
                         'low_stock' => [__('Low stock alerts'), __('When a product runs low or goes out of stock.')],
                     ] as $type => [$label, $description])
                         <label class="flex items-start gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-700 cursor-pointer">

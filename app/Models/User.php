@@ -34,7 +34,7 @@ class User extends Authenticatable
      * Keys this user can toggle off email delivery for. The in-app bell
      * (database channel) is never gated by these — only 'mail'.
      */
-    public const EMAIL_NOTIFICATION_TYPES = ['new_order', 'payment_received', 'low_stock'];
+    public const EMAIL_NOTIFICATION_TYPES = ['new_order', 'payment_received', 'low_stock', 'refund_processed'];
 
     /**
      * Migration-level column defaults aren't reliably honored by SQLite

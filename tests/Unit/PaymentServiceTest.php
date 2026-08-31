@@ -227,4 +227,103 @@ class PaymentServiceTest extends TestCase
         $this->assertSame('failed', Payment::where('reference', 'PAY-TEST4')->first()->status);
         $this->assertSame('pending', $this->order->fresh()->payment_status);
     }
+
+    public function test_a_full_refund_marks_the_order_refunded_without_touching_stock_or_commission(): void
+    {
+        $payment = Payment::create([
+            'business_id' => $this->business->id,
+            'order_id' => $this->order->id,
+            'reference' => 'PAY-REFUND1',
+            'gateway' => 'paystack',
+            'amount' => 500,
+            'currency' => 'NGN',
+            'status' => 'success',
+            'paid_at' => now(),
+            'commission_rate' => 1.5,
+            'commission_amount' => 7.5,
+            'seller_amount' => 492.5,
+        ]);
+        $this->order->update(['payment_status' => 'paid', 'order_status' => 'confirmed', 'inventory_deducted_at' => now()]);
+        $this->product->decrement('stock_quantity', 2); // mirrors the deduction that already happened at payment time
+
+        $this->service->handleRefund('PAY-REFUND1', 50000);
+
+        $payment = $payment->fresh();
+        $this->assertEquals(500, $payment->refunded_amount);
+        $this->assertNotNull($payment->refunded_at);
+        $this->assertTrue($payment->isFullyRefunded());
+        $this->assertSame('refunded', $this->order->fresh()->payment_status);
+
+        // Commission is kept regardless — not clawed back on refund.
+        $this->assertEquals(7.5, $payment->commission_amount);
+        $this->assertEquals(492.5, $payment->seller_amount);
+
+        // Stock is never auto-restored — a refund doesn't imply a return.
+        $this->assertSame(8, $this->product->fresh()->stock_quantity);
+    }
+
+    public function test_a_partial_refund_marks_the_order_partially_refunded(): void
+    {
+        Payment::create([
+            'business_id' => $this->business->id,
+            'order_id' => $this->order->id,
+            'reference' => 'PAY-REFUND2',
+            'gateway' => 'paystack',
+            'amount' => 500,
+            'currency' => 'NGN',
+            'status' => 'success',
+            'paid_at' => now(),
+        ]);
+        $this->order->update(['payment_status' => 'paid']);
+
+        $this->service->handleRefund('PAY-REFUND2', 20000); // ₦200 of ₦500
+
+        $payment = Payment::where('reference', 'PAY-REFUND2')->first();
+        $this->assertEquals(200, $payment->refunded_amount);
+        $this->assertFalse($payment->isFullyRefunded());
+        $this->assertSame('partially_refunded', $this->order->fresh()->payment_status);
+    }
+
+    public function test_a_repeated_refund_webhook_for_the_same_amount_is_a_no_op(): void
+    {
+        Payment::create([
+            'business_id' => $this->business->id,
+            'order_id' => $this->order->id,
+            'reference' => 'PAY-REFUND3',
+            'gateway' => 'paystack',
+            'amount' => 500,
+            'currency' => 'NGN',
+            'status' => 'success',
+            'paid_at' => now(),
+        ]);
+        $this->order->update(['payment_status' => 'paid']);
+
+        $this->service->handleRefund('PAY-REFUND3', 50000);
+        $firstRefundedAt = Payment::where('reference', 'PAY-REFUND3')->first()->refunded_at;
+
+        $this->service->handleRefund('PAY-REFUND3', 50000); // duplicate webhook
+
+        $payment = Payment::where('reference', 'PAY-REFUND3')->first();
+        $this->assertEquals(500, $payment->refunded_amount, 'Refunded amount must not double-count on a repeated webhook.');
+        $this->assertEquals($firstRefundedAt, $payment->refunded_at);
+    }
+
+    public function test_a_refund_for_a_payment_that_was_never_successful_is_ignored(): void
+    {
+        Payment::create([
+            'business_id' => $this->business->id,
+            'order_id' => $this->order->id,
+            'reference' => 'PAY-REFUND4',
+            'gateway' => 'paystack',
+            'amount' => 500,
+            'currency' => 'NGN',
+            'status' => 'pending',
+        ]);
+
+        $this->service->handleRefund('PAY-REFUND4', 50000);
+
+        $payment = Payment::where('reference', 'PAY-REFUND4')->first();
+        $this->assertNull($payment->refunded_at);
+        $this->assertSame('pending', $this->order->fresh()->payment_status);
+    }
 }

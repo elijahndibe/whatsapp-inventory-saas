@@ -31,6 +31,8 @@ class Payment extends Model
         'seller_amount',
         'payment_fee',
         'settlement_status',
+        'refunded_amount',
+        'refunded_at',
     ];
 
     protected function casts(): array
@@ -38,6 +40,7 @@ class Payment extends Model
         return [
             'paid_at' => 'datetime',
             'commission_rate' => 'float',
+            'refunded_at' => 'datetime',
         ];
     }
 
@@ -78,6 +81,11 @@ class Payment extends Model
         return $this->minorUnitAttribute();
     }
 
+    protected function refundedAmount(): Attribute
+    {
+        return $this->minorUnitAttribute();
+    }
+
     public function commissionAmountInMinorUnits(): int
     {
         return (int) $this->getRawOriginal('commission_amount');
@@ -86,6 +94,36 @@ class Payment extends Model
     public function sellerAmountInMinorUnits(): int
     {
         return (int) $this->getRawOriginal('seller_amount');
+    }
+
+    public function refundedAmountInMinorUnits(): int
+    {
+        return (int) $this->getRawOriginal('refunded_amount');
+    }
+
+    public function isRefunded(): bool
+    {
+        return $this->refunded_at !== null;
+    }
+
+    public function isFullyRefunded(): bool
+    {
+        return $this->isRefunded() && $this->refundedAmountInMinorUnits() >= (int) $this->getRawOriginal('amount');
+    }
+
+    /**
+     * What the seller-facing Payments page and Admin Transactions page
+     * actually display — `status` alone (pending/success/failed/abandoned)
+     * doesn't capture that a successful charge was later refunded, since
+     * a refund is tracked separately (see the payments refund migration).
+     */
+    public function effectiveStatus(): string
+    {
+        if ($this->isRefunded()) {
+            return $this->isFullyRefunded() ? 'refunded' : 'partially_refunded';
+        }
+
+        return $this->status;
     }
 
     public function order(): BelongsTo

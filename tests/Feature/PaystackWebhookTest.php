@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\ProcessPaystackRefundWebhook;
 use App\Jobs\ProcessPaystackWebhook;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
@@ -72,5 +73,60 @@ class PaystackWebhookTest extends TestCase
 
         $response->assertOk();
         Bus::assertNotDispatched(ProcessPaystackWebhook::class);
+    }
+
+    public function test_a_refund_processed_event_dispatches_the_refund_job(): void
+    {
+        Bus::fake();
+
+        $payload = ['event' => 'refund.processed', 'data' => [
+            'amount' => 20000,
+            'transaction' => ['reference' => 'PAY-REFUNDME'],
+        ]];
+        $body = json_encode($payload);
+
+        $response = $this->call('POST', route('webhooks.paystack'), [], [], [], [
+            'HTTP_x-paystack-signature' => $this->sign($body),
+            'CONTENT_TYPE' => 'application/json',
+        ], $body);
+
+        $response->assertOk();
+        Bus::assertDispatched(ProcessPaystackRefundWebhook::class, fn ($job) => $job->transactionReference === 'PAY-REFUNDME'
+            && $job->refundedAmountMinorUnits === 20000);
+    }
+
+    public function test_a_refund_processed_event_also_accepts_the_flat_transaction_reference_key(): void
+    {
+        Bus::fake();
+
+        $payload = ['event' => 'refund.processed', 'data' => [
+            'amount' => 50000,
+            'transaction_reference' => 'PAY-REFUNDME2',
+        ]];
+        $body = json_encode($payload);
+
+        $response = $this->call('POST', route('webhooks.paystack'), [], [], [], [
+            'HTTP_x-paystack-signature' => $this->sign($body),
+            'CONTENT_TYPE' => 'application/json',
+        ], $body);
+
+        $response->assertOk();
+        Bus::assertDispatched(ProcessPaystackRefundWebhook::class, fn ($job) => $job->transactionReference === 'PAY-REFUNDME2');
+    }
+
+    public function test_a_refund_processed_event_missing_a_reference_is_acknowledged_but_not_processed(): void
+    {
+        Bus::fake();
+
+        $payload = ['event' => 'refund.processed', 'data' => ['amount' => 20000]];
+        $body = json_encode($payload);
+
+        $response = $this->call('POST', route('webhooks.paystack'), [], [], [], [
+            'HTTP_x-paystack-signature' => $this->sign($body),
+            'CONTENT_TYPE' => 'application/json',
+        ], $body);
+
+        $response->assertOk();
+        Bus::assertNotDispatched(ProcessPaystackRefundWebhook::class);
     }
 }

@@ -56,7 +56,7 @@
                                 <td class="px-3 py-3 text-gray-600 dark:text-gray-300">{{ $payment->payment_fee !== null ? number_format($payment->payment_fee, 2) : '—' }}</td>
                                 <td class="px-3 py-3 text-gray-600 dark:text-gray-300">{{ $payment->seller_amount !== null ? number_format($payment->seller_amount, 2) : '—' }}</td>
                                 <td class="px-3 py-3 text-gray-600 dark:text-gray-300">{{ $payment->gateway }}</td>
-                                <td class="px-3 py-3"><x-payment-status-badge :status="$payment->status" /></td>
+                                <td class="px-3 py-3"><x-payment-status-badge :status="$payment->effectiveStatus()" /></td>
                                 <td class="px-3 py-3 text-gray-500 dark:text-gray-400">{{ $payment->created_at?->format('d M Y') }}</td>
                             </tr>
                         @empty
