@@ -247,4 +247,70 @@ class ProductManagementTest extends TestCase
         $this->assertSame(1, Category::where('business_id', $this->business->id)->where('name', 'Sneakers')->count());
         $this->assertSame(1, Category::withoutGlobalScopes()->where('business_id', $otherBusiness->id)->where('name', 'Sneakers')->count());
     }
+
+    public function test_the_create_product_form_offers_the_curated_suggested_categories(): void
+    {
+        $response = $this->actingAs($this->owner)->get(route('products.create'));
+
+        $response->assertOk();
+        $response->assertViewHas('suggestedCategories', function (array $byDepartment) {
+            return in_array('Phones & Tablets', $byDepartment['Electronics'] ?? [], true);
+        });
+        $response->assertSee('suggested:Phones &amp; Tablets', false);
+    }
+
+    public function test_picking_a_suggested_category_creates_it_for_this_business(): void
+    {
+        $response = $this->actingAs($this->owner)->post(route('products.store'), [
+            'category_id' => 'suggested:Phones & Tablets',
+            'name' => 'iPhone Case',
+            'price' => 5000,
+            'stock_quantity' => 10,
+            'low_stock_threshold' => 2,
+            'status' => 'active',
+        ]);
+
+        $product = Product::where('name', 'iPhone Case')->firstOrFail();
+        $response->assertRedirect(route('products.edit', $product));
+
+        $category = Category::where('business_id', $this->business->id)->where('name', 'Phones & Tablets')->firstOrFail();
+        $this->assertSame($category->id, $product->category_id);
+        $this->assertSame('active', $category->status);
+    }
+
+    public function test_picking_the_same_suggested_category_twice_reuses_it_instead_of_duplicating(): void
+    {
+        $this->actingAs($this->owner)->post(route('products.store'), [
+            'category_id' => 'suggested:Books', 'name' => 'Novel One',
+            'price' => 3000, 'stock_quantity' => 5, 'low_stock_threshold' => 1, 'status' => 'active',
+        ]);
+        $this->actingAs($this->owner)->post(route('products.store'), [
+            'category_id' => 'suggested:Books', 'name' => 'Novel Two',
+            'price' => 3500, 'stock_quantity' => 5, 'low_stock_threshold' => 1, 'status' => 'active',
+        ]);
+
+        $this->assertSame(1, Category::where('business_id', $this->business->id)->where('name', 'Books')->count());
+    }
+
+    public function test_a_category_already_added_is_not_offered_as_a_suggestion_again(): void
+    {
+        Category::factory()->create(['business_id' => $this->business->id, 'name' => 'Books']);
+
+        $response = $this->actingAs($this->owner)->get(route('products.create'));
+
+        $response->assertViewHas('suggestedCategories', function (array $byDepartment) {
+            return ! in_array('Books', $byDepartment['Books, Office & Stationery'] ?? [], true);
+        });
+    }
+
+    public function test_an_unknown_suggested_category_name_is_rejected(): void
+    {
+        $response = $this->actingAs($this->owner)->post(route('products.store'), [
+            'category_id' => 'suggested:Not A Real Category',
+            'name' => 'Air Max', 'price' => 25000, 'stock_quantity' => 5, 'low_stock_threshold' => 2, 'status' => 'active',
+        ]);
+
+        $response->assertSessionHasErrors('category_id');
+        $this->assertNull(Product::where('name', 'Air Max')->first());
+    }
 }

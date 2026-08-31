@@ -54,4 +54,31 @@ class Category extends Model
     {
         return $query->where('status', 'active');
     }
+
+    /**
+     * The curated department => [names] library sellers pick from when
+     * adding a product (config/product_categories.php) — not a table,
+     * just names a business's own Category rows get find-or-created from.
+     *
+     * @return array<string, list<string>>
+     */
+    public static function suggestedByDepartment(): array
+    {
+        return config('product_categories', []);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function suggestedNames(): array
+    {
+        $byDepartment = static::suggestedByDepartment();
+
+        return $byDepartment === [] ? [] : array_merge(...array_values($byDepartment));
+    }
+
+    public static function isSuggestedName(string $name): bool
+    {
+        return in_array($name, static::suggestedNames(), true);
+    }
 }

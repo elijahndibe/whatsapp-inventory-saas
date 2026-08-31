@@ -41,8 +41,9 @@ class ProductController extends Controller
         $this->authorize('create', Product::class);
 
         $categories = Category::active()->orderBy('name')->get();
+        $suggestedCategories = $this->suggestedCategoriesExcluding($categories);
 
-        return view('products.create', compact('categories'));
+        return view('products.create', compact('categories', 'suggestedCategories'));
     }
 
     public function store(StoreProductRequest $request): RedirectResponse
@@ -74,9 +75,10 @@ class ProductController extends Controller
         $this->authorize('update', $product);
 
         $categories = Category::orderBy('name')->get();
+        $suggestedCategories = $this->suggestedCategoriesExcluding($categories);
         $product->load('images');
 
-        return view('products.edit', compact('product', 'categories'));
+        return view('products.edit', compact('product', 'categories', 'suggestedCategories'));
     }
 
     public function update(UpdateProductRequest $request, Product $product): RedirectResponse
@@ -118,23 +120,31 @@ class ProductController extends Controller
     }
 
     /**
-     * Turns the "+ Add new category" sentinel ('new' — see
-     * products/_form.blade.php and StoreProductRequest/
-     * UpdateProductRequest) into a real, business-scoped Category before
-     * the product is saved, so a seller never has to leave the product
-     * form to create a category first. find-or-create by name so
-     * accidentally submitting the same new name twice (e.g. a double
-     * form submit) reuses the category rather than creating a duplicate.
+     * Turns either category-selection sentinel — '+ Add new category'
+     * ('new', paired with a typed new_category_name) or picking one of
+     * the curated suggestions ('suggested:<name>' — see
+     * Category::suggestedNames()) — into a real, business-scoped Category
+     * before the product is saved, so a seller never has to leave the
+     * product form to create one first. find-or-create by name so
+     * accidentally submitting the same name twice (a double form submit,
+     * or picking a suggestion that was already added earlier) reuses the
+     * category rather than creating a duplicate.
      */
     private function resolveCategoryId(array &$data, int $businessId): void
     {
-        $isNew = ($data['category_id'] ?? null) === 'new';
-        $name = trim($data['new_category_name'] ?? '');
-        unset($data['new_category_name']);
+        $categoryId = $data['category_id'] ?? null;
 
-        if (! $isNew) {
+        if ($categoryId === 'new') {
+            $name = trim($data['new_category_name'] ?? '');
+        } elseif (is_string($categoryId) && str_starts_with($categoryId, 'suggested:')) {
+            $name = substr($categoryId, strlen('suggested:'));
+        } else {
+            unset($data['new_category_name']);
+
             return;
         }
+
+        unset($data['new_category_name']);
 
         $category = Category::firstOrCreate(
             ['business_id' => $businessId, 'name' => $name],
@@ -142,6 +152,29 @@ class ProductController extends Controller
         );
 
         $data['category_id'] = $category->id;
+    }
+
+    /**
+     * The curated department => [names] library (Category::suggestedByDepartment())
+     * with anything the business already has (by name, case-insensitive)
+     * filtered out — no point suggesting "Books" again once they've
+     * already added it, whether that came from a suggestion or was typed
+     * in by hand.
+     *
+     * @param  \Illuminate\Support\Collection<int, Category>  $existingCategories
+     * @return array<string, list<string>>
+     */
+    private function suggestedCategoriesExcluding($existingCategories): array
+    {
+        $existingNames = $existingCategories->map(fn (Category $c) => mb_strtolower($c->name))->all();
+
+        return collect(Category::suggestedByDepartment())
+            ->map(fn (array $names) => array_values(array_filter(
+                $names,
+                fn (string $name) => ! in_array(mb_strtolower($name), $existingNames, true)
+            )))
+            ->filter(fn (array $names) => $names !== [])
+            ->all();
     }
 
     private function storeImages(Product $product, Request $request): void

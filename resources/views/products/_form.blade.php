@@ -11,9 +11,27 @@
         <x-input-label for="category_id" :value="__('Category')" />
         <select id="category_id" name="category_id" x-model="categorySelection" class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm focus:border-brand-500 focus:ring-brand-500">
             <option value="">{{ __('Uncategorized') }}</option>
-            @foreach ($categories as $category)
-                <option value="{{ $category->id }}">{{ $category->name }}</option>
+
+            @if ($categories->isNotEmpty())
+                <optgroup label="{{ __('Your Categories') }}">
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                    @endforeach
+                </optgroup>
+            @endif
+
+            {{-- A comprehensive e-commerce category library to pick from —
+                 selecting one creates it for this business the first time
+                 it's used (find-or-create, same as typing a new one below).
+                 See Category::suggestedByDepartment() / config/product_categories.php. --}}
+            @foreach (($suggestedCategories ?? []) as $department => $names)
+                <optgroup label="{{ $department }}">
+                    @foreach ($names as $name)
+                        <option value="suggested:{{ $name }}">{{ $name }}</option>
+                    @endforeach
+                </optgroup>
             @endforeach
+
             <option value="new">{{ __('+ Add new category…') }}</option>
         </select>
         <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
