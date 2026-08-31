@@ -89,7 +89,7 @@
 
     <section class="border-y border-gray-100 py-6">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-sm text-gray-400">
-            <span class="flex items-center gap-1.5 font-medium text-gray-500">{{ __('Paystack') }}</span>
+            <span class="flex items-center gap-1.5 font-medium text-gray-500"><x-icon name="payments" class="w-4 h-4" /> {{ __('Secure Payments') }}</span>
             <span class="flex items-center gap-1.5 font-medium text-gray-500"><x-icon name="whatsapp" class="w-4 h-4" /> {{ __('WhatsApp') }}</span>
             <span>{{ __('Trusted by growing businesses across Africa') }}</span>
             <span>{{ __('Secured by bank-level security') }}</span>
@@ -105,7 +105,7 @@
             @foreach ([
                 ['icon' => 'whatsapp', 'title' => 'WhatsApp First', 'desc' => 'Let customers order instantly via WhatsApp.'],
                 ['icon' => 'inventory', 'title' => 'Inventory Management', 'desc' => 'Track stock in real time and avoid running out.'],
-                ['icon' => 'payments', 'title' => 'Secure Payments', 'desc' => 'Accept payments securely with Paystack.'],
+                ['icon' => 'payments', 'title' => 'Secure Payments', 'desc' => 'Accept payments securely — cards, bank transfers & more.'],
                 ['icon' => 'reports', 'title' => 'Sales Reports', 'desc' => 'Understand your business and make better decisions.'],
             ] as $feature)
                 <div class="rounded-2xl border border-gray-100 p-5 hover:shadow-card transition">
@@ -128,7 +128,7 @@
                 <p class="mt-1 text-5xl font-bold text-brand-700">1.5%</p>
                 <p class="text-sm text-gray-500">{{ __('on every successful sale') }}</p>
                 <ul class="mt-6 space-y-2.5 text-sm text-gray-600">
-                    @foreach (['No monthly fees', 'No setup fees', 'Online store & product catalogue', 'WhatsApp ordering (core, always free)', 'Paystack payments', 'Orders, customers & sales reports'] as $item)
+                    @foreach (['No monthly fees', 'No setup fees', 'Online store & product catalogue', 'WhatsApp ordering (core, always free)', 'Secure online payments', 'Orders, customers & sales reports'] as $item)
                         <li class="flex items-center gap-2"><x-icon name="check" class="w-4 h-4 text-success shrink-0" /> {{ __($item) }}</li>
                     @endforeach
                 </ul>

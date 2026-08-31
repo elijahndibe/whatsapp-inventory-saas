@@ -6,6 +6,7 @@ use App\Exceptions\PaystackException;
 use App\Services\PaystackService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Lets a seller connect their own bank account so Paystack can split each
@@ -34,7 +35,13 @@ class PaystackConnectController extends Controller
                 'account_number' => $data['account_number'],
             ]);
         } catch (PaystackException $e) {
-            return back()->with('error', 'Unable to connect your Paystack account: '.$e->getMessage());
+            // The underlying message is our payment processor's own wording
+            // (e.g. "Paystack failed to create the subaccount: ...") — fine
+            // to log, but a seller shouldn't see that processor's name or
+            // its raw API error text.
+            Log::warning('Failed to connect a seller bank account', ['business_id' => $business->id, 'message' => $e->getMessage()]);
+
+            return back()->with('error', 'Unable to connect your bank account. Please double-check your details and try again.');
         }
 
         $business->update([
@@ -44,6 +51,6 @@ class PaystackConnectController extends Controller
             'paystack_account_name' => $result['account_name'] ?? null,
         ]);
 
-        return redirect()->route('settings.edit')->with('status', 'Paystack account connected.');
+        return redirect()->route('settings.edit')->with('status', 'Bank account connected.');
     }
 }

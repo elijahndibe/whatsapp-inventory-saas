@@ -6,6 +6,8 @@ use App\Models\Business;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class BusinessSettingsTest extends TestCase
@@ -28,6 +30,10 @@ class BusinessSettingsTest extends TestCase
 
     public function test_owner_can_view_and_update_settings(): void
     {
+        // The GET below fetches the payout bank list (the business hasn't
+        // connected one yet) — faked so this test never hits the real API.
+        Http::fake(['api.paystack.co/bank*' => Http::response(['status' => true, 'data' => []])]);
+
         $this->actingAs($this->owner)->get(route('settings.edit'))->assertOk();
 
         $response = $this->actingAs($this->owner)->put(route('settings.update'), [
@@ -139,6 +145,63 @@ class BusinessSettingsTest extends TestCase
         ]);
 
         $response->assertSessionDoesntHaveErrors();
+    }
+
+    public function test_settings_page_never_mentions_the_payment_processor_by_name(): void
+    {
+        // A seller shouldn't need to know what powers payouts behind the
+        // scenes — see settings/edit.blade.php's Payments tab.
+        Cache::flush();
+        Http::fake(['api.paystack.co/bank*' => Http::response([
+            'status' => true,
+            'data' => [['name' => 'Guaranty Trust Bank', 'code' => '058']],
+        ])]);
+
+        $response = $this->actingAs($this->owner)->get(route('settings.edit'));
+
+        $response->assertOk();
+        $response->assertDontSee('Paystack');
+    }
+
+    public function test_a_business_without_a_bank_account_yet_is_offered_a_bank_name_dropdown(): void
+    {
+        Cache::flush();
+        Http::fake(['api.paystack.co/bank*' => Http::response([
+            'status' => true,
+            'data' => [
+                ['name' => 'Guaranty Trust Bank', 'code' => '058'],
+                ['name' => 'Access Bank', 'code' => '044'],
+            ],
+        ])]);
+
+        $response = $this->actingAs($this->owner)->get(route('settings.edit'));
+
+        $response->assertOk();
+        $response->assertViewHas('banks', function (?array $banks) {
+            return $banks !== null && collect($banks)->pluck('name')->contains('Guaranty Trust Bank');
+        });
+        $response->assertSee('Guaranty Trust Bank');
+    }
+
+    public function test_a_business_with_a_bank_account_already_connected_is_not_offered_the_dropdown(): void
+    {
+        $this->business->update(['paystack_subaccount_code' => 'ACCT_test123']);
+
+        $response = $this->actingAs($this->owner)->get(route('settings.edit'));
+
+        $response->assertOk();
+        $response->assertViewHas('banks', null);
+    }
+
+    public function test_the_bank_form_falls_back_to_a_plain_field_when_the_bank_list_cannot_be_loaded(): void
+    {
+        Cache::flush();
+        Http::fake(['api.paystack.co/bank*' => Http::response(['status' => false, 'message' => 'unavailable'], 500)]);
+
+        $response = $this->actingAs($this->owner)->get(route('settings.edit'));
+
+        $response->assertOk();
+        $response->assertViewHas('banks', null);
     }
 
     public function test_admin_cannot_access_settings(): void

@@ -59,7 +59,7 @@
                 </a>
             </div>
 
-            {{-- Step 3: Connect Paystack. --}}
+            {{-- Step 3: Connect a bank account for payouts. --}}
             <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-4 flex items-center gap-4">
                 <span @class([
                     'shrink-0 w-9 h-9 rounded-full flex items-center justify-center',
@@ -69,7 +69,7 @@
                     <x-icon :name="$hasPaystack ? 'check' : 'payments'" class="w-5 h-5" />
                 </span>
                 <div class="min-w-0 flex-1">
-                    <p class="font-medium text-ink dark:text-gray-100">{{ __('Connect Paystack') }}</p>
+                    <p class="font-medium text-ink dark:text-gray-100">{{ __('Connect your bank account') }}</p>
                     <p class="text-sm text-gray-500 dark:text-gray-400">
                         {{ $hasPaystack ? __('Connected — your share of every sale pays out automatically.') : __('Optional — until then, your share is tracked for manual payout.') }}
                     </p>

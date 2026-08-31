@@ -83,7 +83,7 @@
                     {{ __('Placing your order opens WhatsApp with your order details pre-filled, ready to send to :business.', ['business' => $business->name]) }}
                 </p>
                 <p class="text-xs text-gray-500 dark:text-gray-400" x-show="paymentMethod === 'paystack'" x-cloak>
-                    {{ __("You'll be redirected to Paystack to pay by card, bank transfer, or USSD.") }}
+                    {{ __("You'll be redirected to a secure payment page to pay by card, bank transfer, or USSD.") }}
                 </p>
 
                 <x-primary-button class="w-full justify-center py-3">

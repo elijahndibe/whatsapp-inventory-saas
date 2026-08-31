@@ -10,7 +10,7 @@
             <div class="space-y-3 text-sm text-gray-600 dark:text-gray-300">
                 <p><strong class="text-ink dark:text-gray-100">{{ __('Add your first product') }}</strong> — {{ __('go to Products → Add product. Give it a name, price and starting stock.') }}</p>
                 <p><strong class="text-ink dark:text-gray-100">{{ __('Share your store') }}</strong> — {{ __('your storefront link is on the WhatsApp page — send it to customers on WhatsApp, Instagram, anywhere.') }}</p>
-                <p><strong class="text-ink dark:text-gray-100">{{ __('Get paid') }}</strong> — {{ __('connect Paystack from Settings so payments (and your share, after Zwenko\'s small commission) land straight in your bank account.') }}</p>
+                <p><strong class="text-ink dark:text-gray-100">{{ __('Get paid') }}</strong> — {{ __('add your bank account in Settings so payments (and your share, after Zwenko\'s small commission) land straight in your bank account.') }}</p>
             </div>
         </x-card>
 
@@ -22,7 +22,7 @@
                         {{ __('Does Zwenko charge a monthly fee?') }}
                         <x-icon name="chevron-down" class="w-4 h-4 text-gray-400 group-open:rotate-180 transition" />
                     </summary>
-                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ __('No — Zwenko is free to use. We only take a small commission (currently 1.5%) on successful sales made through Paystack.') }}</p>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ __('No — Zwenko is free to use. We only take a small commission (currently 1.5%) on successful sales.') }}</p>
                 </details>
                 <details class="py-3 group">
                     <summary class="cursor-pointer font-medium text-sm text-ink dark:text-gray-100 flex items-center justify-between">
@@ -36,7 +36,7 @@
                         {{ __('How do I get paid for a WhatsApp order?') }}
                         <x-icon name="chevron-down" class="w-4 h-4 text-gray-400 group-open:rotate-180 transition" />
                     </summary>
-                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Open the order, click "Confirm order & request payment" to generate a secure Paystack link, then "Send payment link on WhatsApp".') }}</p>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Open the order, click "Confirm order & request payment" to generate a secure payment link, then "Send payment link on WhatsApp".') }}</p>
                 </details>
             </div>
         </x-card>

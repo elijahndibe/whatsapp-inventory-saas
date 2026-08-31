@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Exceptions\PaystackException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 /**
@@ -84,17 +85,24 @@ class PaystackService
     }
 
     /**
+     * The bank list barely ever changes, and this is called on every
+     * Settings page load for a business that hasn't connected a payout
+     * account yet — cached so that's a once-a-day API call, not one per
+     * page view.
+     *
      * @return array<int, array{name: string, code: string}>
      */
     public function listBanks(): array
     {
-        $response = $this->client()->get('/bank', ['country' => 'nigeria', 'currency' => 'NGN']);
+        return Cache::remember('payout_bank_list', now()->addDay(), function () {
+            $response = $this->client()->get('/bank', ['country' => 'nigeria', 'currency' => 'NGN']);
 
-        if (! $response->successful() || ! ($response->json('status') === true)) {
-            throw new PaystackException('Paystack failed to list banks: '.$response->json('message', 'unknown error'));
-        }
+            if (! $response->successful() || ! ($response->json('status') === true)) {
+                throw new PaystackException('Paystack failed to list banks: '.$response->json('message', 'unknown error'));
+            }
 
-        return $response->json('data');
+            return $response->json('data');
+        });
     }
 
     private function client(): \Illuminate\Http\Client\PendingRequest

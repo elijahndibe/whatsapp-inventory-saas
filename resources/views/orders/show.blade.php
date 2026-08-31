@@ -54,9 +54,9 @@
                                     </button>
                                 </div>
                             @elseif (! $order->business->hasPaystackSubaccount())
-                                <p class="mt-1 mb-2 text-sm text-amber-600 dark:text-amber-400">{{ __('Connect Paystack to accept secure online payments and automatically process your commission.') }}</p>
-                                <a href="{{ route('settings.edit') }}" class="inline-block px-4 py-2 bg-brand-700 text-white rounded-md text-sm font-semibold hover:bg-brand-800">
-                                    {{ __('Connect Paystack') }}
+                                <p class="mt-1 mb-2 text-sm text-amber-600 dark:text-amber-400">{{ __('Add your bank account to accept secure online payments and automatically process your commission.') }}</p>
+                                <a href="{{ route('settings.edit') }}#payments" class="inline-block px-4 py-2 bg-brand-700 text-white rounded-md text-sm font-semibold hover:bg-brand-800">
+                                    {{ __('Connect Bank Account') }}
                                 </a>
                             @else
                                 <p class="mt-1 mb-3 text-sm text-gray-600 dark:text-gray-400">{{ __('Once you and the customer have confirmed the order details on WhatsApp, request payment here.') }}</p>

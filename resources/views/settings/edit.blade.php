@@ -326,11 +326,14 @@
                     @endif
                 </div>
 
-                {{-- Payments: Paystack marketplace payout account. --}}
+                {{-- Payments: where your share of every sale gets paid out to.
+                     No payment-processor branding here on purpose — a seller
+                     just needs to know this is their bank account, not what
+                     powers it behind the scenes. --}}
                 <div x-show="tab === 'payments'" x-cloak class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
-                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('Paystack Marketplace Account') }}</h3>
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('Payout Bank Account') }}</h3>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                        {{ __('Connect your bank account so your share of every sale is paid out to you automatically. Platform commission is deducted before it reaches your account.') }}
+                        {{ __('Add your bank account so your share of every sale is paid out to you automatically. Zwenko\'s commission is deducted before it reaches your account.') }}
                     </p>
 
                     @if ($business->hasPaystackSubaccount())
@@ -338,20 +341,34 @@
                             {{ __('Connected') }} — {{ $business->paystack_account_name }} ({{ $business->paystack_account_number }})
                         </div>
                     @else
-                        <div class="mb-4 text-xs text-warning-strong">{{ __('Not connected yet — payments currently settle to the platform account and your share is tracked for manual payout.') }}</div>
+                        <div class="mb-4 text-xs text-warning-strong">{{ __('Not connected yet — your share of each sale is tracked and paid out to you manually until you add a bank account here.') }}</div>
 
                         <form method="POST" action="{{ route('settings.paystack.connect') }}" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             @csrf
                             <div>
-                                <x-input-label for="settlement_bank" :value="__('Bank Code')" />
-                                <x-text-input id="settlement_bank" name="settlement_bank" type="text" class="block mt-1 w-full" placeholder="e.g. 058" required />
+                                <x-input-label for="settlement_bank" :value="__('Bank')" />
+                                @if ($banks)
+                                    <select id="settlement_bank" name="settlement_bank" required
+                                            class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
+                                        <option value="">{{ __('Select your bank') }}</option>
+                                        @foreach ($banks as $bank)
+                                            <option value="{{ $bank['code'] }}">{{ $bank['name'] }}</option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    {{-- Bank list couldn't be loaded — still let a seller
+                                         connect a payout account if they already know
+                                         their bank's settlement code, rather than
+                                         blocking this entirely on an unrelated outage. --}}
+                                    <x-text-input id="settlement_bank" name="settlement_bank" type="text" class="block mt-1 w-full" placeholder="{{ __('Your bank\'s settlement code') }}" required />
+                                @endif
                             </div>
                             <div>
                                 <x-input-label for="account_number" :value="__('Account Number')" />
                                 <x-text-input id="account_number" name="account_number" type="text" class="block mt-1 w-full" required />
                             </div>
                             <div class="sm:col-span-2 flex justify-end">
-                                <x-primary-button>{{ __('Connect Paystack Account') }}</x-primary-button>
+                                <x-primary-button>{{ __('Connect Bank Account') }}</x-primary-button>
                             </div>
                         </form>
                     @endif
