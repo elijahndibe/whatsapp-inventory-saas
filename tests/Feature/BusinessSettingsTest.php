@@ -62,6 +62,23 @@ class BusinessSettingsTest extends TestCase
         $this->assertSame('original-token', $this->business->fresh()->whatsapp_access_token);
     }
 
+    public function test_owner_can_update_phone_country_and_the_geo_select_fields(): void
+    {
+        $this->actingAs($this->owner)->put(route('settings.update'), [
+            'name' => $this->business->name,
+            'phone' => '+233241234567',
+            'country' => 'Ghana',
+            'currency' => 'GHS',
+            'timezone' => 'Africa/Accra',
+        ]);
+
+        $fresh = $this->business->fresh();
+        $this->assertSame('+233241234567', $fresh->phone);
+        $this->assertSame('Ghana', $fresh->country);
+        $this->assertSame('GHS', $fresh->currency);
+        $this->assertSame('Africa/Accra', $fresh->timezone);
+    }
+
     public function test_admin_cannot_access_settings(): void
     {
         $admin = User::factory()->create(['business_id' => $this->business->id]);

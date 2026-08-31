@@ -52,33 +52,17 @@
                         <x-input-error :messages="$errors->get('name')" class="mt-2" />
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <x-input-label for="email" :value="__('Business Email')" />
-                            <x-text-input id="email" name="email" type="email" class="block mt-1 w-full" :value="old('email', $business->email)" />
-                        </div>
-                        <div>
-                            <x-input-label for="phone" :value="__('Phone')" />
-                            <x-text-input id="phone" name="phone" type="text" class="block mt-1 w-full" :value="old('phone', $business->phone)" />
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <x-input-label for="currency" :value="__('Currency Code (e.g. NGN)')" />
-                            <x-text-input id="currency" name="currency" type="text" maxlength="3" class="block mt-1 w-full uppercase" :value="old('currency', $business->currency)" required />
-                            <x-input-error :messages="$errors->get('currency')" class="mt-2" />
-                        </div>
-                        <div>
-                            <x-input-label for="timezone" :value="__('Timezone')" />
-                            <x-text-input id="timezone" name="timezone" type="text" class="block mt-1 w-full" :value="old('timezone', $business->timezone)" required />
-                        </div>
-                    </div>
-
                     <div>
-                        <x-input-label for="country" :value="__('Country')" />
-                        <x-text-input id="country" name="country" type="text" class="block mt-1 w-full max-w-xs" :value="old('country', $business->country)" />
+                        <x-input-label for="email" :value="__('Business Email')" />
+                        <x-text-input id="email" name="email" type="email" class="block mt-1 w-full" :value="old('email', $business->email)" />
                     </div>
+
+                    <x-geo-fields
+                        :country="old('country', $business->country)"
+                        :currency="old('currency', $business->currency)"
+                        :timezone="old('timezone', $business->timezone)"
+                        :phone="old('phone', $business->phone)"
+                        :phone-label="__('Phone')" />
 
                     <div class="flex items-center">
                         <input id="allow_overselling" name="allow_overselling" type="checkbox" value="1" @checked(old('allow_overselling', $business->allow_overselling))

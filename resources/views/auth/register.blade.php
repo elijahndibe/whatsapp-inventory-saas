@@ -26,11 +26,9 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <!-- WhatsApp / Phone Number -->
+        <!-- WhatsApp / Phone Number, Country, Currency, Timezone — auto-detected, always editable -->
         <div class="mt-4">
-            <x-input-label for="phone" :value="__('WhatsApp / Phone Number')" />
-            <x-text-input id="phone" class="block mt-1 w-full" type="text" name="phone" :value="old('phone')" autocomplete="tel" placeholder="+234..." />
-            <x-input-error :messages="$errors->get('phone')" class="mt-2" />
+            <x-geo-fields :country="old('country')" :currency="old('currency')" :timezone="old('timezone')" :phone="old('phone')" />
         </div>
 
         <!-- Password -->

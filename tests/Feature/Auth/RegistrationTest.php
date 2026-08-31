@@ -76,4 +76,47 @@ class RegistrationTest extends TestCase
         $response->assertSessionHasErrors('business_name');
         $this->assertGuest();
     }
+
+    public function test_the_detected_country_currency_and_timezone_are_saved_when_submitted(): void
+    {
+        $this->post('/register', [
+            'business_name' => 'Accra Traders',
+            'name' => 'Kwame Mensah',
+            'email' => 'kwame@example.com',
+            'phone' => '+233241234567',
+            'country' => 'Ghana',
+            'currency' => 'GHS',
+            'timezone' => 'Africa/Accra',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $business = Business::first();
+
+        $this->assertSame('Ghana', $business->country);
+        $this->assertSame('GHS', $business->currency);
+        $this->assertSame('Africa/Accra', $business->timezone);
+        $this->assertSame('+233241234567', $business->phone);
+    }
+
+    public function test_omitting_country_currency_and_timezone_falls_back_to_the_column_defaults(): void
+    {
+        // Simulates JS-disabled registration, or a browser whose timezone
+        // isn't in the curated country list — the fields simply aren't
+        // submitted, and the businesses table's own defaults (Nigeria/
+        // NGN/Africa/Lagos) apply exactly as they did before this feature.
+        $this->post('/register', [
+            'business_name' => 'No JS Store',
+            'name' => 'Tola Adeyemi',
+            'email' => 'tola@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $business = Business::first();
+
+        $this->assertSame('Nigeria', $business->country);
+        $this->assertSame('NGN', $business->currency);
+        $this->assertSame('Africa/Lagos', $business->timezone);
+    }
 }
