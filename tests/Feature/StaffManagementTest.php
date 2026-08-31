@@ -134,4 +134,71 @@ class StaffManagementTest extends TestCase
         $response->assertSessionHas('error');
         $this->assertNull(User::where('email', 'extra@example.com')->first());
     }
+
+    public function test_owner_can_transfer_ownership_to_an_active_staff_member(): void
+    {
+        $staff = User::factory()->create(['business_id' => $this->business->id, 'password' => bcrypt('password')]);
+        $staff->assignRole('Staff');
+
+        $response = $this->actingAs($this->owner)->post(route('staff.transfer-ownership', $staff), [
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('staff.index'));
+        $this->assertTrue($staff->fresh()->hasRole('Owner'));
+        $this->assertTrue($this->owner->fresh()->hasRole('Admin'));
+        $this->assertFalse($this->owner->fresh()->hasRole('Owner'));
+    }
+
+    public function test_transferring_ownership_requires_the_current_password(): void
+    {
+        $staff = User::factory()->create(['business_id' => $this->business->id, 'password' => bcrypt('password')]);
+        $staff->assignRole('Staff');
+
+        $response = $this->actingAs($this->owner)->post(route('staff.transfer-ownership', $staff), [
+            'password' => 'wrong-password',
+        ]);
+
+        $response->assertSessionHasErrors('password');
+        $this->assertFalse($staff->fresh()->hasRole('Owner'));
+        $this->assertTrue($this->owner->fresh()->hasRole('Owner'));
+    }
+
+    public function test_only_the_owner_can_initiate_a_transfer_not_an_admin(): void
+    {
+        $admin = User::factory()->create(['business_id' => $this->business->id]);
+        $admin->assignRole('Admin');
+
+        $staff = User::factory()->create(['business_id' => $this->business->id]);
+        $staff->assignRole('Staff');
+
+        $this->actingAs($admin)
+            ->post(route('staff.transfer-ownership', $staff), ['password' => 'password'])
+            ->assertForbidden();
+
+        $this->assertFalse($staff->fresh()->hasRole('Owner'));
+    }
+
+    public function test_ownership_cannot_be_transferred_to_an_inactive_staff_member(): void
+    {
+        $staff = User::factory()->create(['business_id' => $this->business->id, 'status' => 'inactive']);
+        $staff->assignRole('Staff');
+
+        $this->actingAs($this->owner)
+            ->post(route('staff.transfer-ownership', $staff), ['password' => 'password'])
+            ->assertStatus(422);
+
+        $this->assertFalse($staff->fresh()->hasRole('Owner'));
+    }
+
+    public function test_ownership_cannot_be_transferred_to_a_user_from_another_business(): void
+    {
+        $otherBusiness = Business::factory()->create();
+        $otherStaff = User::factory()->create(['business_id' => $otherBusiness->id]);
+        $otherStaff->assignRole('Staff');
+
+        $this->actingAs($this->owner)
+            ->post(route('staff.transfer-ownership', $otherStaff), ['password' => 'password'])
+            ->assertNotFound();
+    }
 }

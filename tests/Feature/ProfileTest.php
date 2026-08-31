@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Business;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -95,5 +97,61 @@ class ProfileTest extends TestCase
             ->assertRedirect('/profile');
 
         $this->assertNotNull($user->fresh());
+    }
+
+    public function test_a_sole_owner_can_delete_their_account_and_the_business_is_closed_not_deleted(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+
+        $business = Business::factory()->create();
+        $owner = User::factory()->create(['business_id' => $business->id]);
+        $owner->assignRole('Owner');
+
+        $response = $this->actingAs($owner)->delete('/profile', ['password' => 'password']);
+
+        $response->assertSessionHasNoErrors()->assertRedirect('/');
+        $this->assertGuest();
+        $this->assertNull($owner->fresh());
+
+        // The business itself, and everything under it, survives — only
+        // closed, so historical orders/payments stay intact for reporting.
+        $business->refresh();
+        $this->assertSame('closed', $business->status);
+        $this->assertNotNull($business->closed_at);
+    }
+
+    public function test_an_owner_cannot_delete_their_account_while_other_staff_remain(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+
+        $business = Business::factory()->create();
+        $owner = User::factory()->create(['business_id' => $business->id]);
+        $owner->assignRole('Owner');
+        $staff = User::factory()->create(['business_id' => $business->id]);
+        $staff->assignRole('Staff');
+
+        $response = $this->actingAs($owner)->delete('/profile', ['password' => 'password']);
+
+        $response->assertSessionHasErrorsIn('userDeletion', 'business');
+        $this->assertNotNull($owner->fresh());
+        $this->assertSame('active', $business->fresh()->status);
+    }
+
+    public function test_a_staff_member_deleting_their_own_account_does_not_affect_the_business(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+
+        $business = Business::factory()->create();
+        $owner = User::factory()->create(['business_id' => $business->id]);
+        $owner->assignRole('Owner');
+        $staff = User::factory()->create(['business_id' => $business->id]);
+        $staff->assignRole('Staff');
+
+        $response = $this->actingAs($staff)->delete('/profile', ['password' => 'password']);
+
+        $response->assertSessionHasNoErrors()->assertRedirect('/');
+        $this->assertNull($staff->fresh());
+        $this->assertSame('active', $business->fresh()->status);
+        $this->assertNotNull($owner->fresh());
     }
 }

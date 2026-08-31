@@ -7,11 +7,13 @@
                     @csrf
                     <button class="px-3 py-1.5 bg-red-600 text-white rounded-md text-xs font-semibold uppercase">{{ __('Suspend') }}</button>
                 </form>
-            @else
+            @elseif ($business->status === 'suspended')
                 <form method="POST" action="{{ route('admin.businesses.activate', $business) }}">
                     @csrf
                     <button class="px-3 py-1.5 bg-green-600 text-white rounded-md text-xs font-semibold uppercase">{{ __('Activate') }}</button>
                 </form>
+            @else
+                <span class="text-xs font-semibold uppercase text-gray-400">{{ __('Closed') }}</span>
             @endif
         </div>
     </x-slot>
@@ -39,6 +41,9 @@
             <div>{{ __('Currency') }}: {{ $business->currency }}</div>
             <div>{{ __('Created') }}: {{ $business->created_at->format('d M Y') }}</div>
             <div>{{ __('Paystack') }}: {{ $business->hasPaystackSubaccount() ? __('Connected') : __('Not connected') }}</div>
+            @if ($business->isClosed())
+                <div class="text-gray-400">{{ __('Closed') }}: {{ $business->closed_at?->format('d M Y') }} — {{ __('the Owner deleted their account with no remaining staff.') }}</div>
+            @endif
         </div>
 
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">

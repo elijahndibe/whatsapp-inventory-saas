@@ -26,6 +26,7 @@ class Business extends Model
         'currency',
         'timezone',
         'status',
+        'closed_at',
         'onboarding_completed_at',
         'whatsapp_phone_number_id',
         'whatsapp_business_account_id',
@@ -54,6 +55,7 @@ class Business extends Model
             'whatsapp_access_token' => 'encrypted',
             'whatsapp_connected_at' => 'datetime',
             'onboarding_completed_at' => 'datetime',
+            'closed_at' => 'datetime',
             'commission_rate' => 'float',
         ];
     }
@@ -134,6 +136,17 @@ class Business extends Model
     public function isActive(): bool
     {
         return $this->status === 'active';
+    }
+
+    /**
+     * A business whose sole Owner deleted their own account (see
+     * ProfileController::destroy()) — permanent, and distinct from
+     * 'suspended' (admin-initiated, reversible). There's never a user left
+     * to log in and reopen it, so no reactivate path exists for this.
+     */
+    public function isClosed(): bool
+    {
+        return $this->status === 'closed';
     }
 
     public function currencySymbol(): string

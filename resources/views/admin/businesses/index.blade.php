@@ -11,6 +11,7 @@
                 <option value="">{{ __('All Statuses') }}</option>
                 <option value="active" @selected(request('status') === 'active')>{{ __('Active') }}</option>
                 <option value="suspended" @selected(request('status') === 'suspended')>{{ __('Suspended') }}</option>
+                <option value="closed" @selected(request('status') === 'closed')>{{ __('Closed') }}</option>
             </select>
             <button class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-sm">{{ __('Filter') }}</button>
         </form>
@@ -40,7 +41,7 @@
                                 <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ $business->subscriptions->first()?->plan?->name ?? '—' }}</td>
                                 <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ $business->users_count }}</td>
                                 <td class="px-4 py-3">
-                                    <x-badge :variant="$business->status === 'active' ? 'success' : 'danger'">{{ ucfirst($business->status) }}</x-badge>
+                                    <x-badge :variant="match($business->status) { 'active' => 'success', 'suspended' => 'danger', default => 'neutral' }">{{ ucfirst($business->status) }}</x-badge>
                                 </td>
                                 <td class="px-4 py-3 text-right">
                                     @if ($business->status === 'active')
@@ -48,7 +49,7 @@
                                             @csrf
                                             <button class="text-red-600 dark:text-red-400 hover:underline text-xs">{{ __('Suspend') }}</button>
                                         </form>
-                                    @else
+                                    @elseif ($business->status === 'suspended')
                                         <form method="POST" action="{{ route('admin.businesses.activate', $business) }}">
                                             @csrf
                                             <button class="text-green-600 dark:text-green-400 hover:underline text-xs">{{ __('Activate') }}</button>

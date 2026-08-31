@@ -29,8 +29,11 @@ class EnsureBusinessIsActive
             if ($user->business && ! $user->business->isActive()) {
                 Auth::logout();
 
-                return redirect()->route('login')
-                    ->withErrors(['email' => 'This business account has been suspended.']);
+                $message = $user->business->isClosed()
+                    ? 'This business has been closed.'
+                    : 'This business account has been suspended.';
+
+                return redirect()->route('login')->withErrors(['email' => $message]);
             }
         }
 

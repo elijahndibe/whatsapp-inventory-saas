@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\FeatureService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -96,6 +97,36 @@ class StaffController extends Controller
         $user->locations()->sync($data['locations'] ?? []);
 
         return redirect()->route('staff.index')->with('status', 'Staff member updated.');
+    }
+
+    /**
+     * Hands the Owner role to an existing active teammate and demotes the
+     * current Owner to Admin (not removed entirely — they stay on the
+     * team with broad access, just without the three owner-only
+     * permissions). Owner-only: even an Admin with 'manage staff' can't
+     * initiate this, since it's the one action that changes who holds
+     * ultimate control of the business. Requires the current password —
+     * same bar as deleting an account, since giving up ownership is just
+     * as consequential.
+     */
+    public function transferOwnership(Request $request, User $user): RedirectResponse
+    {
+        $currentOwner = $request->user();
+        abort_unless($currentOwner->hasRole('Owner'), 403, 'Only the business owner can transfer ownership.');
+
+        abort_unless($user->business_id === $currentOwner->business_id, 404);
+        abort_if($user->hasRole('Owner'), 404);
+        abort_if($user->status !== 'active', 422, 'Only an active staff member can be made Owner.');
+
+        $request->validate(['password' => ['required', 'current_password']]);
+
+        DB::transaction(function () use ($currentOwner, $user) {
+            $currentOwner->syncRoles(['Admin']);
+            $user->syncRoles(['Owner']);
+        });
+
+        return redirect()->route('staff.index')
+            ->with('status', "Ownership transferred to {$user->name}. You're now an Admin on this business.");
     }
 
     /**

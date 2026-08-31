@@ -81,6 +81,7 @@ Route::middleware('auth')->group(function () {
     Route::post('staff', [StaffController::class, 'store'])->name('staff.store');
     Route::get('staff/{user}/edit', [StaffController::class, 'edit'])->name('staff.edit');
     Route::put('staff/{user}', [StaffController::class, 'update'])->name('staff.update');
+    Route::post('staff/{user}/transfer-ownership', [StaffController::class, 'transferOwnership'])->name('staff.transfer-ownership');
 
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
 

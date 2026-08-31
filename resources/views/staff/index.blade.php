@@ -39,6 +39,33 @@
                                 <x-badge :variant="$user->status === 'active' ? 'success' : 'neutral'">{{ ucfirst($user->status) }}</x-badge>
                                 @unless ($user->hasRole('Owner'))
                                     <a href="{{ route('staff.edit', $user) }}" class="text-brand-600 dark:text-brand-400 hover:underline">{{ __('Edit') }}</a>
+                                    @if (auth()->user()->hasRole('Owner') && $user->status === 'active')
+                                        <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'transfer-ownership-{{ $user->id }}')"
+                                                class="text-gray-500 dark:text-gray-400 hover:underline">{{ __('Make Owner') }}</button>
+
+                                        <x-modal name="transfer-ownership-{{ $user->id }}" focusable>
+                                            <form method="POST" action="{{ route('staff.transfer-ownership', $user) }}" class="p-6">
+                                                @csrf
+                                                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                                                    {{ __('Transfer ownership to :name?', ['name' => $user->name]) }}
+                                                </h2>
+                                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                                    {{ __(':name will become the Owner of this business, with full access to staff, settings and payments. You\'ll be moved to Admin — you keep everything except those three.', ['name' => $user->name]) }}
+                                                </p>
+
+                                                <div class="mt-6">
+                                                    <x-input-label for="transfer_password_{{ $user->id }}" :value="__('Confirm your password')" />
+                                                    <x-text-input id="transfer_password_{{ $user->id }}" name="password" type="password" class="mt-1 block w-3/4" />
+                                                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                                                </div>
+
+                                                <div class="mt-6 flex justify-end gap-3">
+                                                    <x-secondary-button type="button" x-on:click="$dispatch('close')">{{ __('Cancel') }}</x-secondary-button>
+                                                    <x-primary-button>{{ __('Transfer Ownership') }}</x-primary-button>
+                                                </div>
+                                            </form>
+                                        </x-modal>
+                                    @endif
                                 @endunless
                             </div>
                         </li>
