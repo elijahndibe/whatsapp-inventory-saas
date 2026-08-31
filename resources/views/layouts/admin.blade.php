@@ -31,25 +31,31 @@
         @endphp
 
         <div class="lg:flex min-h-screen">
-            <aside class="hidden lg:flex lg:flex-col lg:w-64 lg:shrink-0 bg-gray-900 min-h-screen sticky top-0">
-                <div class="px-4 py-5 flex items-center justify-between">
+            <aside class="hidden lg:flex lg:flex-col lg:w-64 lg:shrink-0 bg-gray-900 h-screen sticky top-0">
+                <div class="shrink-0 px-4 py-5 flex items-center justify-between">
                     <x-zwenko-wordmark variant="white" />
                 </div>
-                <p class="px-7 text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-2">{{ __('Platform Admin') }}</p>
-                <nav class="flex-1 px-3 space-y-1 overflow-y-auto pb-4">
+                <p class="shrink-0 px-7 text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-2">{{ __('Platform Admin') }}</p>
+                {{-- min-h-0 is what actually lets this scroll — flex-1 alone
+                     defaults to min-height:auto, which stretches to fit
+                     every nav link instead of respecting h-screen. --}}
+                <nav class="flex-1 min-h-0 px-3 space-y-1 overflow-y-auto pb-4">
                     @foreach ($adminNav as $item)
                         <x-sidebar-link :href="route($item['route'])" :active="request()->routeIs($item['match'])" :icon="$item['icon']">
                             {{ __($item['label']) }}
                         </x-sidebar-link>
                     @endforeach
                 </nav>
-                <div class="px-3 pb-4 pt-3 border-t border-white/10">
+                <div class="shrink-0 px-3 pb-4 pt-3 border-t border-white/10">
                     <div class="flex items-center gap-2.5 px-2 py-2">
                         <span class="w-8 h-8 rounded-full bg-brand-700 text-white flex items-center justify-center text-xs font-semibold shrink-0">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
                         <span class="min-w-0 text-left">
                             <span class="block text-sm font-medium text-white truncate">{{ Auth::user()->name }}</span>
                         </span>
                     </div>
+                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition">
+                        <x-icon name="user" class="w-5 h-5" /> {{ __('Profile') }}
+                    </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button class="w-full text-left flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition">
@@ -67,17 +73,38 @@
                     </div>
                     <div x-show="menuOpen" x-cloak class="fixed inset-0 z-50" x-transition.opacity role="dialog" aria-modal="true" :aria-hidden="!menuOpen">
                         <div class="absolute inset-0 bg-black/50" @click="menuOpen = false"></div>
-                        <div class="absolute inset-y-0 right-0 w-72 bg-gray-900 shadow-xl overflow-y-auto p-3"
+                        <div class="absolute inset-y-0 right-0 w-72 bg-gray-900 shadow-xl flex flex-col"
                              x-transition:enter="transition ease-out duration-200" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0">
-                            <div class="flex items-center justify-between px-2 py-3">
+                            <div class="shrink-0 flex items-center justify-between px-4 py-4 border-b border-white/10">
                                 <x-zwenko-wordmark variant="white" />
                                 <button @click="menuOpen = false" class="p-1 text-gray-300" aria-label="{{ __('Close menu') }}"><x-icon name="x" class="w-5 h-5" /></button>
                             </div>
-                            @foreach ($adminNav as $item)
-                                <x-sidebar-link :href="route($item['route'])" :active="request()->routeIs($item['match'])" :icon="$item['icon']">
-                                    {{ __($item['label']) }}
-                                </x-sidebar-link>
-                            @endforeach
+
+                            <div class="flex-1 min-h-0 overflow-y-auto p-3 space-y-1">
+                                @foreach ($adminNav as $item)
+                                    <x-sidebar-link :href="route($item['route'])" :active="request()->routeIs($item['match'])" :icon="$item['icon']">
+                                        {{ __($item['label']) }}
+                                    </x-sidebar-link>
+                                @endforeach
+                            </div>
+
+                            <div class="shrink-0 px-3 pb-4 pt-3 border-t border-white/10">
+                                <div class="flex items-center gap-2.5 px-2 py-2">
+                                    <span class="w-8 h-8 rounded-full bg-brand-700 text-white flex items-center justify-center text-xs font-semibold shrink-0">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
+                                    <span class="min-w-0 text-left">
+                                        <span class="block text-sm font-medium text-white truncate">{{ Auth::user()->name }}</span>
+                                    </span>
+                                </div>
+                                <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition">
+                                    <x-icon name="user" class="w-5 h-5" /> {{ __('Profile') }}
+                                </a>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button class="w-full text-left flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition">
+                                        <x-icon name="logout" class="w-5 h-5" /> {{ __('Log Out') }}
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </header>
