@@ -6,7 +6,7 @@
         <div class="md:col-span-2">
             <form method="POST" action="{{ route('storefront.checkout.store', $business) }}"
                   x-data="{ paymentMethod: '{{ old('payment_method', 'whatsapp') }}' }"
-                  class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 space-y-4">
+                  class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 sm:p-6 space-y-4">
                 @csrf
 
                 <div>
@@ -94,30 +94,30 @@
         </div>
 
         <div>
-            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 sm:p-6">
                 <h2 class="font-semibold text-gray-800 dark:text-gray-200 mb-3">{{ __('Order Summary') }}</h2>
                 <div class="space-y-2 text-sm">
                     @foreach ($items as $item)
-                        <div class="flex justify-between text-gray-600 dark:text-gray-400">
-                            <span>{{ $item->product->name }} &times;{{ $item->quantity }}</span>
-                            <span>{{ $business->currencySymbol() }}{{ number_format($item->subtotal, 2) }}</span>
+                        <div class="flex justify-between gap-3 text-gray-600 dark:text-gray-400">
+                            <span class="min-w-0 truncate">{{ $item->product->name }} &times;{{ $item->quantity }}</span>
+                            <span class="shrink-0 tabular-nums">{{ $business->currencySymbol() }}{{ number_format($item->subtotal, 2) }}</span>
                         </div>
                     @endforeach
                 </div>
                 <div class="border-t border-gray-200 dark:border-gray-700 mt-3 pt-3 space-y-1 text-sm">
                     <div class="flex justify-between text-gray-600 dark:text-gray-400">
                         <span>{{ __('Subtotal') }}</span>
-                        <span>{{ $business->currencySymbol() }}{{ number_format($subtotal, 2) }}</span>
+                        <span class="tabular-nums">{{ $business->currencySymbol() }}{{ number_format($subtotal, 2) }}</span>
                     </div>
                     @if ($appliedCouponCode && $couponDiscount > 0)
-                        <div class="flex justify-between text-success-strong">
-                            <span>{{ __('Coupon (:code)', ['code' => $appliedCouponCode]) }}</span>
-                            <span>&minus;{{ $business->currencySymbol() }}{{ number_format($couponDiscount, 2) }}</span>
+                        <div class="flex justify-between gap-3 text-success-strong">
+                            <span class="min-w-0 truncate">{{ __('Coupon (:code)', ['code' => $appliedCouponCode]) }}</span>
+                            <span class="shrink-0 tabular-nums">&minus;{{ $business->currencySymbol() }}{{ number_format($couponDiscount, 2) }}</span>
                         </div>
                     @endif
                     <div class="flex justify-between font-semibold text-gray-900 dark:text-gray-100 text-base pt-1">
                         <span>{{ __('Total') }}</span>
-                        <span>{{ $business->currencySymbol() }}{{ number_format(max(0, $subtotal - $couponDiscount), 2) }}</span>
+                        <span class="tabular-nums">{{ $business->currencySymbol() }}{{ number_format(max(0, $subtotal - $couponDiscount), 2) }}</span>
                     </div>
                 </div>
             </div>

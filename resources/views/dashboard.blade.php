@@ -7,6 +7,8 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         <x-flash-messages />
 
+        <x-setup-reminder :business="$business" />
+
         <x-card class="!p-4 sm:!p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 min-w-0">
                 <x-icon name="store" class="w-4 h-4 shrink-0" />
