@@ -104,9 +104,21 @@
                         </div>
                     @endforeach
                 </div>
-                <div class="border-t border-gray-200 dark:border-gray-700 mt-3 pt-3 flex justify-between font-semibold text-gray-900 dark:text-gray-100">
-                    <span>{{ __('Total') }}</span>
-                    <span>{{ $business->currencySymbol() }}{{ number_format($subtotal, 2) }}</span>
+                <div class="border-t border-gray-200 dark:border-gray-700 mt-3 pt-3 space-y-1 text-sm">
+                    <div class="flex justify-between text-gray-600 dark:text-gray-400">
+                        <span>{{ __('Subtotal') }}</span>
+                        <span>{{ $business->currencySymbol() }}{{ number_format($subtotal, 2) }}</span>
+                    </div>
+                    @if ($appliedCouponCode && $couponDiscount > 0)
+                        <div class="flex justify-between text-success-strong">
+                            <span>{{ __('Coupon (:code)', ['code' => $appliedCouponCode]) }}</span>
+                            <span>&minus;{{ $business->currencySymbol() }}{{ number_format($couponDiscount, 2) }}</span>
+                        </div>
+                    @endif
+                    <div class="flex justify-between font-semibold text-gray-900 dark:text-gray-100 text-base pt-1">
+                        <span>{{ __('Total') }}</span>
+                        <span>{{ $business->currencySymbol() }}{{ number_format(max(0, $subtotal - $couponDiscount), 2) }}</span>
+                    </div>
                 </div>
             </div>
         </div>

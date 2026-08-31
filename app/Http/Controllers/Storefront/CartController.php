@@ -6,25 +6,79 @@ use App\Http\Controllers\Controller;
 use App\Models\Business;
 use App\Models\Product;
 use App\Services\CartService;
+use App\Services\CouponService;
+use App\Services\FeatureService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CartController extends Controller
 {
-    public function __construct(private readonly CartService $cart) {}
+    public function __construct(
+        private readonly CartService $cart,
+        private readonly CouponService $coupons,
+        private readonly FeatureService $features,
+    ) {}
 
     public function index(Business $business): View
     {
         abort_unless($business->isActive(), 404);
 
         $items = $this->cart->detailed($business);
+        $subtotal = (float) $items->sum('subtotal');
 
         return view('storefront.cart', [
             'business' => $business,
             'items' => $items,
-            'subtotal' => $items->sum('subtotal'),
+            'subtotal' => $subtotal,
+            'couponsEnabled' => $this->features->enabled($business, 'coupons'),
+            ...$this->couponViewData($business, $subtotal),
         ]);
+    }
+
+    public function applyCoupon(Request $request, Business $business): RedirectResponse
+    {
+        abort_unless($business->isActive(), 404);
+
+        $code = (string) $request->validate(['code' => ['required', 'string', 'max:50']])['code'];
+        $subtotal = $this->cart->subtotal($business);
+
+        $result = $this->coupons->validate($business, $code, $subtotal);
+
+        if ($result['error']) {
+            return back()->with('error', $result['error']);
+        }
+
+        $this->cart->applyCoupon($business->id, $code);
+
+        return back()->with('status', 'Coupon applied.');
+    }
+
+    public function removeCoupon(Business $business): RedirectResponse
+    {
+        $this->cart->removeCoupon($business->id);
+
+        return back()->with('status', 'Coupon removed.');
+    }
+
+    /**
+     * @return array{appliedCouponCode: ?string, couponDiscount: float, couponError: ?string}
+     */
+    private function couponViewData(Business $business, float $subtotal): array
+    {
+        $code = $this->cart->appliedCouponCode($business->id);
+
+        if (! $code) {
+            return ['appliedCouponCode' => null, 'couponDiscount' => 0.0, 'couponError' => null];
+        }
+
+        $result = $this->coupons->validate($business, $code, $subtotal);
+
+        return [
+            'appliedCouponCode' => $code,
+            'couponDiscount' => $result['discount'],
+            'couponError' => $result['error'],
+        ];
     }
 
     public function store(Request $request, Business $business): RedirectResponse

@@ -170,7 +170,7 @@
                     @endif
                     @if ($order->discount > 0)
                         <div class="flex justify-between text-gray-600 dark:text-gray-400">
-                            <span>{{ __('Discount') }}</span><span>-{{ $order->currencySymbol() }}{{ number_format($order->discount, 2) }}</span>
+                            <span>{{ $order->coupon_code ? __('Coupon (:code)', ['code' => $order->coupon_code]) : __('Discount') }}</span><span>-{{ $order->currencySymbol() }}{{ number_format($order->discount, 2) }}</span>
                         </div>
                     @endif
                     <div class="flex justify-between font-semibold text-gray-900 dark:text-gray-100 text-base pt-1">

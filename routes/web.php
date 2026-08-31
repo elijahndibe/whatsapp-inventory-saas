@@ -15,6 +15,7 @@ use App\Http\Controllers\BusinessSettingsController;
 use App\Http\Controllers\PaystackConnectController;
 use App\Http\Controllers\WhatsAppConnectController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\LegalController;
@@ -67,6 +68,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('categories', CategoryController::class)->except(['show']);
+    Route::resource('coupons', CouponController::class)->except(['show']);
 
     Route::resource('products', ProductController::class)->except(['show'])
         ->middlewareFor('store', 'plan.limit:products');
@@ -134,6 +136,8 @@ Route::prefix('store/{business:slug}')->name('storefront.')->group(function () {
     Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
     Route::patch('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
+    Route::post('/cart/coupon', [CartController::class, 'applyCoupon'])->name('cart.coupon.apply');
+    Route::delete('/cart/coupon', [CartController::class, 'removeCoupon'])->name('cart.coupon.remove');
 
     Route::get('/checkout', [CheckoutController::class, 'create'])->name('checkout.create');
     Route::post('/checkout', [CheckoutController::class, 'store'])->middleware(['plan.limit:orders', 'throttle:10,1'])->name('checkout.store');

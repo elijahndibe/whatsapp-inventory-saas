@@ -67,6 +67,12 @@
                 <span>{{ __('Subtotal') }}</span>
                 <span>{{ $order->currencySymbol() }}{{ number_format($order->subtotal, 2) }}</span>
             </div>
+            @if ($order->discount > 0)
+                <div class="flex justify-between text-success-strong">
+                    <span>{{ $order->coupon_code ? __('Coupon (:code)', ['code' => $order->coupon_code]) : __('Discount') }}</span>
+                    <span>&minus;{{ $order->currencySymbol() }}{{ number_format($order->discount, 2) }}</span>
+                </div>
+            @endif
             @if ($order->delivery_fee > 0)
                 <div class="flex justify-between text-gray-600 dark:text-gray-400">
                     <span>{{ __('Delivery') }}</span>

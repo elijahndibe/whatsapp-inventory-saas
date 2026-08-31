@@ -50,6 +50,11 @@ class PlansSeeder extends Seeder
             'staff' => ['free' => 0, 'pro' => 5, 'business' => 20],
             'locations' => ['free' => 1, 'pro' => 3, 'business' => null],
             'paystack' => ['free' => true, 'pro' => true, 'business' => true],
+            // Free for every plan today, per product decision — but wired
+            // through the same plan matrix as everything else, so it can
+            // be turned into a Pro/Business upsell later with an admin
+            // toggle on the Features page, no code change required.
+            'coupons' => ['free' => true, 'pro' => true, 'business' => true],
             'invoices' => ['free' => true, 'pro' => true, 'business' => true],
             'advanced_analytics' => ['free' => false, 'pro' => true, 'business' => true],
             'advanced_reports' => ['free' => false, 'pro' => true, 'business' => true],

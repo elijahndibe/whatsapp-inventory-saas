@@ -52,9 +52,54 @@
             @endforeach
         </div>
 
-        <div class="mt-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between">
-            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Subtotal') }}</span>
-            <span class="text-lg font-semibold text-ink dark:text-gray-100">{{ $business->currencySymbol() }}{{ number_format($subtotal, 2) }}</span>
+        @if ($couponsEnabled)
+            <div class="mt-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4">
+                @if ($appliedCouponCode)
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2 text-sm">
+                            <x-icon name="tag" class="w-4 h-4 text-success" />
+                            <span class="font-mono font-medium text-ink dark:text-gray-100">{{ $appliedCouponCode }}</span>
+                            @if (! $couponError)
+                                <span class="text-success-strong">&minus;{{ $business->currencySymbol() }}{{ number_format($couponDiscount, 2) }}</span>
+                            @endif
+                        </div>
+                        <form method="POST" action="{{ route('storefront.cart.coupon.remove', $business) }}">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-xs text-gray-500 dark:text-gray-400 hover:underline">{{ __('Remove') }}</button>
+                        </form>
+                    </div>
+                    @if ($couponError)
+                        <p class="mt-2 text-xs text-danger">{{ $couponError }}</p>
+                    @endif
+                @else
+                    <form method="POST" action="{{ route('storefront.cart.coupon.apply', $business) }}" class="flex gap-2">
+                        @csrf
+                        <input type="text" name="code" placeholder="{{ __('Coupon code') }}" maxlength="50"
+                               class="flex-1 rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm text-sm uppercase" />
+                        <button type="submit" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600">
+                            {{ __('Apply') }}
+                        </button>
+                    </form>
+                @endif
+            </div>
+        @endif
+
+        <div class="mt-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 space-y-1">
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-500 dark:text-gray-400">{{ __('Subtotal') }}</span>
+                <span class="text-gray-700 dark:text-gray-300">{{ $business->currencySymbol() }}{{ number_format($subtotal, 2) }}</span>
+            </div>
+            @if ($appliedCouponCode && ! $couponError)
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-500 dark:text-gray-400">{{ __('Discount') }}</span>
+                    <span class="text-success-strong">&minus;{{ $business->currencySymbol() }}{{ number_format($couponDiscount, 2) }}</span>
+                </div>
+            @endif
+            <div class="flex items-center justify-between pt-1">
+                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Total') }}</span>
+                <span class="text-lg font-semibold text-ink dark:text-gray-100">{{ $business->currencySymbol() }}{{ number_format(max(0, $subtotal - ($couponError ? 0 : $couponDiscount)), 2) }}</span>
+            </div>
         </div>
 
         <a href="{{ route('storefront.checkout.create', $business) }}" class="mt-4 block text-center w-full px-4 py-3 bg-brand-700 border border-transparent rounded-lg font-semibold text-sm text-white hover:bg-brand-800 transition">

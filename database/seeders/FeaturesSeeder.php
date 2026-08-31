@@ -22,6 +22,7 @@ class FeaturesSeeder extends Seeder
             ['key' => 'staff', 'name' => 'Staff accounts', 'type' => Feature::TYPE_LIMIT, 'description' => 'Maximum additional staff/team member accounts.'],
             ['key' => 'locations', 'name' => 'Locations', 'type' => Feature::TYPE_LIMIT, 'description' => 'Maximum business locations/branches.'],
             ['key' => 'paystack', 'name' => 'Paystack payments', 'type' => Feature::TYPE_BOOLEAN, 'description' => 'Accept online payments via Paystack.'],
+            ['key' => 'coupons', 'name' => 'Coupon codes', 'type' => Feature::TYPE_BOOLEAN, 'description' => 'Create discount codes customers can redeem at checkout.'],
             ['key' => 'invoices', 'name' => 'Invoices & receipts', 'type' => Feature::TYPE_BOOLEAN, 'description' => 'Generate PDF invoices and receipts.'],
             ['key' => 'whatsapp_cloud_api', 'name' => 'WhatsApp Cloud API', 'type' => Feature::TYPE_BOOLEAN, 'description' => 'Automated WhatsApp order status messages via Meta Cloud API.'],
             ['key' => 'advanced_analytics', 'name' => 'Advanced analytics', 'type' => Feature::TYPE_BOOLEAN, 'description' => 'Category breakdown and payment method charts on Reports.'],

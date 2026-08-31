@@ -74,6 +74,11 @@
                     {{ __('Reports') }}
                 </x-sidebar-link>
             @endcan
+            @can('manage coupons')
+                <x-sidebar-link :href="route('coupons.index')" :active="request()->routeIs('coupons.*')" icon="tag">
+                    {{ __('Coupons') }}
+                </x-sidebar-link>
+            @endcan
             @can('manage staff')
                 <x-sidebar-link :href="route('staff.index')" :active="request()->routeIs('staff.*')" icon="staff">
                     {{ __('Staff') }}

@@ -8,6 +8,7 @@ use App\Http\Requests\Storefront\CheckoutRequest;
 use App\Models\Business;
 use App\Models\Order;
 use App\Services\CartService;
+use App\Services\CouponService;
 use App\Services\FeatureService;
 use App\Services\OrderService;
 use App\Services\PaymentService;
@@ -22,6 +23,7 @@ class CheckoutController extends Controller
         private readonly OrderService $orders,
         private readonly PaymentService $payments,
         private readonly FeatureService $features,
+        private readonly CouponService $coupons,
     ) {}
 
     public function create(Business $business): View|RedirectResponse
@@ -35,11 +37,17 @@ class CheckoutController extends Controller
                 ->with('error', 'Your cart is empty.');
         }
 
+        $subtotal = (float) $items->sum('subtotal');
+        $couponCode = $this->cart->appliedCouponCode($business->id);
+        $couponDiscount = $couponCode ? $this->coupons->validate($business, $couponCode, $subtotal)['discount'] : 0.0;
+
         return view('storefront.checkout', [
             'business' => $business,
             'items' => $items,
-            'subtotal' => $items->sum('subtotal'),
+            'subtotal' => $subtotal,
             'canPayOnline' => $this->features->enabled($business, 'paystack'),
+            'appliedCouponCode' => $couponCode,
+            'couponDiscount' => $couponDiscount,
         ]);
     }
 
@@ -64,7 +72,28 @@ class CheckoutController extends Controller
             return back()->withInput()->with('error', 'Online payment is not available for this store right now. Please order via WhatsApp instead.');
         }
 
-        $order = $this->orders->createFromCart($business, $items, $request->validated());
+        $orderData = $request->validated();
+
+        // Re-validated here, never trusted from the cart page's earlier
+        // check — a code can expire, hit its usage limit, or (now that we
+        // finally have a phone number) turn out already used by this exact
+        // customer, in the time between "Apply" and submitting the order.
+        if ($couponCode = $this->cart->appliedCouponCode($business->id)) {
+            $subtotal = (float) $items->sum('subtotal');
+            $result = $this->coupons->validate($business, $couponCode, $subtotal, $orderData['phone']);
+
+            if ($result['error']) {
+                $this->cart->removeCoupon($business->id);
+
+                return redirect()->route('storefront.cart.index', $business)
+                    ->with('error', "Your coupon could no longer be applied: {$result['error']}");
+            }
+
+            $orderData['coupon'] = $result['coupon'];
+            $orderData['coupon_discount'] = $result['discount'];
+        }
+
+        $order = $this->orders->createFromCart($business, $items, $orderData);
 
         $this->cart->clear($business->id);
 

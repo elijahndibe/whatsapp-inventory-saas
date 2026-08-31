@@ -21,6 +21,7 @@ class RolesAndPermissionsSeeder extends Seeder
         'view orders', 'update orders',
         'view customers', 'manage customers',
         'view reports',
+        'manage coupons',
         'manage staff',
         'manage settings',
         'manage payments',

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Jobs\SendWhatsAppOrderMessage;
 use App\Models\Business;
+use App\Models\Coupon;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
@@ -17,10 +18,21 @@ use InvalidArgumentException;
 
 class OrderService
 {
-    public function __construct(private readonly InventoryService $inventory) {}
+    public function __construct(
+        private readonly InventoryService $inventory,
+        private readonly CouponService $coupons,
+    ) {}
 
     /**
      * @param  Collection<int, object{product: \App\Models\Product, quantity: int, subtotal: float}>  $cartItems
+     * @param  array  $customerData  May include 'coupon' (a validated Coupon
+     *                                instance) and 'coupon_discount' (its
+     *                                already-computed discount amount) — see
+     *                                CheckoutController::store(), which is the
+     *                                only caller expected to pass these; a
+     *                                caller that omits them simply creates an
+     *                                order with no discount, same as before
+     *                                coupons existed.
      */
     public function createFromCart(Business $business, Collection $cartItems, array $customerData): Order
     {
@@ -28,7 +40,11 @@ class OrderService
             throw new InvalidArgumentException('Cannot create an order from an empty cart.');
         }
 
-        $order = DB::transaction(function () use ($business, $cartItems, $customerData) {
+        /** @var ?Coupon $coupon */
+        $coupon = $customerData['coupon'] ?? null;
+        $discount = (float) ($customerData['coupon_discount'] ?? 0);
+
+        $order = DB::transaction(function () use ($business, $cartItems, $customerData, $coupon, $discount) {
             $customer = Customer::updateOrCreate(
                 ['business_id' => $business->id, 'phone' => $customerData['phone']],
                 [
@@ -48,9 +64,12 @@ class OrderService
             $order = Order::create([
                 'business_id' => $business->id,
                 'customer_id' => $customer->id,
+                'coupon_id' => $coupon?->id,
+                'coupon_code' => $coupon?->code,
                 'subtotal' => $subtotal,
+                'discount' => $discount,
                 'delivery_fee' => $deliveryFee,
-                'total' => $subtotal + $deliveryFee,
+                'total' => $subtotal - $discount + $deliveryFee,
                 'currency' => $business->currency,
                 'payment_method' => $paymentMethod,
                 'customer_notes' => $customerData['notes'] ?? null,
@@ -70,6 +89,10 @@ class OrderService
                     'price' => $item->product->price,
                     'subtotal' => $item->subtotal,
                 ]);
+            }
+
+            if ($coupon) {
+                $this->coupons->redeem($coupon);
             }
 
             return $order;

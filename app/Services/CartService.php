@@ -21,6 +21,40 @@ class CartService
         return "cart.{$businessId}";
     }
 
+    /**
+     * Deliberately a different top-level branch from key() ("cart_coupon",
+     * not "cart") — the session helper resolves a dotted string like
+     * "cart.{$businessId}" via Arr::get/Arr::set, i.e. as a nested path
+     * under a shared "cart" array. A coupon key nested under that same
+     * "cart" branch would collide with — and corrupt — the product_id
+     * => quantity items array key() already stores there.
+     */
+    private function couponKey(int $businessId): string
+    {
+        return "cart_coupon.{$businessId}";
+    }
+
+    /**
+     * Only the typed code is remembered here — never a cached discount
+     * amount. Validity (expiry, usage limits, minimum order) is always
+     * re-checked fresh against live data wherever this is read, exactly
+     * like cart prices/stock already are.
+     */
+    public function appliedCouponCode(int $businessId): ?string
+    {
+        return session($this->couponKey($businessId));
+    }
+
+    public function applyCoupon(int $businessId, string $code): void
+    {
+        session([$this->couponKey($businessId) => strtoupper(trim($code))]);
+    }
+
+    public function removeCoupon(int $businessId): void
+    {
+        session()->forget($this->couponKey($businessId));
+    }
+
     public function items(int $businessId): array
     {
         return session($this->key($businessId), []);
@@ -54,6 +88,7 @@ class CartService
     public function clear(int $businessId): void
     {
         session()->forget($this->key($businessId));
+        $this->removeCoupon($businessId);
     }
 
     public function count(int $businessId): int
