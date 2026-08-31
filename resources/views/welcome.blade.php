@@ -38,16 +38,23 @@
     {{-- Hero: names the exact, specific pain (the DM "is this still
          available?" cycle) rather than a generic value prop, since that's
          the thing every WhatsApp seller in this audience will recognize
-         instantly. The mockup card + WhatsApp bubble tell the "chat →
-         real store" story visually without needing invented testimonials. --}}
-    <section class="relative overflow-hidden bg-gradient-to-b from-brand-50/70 to-white">
-        <div class="pointer-events-none absolute -top-24 -right-24 w-96 h-96 rounded-full bg-brand-100/50 blur-3xl"></div>
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center relative">
+         instantly. The phone mockup + WhatsApp bubble tell the "chat →
+         real store" story visually without needing invented testimonials.
+         Phone frame, not a hand illustration — a hand-drawn/hand-coded
+         hand risks looking amateurish with no image-generation tool or
+         photo asset to work from; a clean device frame is both lower-risk
+         and the more common pattern on real SaaS marketing sites anyway. --}}
+    <section class="relative overflow-hidden bg-gradient-to-b from-brand-50/70 via-brand-50/20 to-white">
+        <div class="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle,theme(colors.brand.200)_1px,transparent_1px)] [background-size:28px_28px] opacity-[0.35] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,black_40%,transparent_100%)]"></div>
+        <div class="pointer-events-none absolute -top-32 -right-32 w-[28rem] h-[28rem] rounded-full bg-brand-200/40 blur-3xl"></div>
+        <div class="pointer-events-none absolute top-40 -left-32 w-80 h-80 rounded-full bg-purple-100/50 blur-3xl"></div>
+
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20 grid lg:grid-cols-[1.15fr_1fr] gap-12 lg:gap-10 items-center relative">
             <div>
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-brand-700 text-xs font-medium border border-brand-100 shadow-sm">
                     <x-icon name="whatsapp" class="w-3.5 h-3.5" /> {{ __('Built for WhatsApp sellers across Africa') }}
                 </span>
-                <h1 class="mt-5 text-4xl sm:text-5xl font-bold tracking-tight leading-[1.08]">
+                <h1 class="mt-5 text-4xl sm:text-5xl lg:text-[3.25rem] font-bold tracking-tight leading-[1.08]">
                     {{ __('Stop selling out of') }}<br>{{ __('your ') }}<span class="text-brand-700">{{ __('DMs.') }}</span>
                 </h1>
                 <p class="mt-5 text-lg text-gray-600 max-w-lg">
@@ -65,47 +72,76 @@
                 </div>
             </div>
 
-            <div class="relative">
-                <div class="bg-gray-900 rounded-2xl shadow-2xl p-3 lg:p-4">
-                    <div class="bg-white rounded-xl overflow-hidden">
-                        <div class="bg-gray-900 px-4 py-3 flex items-center gap-2">
-                            <x-zwenko-logo variant="white" class="h-6 w-6" />
-                            <p class="text-white text-sm font-medium">{{ __('Good morning, Bella Fashion 👋') }}</p>
-                        </div>
-                        <div class="p-4 space-y-3">
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="rounded-lg border border-gray-100 p-3">
-                                    <p class="text-[10px] text-gray-500 uppercase">{{ __("Today's sales") }}</p>
-                                    <p class="text-lg font-semibold text-ink">₦185,000</p>
-                                    <p class="text-[11px] text-success-strong">↑ 12.5% {{ __('vs yesterday') }}</p>
+            <div class="relative flex justify-center lg:justify-end">
+                {{-- Soft glow seated behind the device for depth. --}}
+                <div class="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full bg-gradient-to-br from-brand-300/40 to-purple-300/30 blur-3xl"></div>
+
+                <div class="relative w-[248px] sm:w-[268px]">
+                    {{-- Phone shell --}}
+                    <div class="relative bg-gray-900 rounded-[2.75rem] p-2.5 shadow-2xl ring-1 ring-black/5">
+                        <span class="absolute -left-px top-24 w-[3px] h-7 bg-gray-800 rounded-l-sm"></span>
+                        <span class="absolute -left-px top-[8.5rem] w-[3px] h-11 bg-gray-800 rounded-l-sm"></span>
+                        <span class="absolute -right-px top-32 w-[3px] h-14 bg-gray-800 rounded-r-sm"></span>
+
+                        <div class="relative bg-white rounded-[2.25rem] overflow-hidden">
+                            {{-- Notch --}}
+                            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-gray-900 rounded-b-2xl z-10"></div>
+
+                            {{-- Status bar --}}
+                            <div class="h-10 flex items-end justify-between px-6 pb-1.5 text-[10px] font-semibold text-ink">
+                                <span>9:41</span>
+                                <span class="flex items-center gap-1 text-gray-800">
+                                    <span class="w-3 h-2 rounded-[1px] border border-current"></span>
+                                </span>
+                            </div>
+
+                            {{-- App header --}}
+                            <div class="bg-gray-900 px-4 py-2.5 flex items-center gap-2">
+                                <x-zwenko-logo variant="white" class="h-5 w-5" />
+                                <p class="text-white text-xs font-medium">{{ __('Good morning, Bella Fashion 👋') }}</p>
+                            </div>
+
+                            {{-- Dashboard content --}}
+                            <div class="p-3 space-y-2.5 bg-gray-50/60">
+                                <div class="grid grid-cols-2 gap-2.5">
+                                    <div class="rounded-lg border border-gray-100 bg-white p-2.5">
+                                        <p class="text-[9px] text-gray-500 uppercase tracking-wide">{{ __("Today's sales") }}</p>
+                                        <p class="text-sm font-semibold text-ink">₦185,000</p>
+                                        <p class="text-[10px] text-success-strong">↑ 12.5%</p>
+                                    </div>
+                                    <div class="rounded-lg border border-gray-100 bg-white p-2.5">
+                                        <p class="text-[9px] text-gray-500 uppercase tracking-wide">{{ __('Orders') }}</p>
+                                        <p class="text-sm font-semibold text-ink">24</p>
+                                        <p class="text-[10px] text-success-strong">↑ 8.2%</p>
+                                    </div>
                                 </div>
-                                <div class="rounded-lg border border-gray-100 p-3">
-                                    <p class="text-[10px] text-gray-500 uppercase">{{ __('Orders') }}</p>
-                                    <p class="text-lg font-semibold text-ink">24</p>
-                                    <p class="text-[11px] text-success-strong">↑ 8.2% {{ __('vs yesterday') }}</p>
+                                <div class="rounded-lg border border-gray-100 bg-white p-2.5">
+                                    <p class="text-[10px] font-medium text-gray-600 mb-1.5">{{ __('Recent orders') }}</p>
+                                    <div class="space-y-1.5 text-[10px]">
+                                        <div class="flex justify-between"><span class="text-gray-600">#ORD-1025 John Doe</span><span class="text-success-strong font-medium">{{ __('Paid') }}</span></div>
+                                        <div class="flex justify-between"><span class="text-gray-600">#ORD-1024 Maryam Yusuf</span><span class="text-success-strong font-medium">{{ __('Paid') }}</span></div>
+                                        <div class="flex justify-between"><span class="text-gray-600">#ORD-1023 James Okafor</span><span class="text-warning-strong font-medium">{{ __('Processing') }}</span></div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="rounded-lg border border-gray-100 p-3">
-                                <p class="text-[11px] font-medium text-gray-600 mb-2">{{ __('Recent orders') }}</p>
-                                <div class="space-y-1.5 text-xs">
-                                    <div class="flex justify-between"><span class="text-gray-600">#ORD-1025 John Doe</span><span class="text-success-strong font-medium">{{ __('Paid') }}</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">#ORD-1024 Maryam Yusuf</span><span class="text-success-strong font-medium">{{ __('Paid') }}</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-600">#ORD-1023 James Okafor</span><span class="text-warning-strong font-medium">{{ __('Processing') }}</span></div>
-                                </div>
+
+                            {{-- Home indicator --}}
+                            <div class="h-6 flex items-center justify-center bg-gray-50/60">
+                                <div class="w-24 h-1 bg-gray-300 rounded-full"></div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {{-- Floating WhatsApp chip — the visual thread tying the
-                     "chat" origin story to the polished dashboard above it. --}}
-                <div class="hidden sm:flex absolute -left-6 -bottom-6 items-center gap-2 bg-white rounded-xl shadow-xl border border-gray-100 pl-2 pr-4 py-2">
-                    <span class="w-9 h-9 rounded-full bg-whatsapp flex items-center justify-center shrink-0">
-                        <x-icon name="whatsapp" class="w-4 h-4 text-white" />
-                    </span>
-                    <div class="leading-tight">
-                        <p class="text-[11px] text-gray-400">{{ __('New order via WhatsApp') }}</p>
-                        <p class="text-xs font-medium text-ink">{{ __('"I\'ll take the blue one, size M"') }}</p>
+                    {{-- Floating WhatsApp chip — the visual thread tying the
+                         "chat" origin story to the phone beside it. --}}
+                    <div class="hidden sm:flex absolute -left-24 -bottom-6 items-center gap-2 bg-white rounded-xl shadow-xl border border-gray-100 pl-2 pr-4 py-2 max-w-[200px]">
+                        <span class="w-9 h-9 rounded-full bg-whatsapp flex items-center justify-center shrink-0">
+                            <x-icon name="whatsapp" class="w-4 h-4 text-white" />
+                        </span>
+                        <div class="leading-tight">
+                            <p class="text-[11px] text-gray-400">{{ __('New order via WhatsApp') }}</p>
+                            <p class="text-xs font-medium text-ink">{{ __('"I\'ll take the blue one, size M"') }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -241,9 +277,20 @@
                     <p class="text-white/70 text-xs">{{ __('Lagos, Nigeria') }}</p>
                 </div>
                 <div class="p-4 grid grid-cols-2 gap-3">
-                    @foreach ([['n' => 'Ankara Maxi Dress', 'p' => '₦15,000'], ['n' => 'Leather Handbag', 'p' => '₦22,000'], ['n' => 'Beaded Sandals', 'p' => '₦8,500'], ['n' => 'Silk Headwrap', 'p' => '₦4,000']] as $product)
+                    {{-- Illustrated tiles, not empty placeholders — no real
+                         product photos or image-generation tool available,
+                         so a large emoji on a soft gradient stands in for
+                         a photo without pretending to be one. --}}
+                    @foreach ([
+                        ['n' => 'Ankara Maxi Dress', 'p' => '₦15,000', 'e' => '👗', 'from' => 'from-rose-100', 'to' => 'to-orange-100'],
+                        ['n' => 'Leather Handbag', 'p' => '₦22,000', 'e' => '👜', 'from' => 'from-amber-100', 'to' => 'to-yellow-100'],
+                        ['n' => 'Beaded Sandals', 'p' => '₦8,500', 'e' => '👡', 'from' => 'from-teal-100', 'to' => 'to-cyan-100'],
+                        ['n' => 'Silk Headwrap', 'p' => '₦4,000', 'e' => '🧣', 'from' => 'from-purple-100', 'to' => 'to-pink-100'],
+                    ] as $product)
                         <div class="rounded-lg border border-gray-100 overflow-hidden">
-                            <div class="aspect-square bg-gray-50"></div>
+                            <div class="aspect-square bg-gradient-to-br {{ $product['from'] }} {{ $product['to'] }} flex items-center justify-center text-3xl">
+                                {{ $product['e'] }}
+                            </div>
                             <div class="p-2">
                                 <p class="text-[11px] font-medium text-ink truncate">{{ $product['n'] }}</p>
                                 <p class="text-[11px] text-gray-500">{{ $product['p'] }}</p>
