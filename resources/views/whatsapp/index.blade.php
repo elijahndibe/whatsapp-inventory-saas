@@ -15,7 +15,7 @@
                     </span>
                     <div>
                         <p class="font-semibold text-ink dark:text-gray-100">{{ __('WhatsApp Ordering') }}</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Core feature — always free, never gated.') }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Included at no extra cost, for every store.') }}</p>
                     </div>
                 </div>
                 <x-badge variant="success">
@@ -66,9 +66,12 @@
             <div class="flex items-start gap-3">
                 <x-icon name="info" class="w-5 h-5 text-gray-400 shrink-0 mt-0.5" />
                 <div>
-                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Advanced WhatsApp (coming later)') }}</p>
+                    <div class="flex items-center gap-2">
+                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Advanced WhatsApp Tools') }}</p>
+                        <x-badge variant="neutral">{{ __('Coming soon') }}</x-badge>
+                    </div>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                        {{ __('Automated broadcast messages, campaigns, and message templates may become optional paid add-ons in the future. Basic click-to-chat ordering above will always stay free.') }}
+                        {{ __('Broadcast messages, campaigns, and reusable message templates are on the way.') }}
                     </p>
                 </div>
             </div>

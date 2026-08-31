@@ -128,7 +128,7 @@
                 <p class="mt-1 text-5xl font-bold text-brand-700">1.5%</p>
                 <p class="text-sm text-gray-500">{{ __('on every successful sale') }}</p>
                 <ul class="mt-6 space-y-2.5 text-sm text-gray-600">
-                    @foreach (['No monthly fees', 'No setup fees', 'Online store & product catalogue', 'WhatsApp ordering (core, always free)', 'Secure online payments', 'Orders, customers & sales reports'] as $item)
+                    @foreach (['No monthly fees', 'No setup fees', 'Online store & product catalogue', 'WhatsApp ordering, always free', 'Secure online payments', 'Orders, customers & sales reports'] as $item)
                         <li class="flex items-center gap-2"><x-icon name="check" class="w-4 h-4 text-success shrink-0" /> {{ __($item) }}</li>
                     @endforeach
                 </ul>

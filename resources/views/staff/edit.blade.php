@@ -20,8 +20,8 @@
                     <div>
                         <x-input-label for="role" :value="__('Role')" />
                         <select id="role" name="role" x-model="role" class="block mt-1 w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm">
-                            <option value="Admin" @selected(old('role', $currentRole) === 'Admin')>{{ __('Admin — almost full access') }}</option>
-                            <option value="Staff" @selected(old('role', $currentRole) === 'Staff')>{{ __('Staff — limited, choose permissions below') }}</option>
+                            <option value="Admin" @selected(old('role', $currentRole) === 'Admin')>{{ __('Admin — full access except staff, settings and payments') }}</option>
+                            <option value="Staff" @selected(old('role', $currentRole) === 'Staff')>{{ __('Staff — choose exactly what they can access') }}</option>
                         </select>
                     </div>
 

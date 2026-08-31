@@ -31,7 +31,7 @@
                     <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-700 text-sm">
                         <thead class="bg-gray-50 dark:bg-gray-900/50">
                             <tr>
-                                @foreach (['Order', 'Customer', 'Amount', 'Fee', 'Net', 'Gateway', 'Status', 'Date'] as $col)
+                                @foreach (['Order', 'Customer', 'Amount', 'Fee', 'Net', 'Status', 'Date'] as $col)
                                     <th class="px-4 py-3 text-left font-medium text-gray-500 dark:text-gray-400 uppercase text-xs">{{ __($col) }}</th>
                                 @endforeach
                             </tr>
@@ -44,7 +44,6 @@
                                     <td class="px-4 py-3 text-ink dark:text-gray-100 font-medium">{{ number_format($payment->amount, 2) }}</td>
                                     <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $payment->commission_amount !== null ? number_format($payment->commission_amount, 2) : '—' }}</td>
                                     <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ $payment->seller_amount !== null ? number_format($payment->seller_amount, 2) : '—' }}</td>
-                                    <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ ucfirst($payment->gateway) }}</td>
                                     <td class="px-4 py-3"><x-payment-status-badge :status="$payment->status" /></td>
                                     <td class="px-4 py-3 text-gray-400 whitespace-nowrap">{{ $payment->created_at?->format('d M Y') }}</td>
                                 </tr>

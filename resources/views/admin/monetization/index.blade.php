@@ -44,7 +44,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
             <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('Subscriptions') }}</h3>
             <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                {{ __('While OFF, every business gets full access to globally-enabled features with no plan-tier limits, and no seller is prompted to subscribe. Turn ON to start enforcing the Free/Pro/Business matrix configured on the Features page.') }}
+                {{ __('When subscriptions are off, every business has unrestricted access to enabled features and no one is asked to upgrade. Turn subscriptions on to enforce the plan limits you\'ve configured on the Plans and Features pages.') }}
             </p>
             <form method="POST" action="{{ route('admin.monetization.subscription-system.update') }}" class="flex items-center gap-4">
                 @csrf
@@ -56,7 +56,7 @@
                 </div>
                 <x-primary-button>{{ __('Save') }}</x-primary-button>
                 <span class="text-xs text-gray-400">
-                    {{ __('Currently:') }} <strong>{{ $subscriptionEnabled ? __('ON — tier limits enforced') : __('OFF — commission-only mode') }}</strong>
+                    {{ __('Currently:') }} <strong>{{ $subscriptionEnabled ? __('On — plan limits enforced') : __('Off — every business has full access') }}</strong>
                 </span>
             </form>
         </div>

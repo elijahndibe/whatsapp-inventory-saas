@@ -126,7 +126,7 @@
                         <x-text-input id="whatsapp_number" name="whatsapp_number" type="text" class="block mt-1 w-full max-w-sm" :value="old('whatsapp_number', $business->whatsapp_number)" placeholder="+234..." />
                         <x-input-error :messages="$errors->get('whatsapp_number')" class="mt-2" />
                         <p class="mt-2 text-xs text-gray-400">
-                            {{ __('This basic click-to-chat ordering is always free. See the') }}
+                            {{ __('This is the number customers reach when they tap "Order via WhatsApp." Visit the') }}
                             <a href="{{ route('whatsapp.index') }}" class="text-brand-600 dark:text-brand-400 hover:underline">{{ __('WhatsApp page') }}</a>
                             {{ __('to share your store link.') }}
                         </p>

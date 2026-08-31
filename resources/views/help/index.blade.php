@@ -29,7 +29,7 @@
                         {{ __('Is WhatsApp ordering really free?') }}
                         <x-icon name="chevron-down" class="w-4 h-4 text-gray-400 group-open:rotate-180 transition" />
                     </summary>
-                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Yes. Click-to-chat WhatsApp ordering is a core feature available to every seller, on every plan, forever.') }}</p>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Yes — WhatsApp ordering is included with every store, on every plan, at no extra cost.') }}</p>
                 </details>
                 <details class="py-3 group">
                     <summary class="cursor-pointer font-medium text-sm text-ink dark:text-gray-100 flex items-center justify-between">
