@@ -14,7 +14,7 @@
 
             <x-flash-messages />
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
                 @if ($staff->isEmpty())
                     <x-empty-state icon="staff" :title="__('No staff members yet')" :description="__('Invite teammates to help manage orders, products and inventory.')">
                         <x-slot name="action">

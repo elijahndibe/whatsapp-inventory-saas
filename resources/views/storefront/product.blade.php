@@ -4,7 +4,7 @@
 
     <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-            <div class="aspect-square bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <div class="aspect-square bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
                 @if ($product->images->isNotEmpty())
                     <img src="{{ $product->primaryImageUrl() }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                 @else

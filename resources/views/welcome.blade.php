@@ -108,7 +108,7 @@
                 ['icon' => 'payments', 'title' => 'Secure Payments', 'desc' => 'Accept payments securely with Paystack.'],
                 ['icon' => 'reports', 'title' => 'Sales Reports', 'desc' => 'Understand your business and make better decisions.'],
             ] as $feature)
-                <div class="rounded-xl border border-gray-100 p-5 hover:shadow-card transition">
+                <div class="rounded-2xl border border-gray-100 p-5 hover:shadow-card transition">
                     <span class="w-10 h-10 rounded-lg bg-brand-50 text-brand-700 flex items-center justify-center"><x-icon :name="$feature['icon']" class="w-5 h-5" /></span>
                     <p class="mt-3 font-semibold">{{ __($feature['title']) }}</p>
                     <p class="mt-1 text-sm text-gray-500">{{ __($feature['desc']) }}</p>

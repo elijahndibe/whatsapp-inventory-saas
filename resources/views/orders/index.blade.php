@@ -36,7 +36,7 @@
                 </button>
             </form>
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
                 @if ($orders->isEmpty())
                     <div class="p-8 text-center text-sm text-gray-500 dark:text-gray-400">{{ __('No orders found.') }}</div>
                 @else

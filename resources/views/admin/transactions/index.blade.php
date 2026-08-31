@@ -10,7 +10,7 @@
     </x-slot>
 
     <div class="space-y-4">
-        <form method="GET" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-4 grid grid-cols-2 sm:grid-cols-6 gap-3 text-sm">
+        <form method="GET" class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-4 grid grid-cols-2 sm:grid-cols-6 gap-3 text-sm">
             <select name="business_id" class="rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 shadow-sm text-sm">
                 <option value="">{{ __('All Sellers') }}</option>
                 @foreach ($businesses as $business)
@@ -32,7 +32,7 @@
             <button class="px-3 py-1.5 bg-brand-700 text-white rounded-md text-sm font-semibold hover:bg-brand-800">{{ __('Filter') }}</button>
         </form>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
                     <thead class="bg-gray-50 dark:bg-gray-900/50">

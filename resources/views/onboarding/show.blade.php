@@ -31,7 +31,7 @@
 
         <div class="space-y-3">
             {{-- Step 1: Create business — always complete by the time this page loads. --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-4 flex items-center gap-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-4 flex items-center gap-4">
                 <span class="shrink-0 w-9 h-9 rounded-full bg-success-bg dark:bg-green-900/30 text-success flex items-center justify-center">
                     <x-icon name="check" class="w-5 h-5" />
                 </span>
@@ -42,7 +42,7 @@
             </div>
 
             {{-- Step 2: Add first products. --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-4 flex items-center gap-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-4 flex items-center gap-4">
                 <span @class([
                     'shrink-0 w-9 h-9 rounded-full flex items-center justify-center',
                     'bg-success-bg dark:bg-green-900/30 text-success' => $hasProducts,
@@ -60,7 +60,7 @@
             </div>
 
             {{-- Step 3: Connect Paystack. --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-4 flex items-center gap-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-4 flex items-center gap-4">
                 <span @class([
                     'shrink-0 w-9 h-9 rounded-full flex items-center justify-center',
                     'bg-success-bg dark:bg-green-900/30 text-success' => $hasPaystack,
@@ -82,7 +82,7 @@
             </div>
 
             {{-- Step 4: Share store. --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-4 flex items-center gap-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-4 flex items-center gap-4">
                 <span class="shrink-0 w-9 h-9 rounded-full bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300 flex items-center justify-center">
                     <x-icon name="share" class="w-5 h-5" />
                 </span>

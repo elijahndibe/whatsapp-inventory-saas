@@ -14,15 +14,15 @@
             <x-flash-messages />
 
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-4">
                     <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Total Orders') }}</p>
                     <p class="mt-1 text-xl font-semibold text-gray-900 dark:text-gray-100">{{ $orders->total() }}</p>
                 </div>
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-4">
                     <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Total Spent') }}</p>
                     <p class="mt-1 text-xl font-semibold text-gray-900 dark:text-gray-100">{{ auth()->user()->business->currencySymbol() }}{{ number_format($totalSpent / 100, 2) }}</p>
                 </div>
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-4 col-span-2 sm:col-span-2">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-4 col-span-2 sm:col-span-2">
                     <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ __('Contact') }}</p>
                     <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $customer->phone }}</p>
                     @if ($customer->email)
@@ -32,7 +32,7 @@
             </div>
 
             @if ($customer->address || $customer->notes)
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6 text-sm">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6 text-sm">
                     @if ($customer->address)
                         <p class="text-gray-700 dark:text-gray-300"><span class="text-gray-400">{{ __('Address') }}:</span> {{ collect([$customer->address, $customer->city, $customer->state])->filter()->implode(', ') }}</p>
                     @endif
@@ -42,7 +42,7 @@
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 font-semibold text-gray-800 dark:text-gray-200">
                     {{ __('Order History') }}
                 </div>

@@ -3,7 +3,7 @@
         <h2 class="text-[28px] leading-8 font-semibold text-ink dark:text-gray-100">{{ __('Failed Jobs') }}</h2>
     </x-slot>
 
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
         @if ($failedJobs->isEmpty())
             <x-empty-state icon="check-circle" :title="__('No failed jobs')" :description="__('Everything is running smoothly.')" />
         @else

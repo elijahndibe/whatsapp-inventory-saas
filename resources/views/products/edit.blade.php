@@ -17,7 +17,7 @@
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                 <form method="POST" action="{{ route('products.update', $product) }}" enctype="multipart/form-data">
                     @method('PUT')
                     @include('products._form')
@@ -25,7 +25,7 @@
             </div>
 
             @can('adjustStock', $product)
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-semibold text-gray-800 dark:text-gray-200">
                             {{ __('Stock') }}: <span class="font-mono">{{ $product->stock_quantity }}</span>

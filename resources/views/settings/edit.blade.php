@@ -45,7 +45,7 @@
                 @method('PUT')
 
                 {{-- Business: account-level identity and operational defaults. --}}
-                <div x-show="tab === 'business'" x-cloak class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6 space-y-4">
+                <div x-show="tab === 'business'" x-cloak class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6 space-y-4">
                     <div>
                         <x-input-label for="name" :value="__('Business Name')" />
                         <x-text-input id="name" name="name" type="text" class="block mt-1 w-full" :value="old('name', $business->name)" required />
@@ -89,7 +89,7 @@
 
                 {{-- Storefront: exactly what a customer sees on the public store page. --}}
                 <div x-show="tab === 'storefront'" x-cloak class="space-y-6">
-                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                         <div class="flex items-center justify-between gap-3 mb-4">
                             <div class="min-w-0">
                                 <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">{{ __('Your storefront') }}</p>
@@ -137,7 +137,7 @@
 
                 {{-- WhatsApp: the number used for ordering, plus the optional Cloud API connection. --}}
                 <div x-show="tab === 'whatsapp'" x-cloak class="space-y-6">
-                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                         <x-input-label for="whatsapp_number" :value="__('WhatsApp Number (for the Order via WhatsApp button)')" />
                         <x-text-input id="whatsapp_number" name="whatsapp_number" type="text" class="block mt-1 w-full max-w-sm" :value="old('whatsapp_number', $business->whatsapp_number)" placeholder="+234..." />
                         <x-input-error :messages="$errors->get('whatsapp_number')" class="mt-2" />
@@ -148,7 +148,7 @@
                         </p>
                     </div>
 
-                    <details class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+                    <details class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                         <summary class="cursor-pointer select-none font-semibold text-gray-800 dark:text-gray-200">{{ __('Advanced: connect WhatsApp manually') }}</summary>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 mb-4">
                             {{ __('Most stores should use the "Connect WhatsApp" button below instead. Only use this if you already have your own Meta Cloud API credentials.') }}
@@ -182,7 +182,7 @@
                  each posts to its own dedicated endpoint (a <form> can't nest inside
                  another) — but stay inside the same x-data scope so the tab switcher
                  above still controls them. --}}
-            <div x-show="tab === 'whatsapp'" x-cloak class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+            <div x-show="tab === 'whatsapp'" x-cloak class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                     <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('WhatsApp Cloud API Connection') }}</h3>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
                         {{ __('Optional — connect your WhatsApp Business account to send and receive customer messages directly through the platform.') }}
@@ -343,7 +343,7 @@
                 </div>
 
                 {{-- Payments: Paystack marketplace payout account. --}}
-                <div x-show="tab === 'payments'" x-cloak class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+                <div x-show="tab === 'payments'" x-cloak class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                     <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('Paystack Marketplace Account') }}</h3>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
                         {{ __('Connect your bank account so your share of every sale is paid out to you automatically. Platform commission is deducted before it reaches your account.') }}
@@ -375,7 +375,7 @@
 
                 {{-- Locations and Staff already have full dedicated screens with their
                      own CRUD — link out instead of duplicating that UI here. --}}
-                <div x-show="tab === 'locations'" x-cloak class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6 flex items-center justify-between gap-4">
+                <div x-show="tab === 'locations'" x-cloak class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6 flex items-center justify-between gap-4">
                     <div>
                         <h3 class="font-semibold text-gray-800 dark:text-gray-200">{{ __('Locations') }}</h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __('Manage the warehouses, stores and pickup points you stock from.') }}</p>
@@ -385,7 +385,7 @@
                     </a>
                 </div>
 
-                <div x-show="tab === 'staff'" x-cloak class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6 flex items-center justify-between gap-4">
+                <div x-show="tab === 'staff'" x-cloak class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6 flex items-center justify-between gap-4">
                     <div>
                         <h3 class="font-semibold text-gray-800 dark:text-gray-200">{{ __('Staff') }}</h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __('Invite teammates and control what they can access.') }}</p>
@@ -398,7 +398,7 @@
             {{-- Notifications: per-user email toggles for the notification types
                  that already exist (App\Notifications\*). The in-app bell is
                  always on — only email delivery is optional. --}}
-            <div x-show="tab === 'notifications'" x-cloak class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+            <div x-show="tab === 'notifications'" x-cloak class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                 <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-1">{{ __('Email Notifications') }}</h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
                     {{ __('You\'ll always see these in your notification bell — choose which ones also go to your email.') }}
@@ -436,7 +436,7 @@
                  session-invalidation middleware; TOTP secrets, recovery codes and
                  a second login step) that deserves its own dedicated review
                  rather than being folded into this settings reorganization. --}}
-            <div x-show="tab === 'security'" x-cloak class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+            <div x-show="tab === 'security'" x-cloak class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                 @include('profile.partials.update-password-form')
             </div>
 

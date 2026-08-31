@@ -19,7 +19,7 @@
                 </button>
             </form>
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
                 @if ($customers->isEmpty())
                     <x-empty-state icon="customers" :title="__('No customers yet')" :description="__('Customers are added automatically the first time they place an order.')" />
                 @else

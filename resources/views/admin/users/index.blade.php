@@ -10,7 +10,7 @@
             <button class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md text-sm">{{ __('Search') }}</button>
         </form>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
             @if ($users->isEmpty())
                 <x-empty-state icon="staff" :title="__('No users found')" :description="__('Try a different search.')" />
             @else

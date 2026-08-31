@@ -19,11 +19,21 @@
         </x-card>
 
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            @php $todaysSales = $stats["Today's Sales"]; @endphp
-            <x-stat-card :label="__('Today\'s Sales')" :value="$business->currencySymbol() . number_format($todaysSales, 2)" icon="trending-up" />
-            <x-stat-card :label="__('Orders')" :value="$stats['Total Orders']" icon="orders" />
-            <x-stat-card :label="__('Customers')" :value="$stats['Total Customers']" icon="customers" />
-            <x-stat-card :label="__('Low stock items')" :value="$stats['Low Stock'] + $stats['Out of Stock']" icon="alert-triangle" />
+            @php
+                $todaysSales = $stats["Today's Sales"];
+                $salesPercent = $trends['sales_change_percent'];
+                $lowStockTotal = $stats['Low Stock'] + $stats['Out of Stock'];
+            @endphp
+            <x-stat-card :label="__('Today\'s Sales')" :value="$business->currencySymbol() . number_format($todaysSales, 2)" icon="trending-up" color="brand"
+                :change="$salesPercent === null ? null : (($salesPercent >= 0 ? '↑ ' : '↓ ').abs($salesPercent).'% '.__('vs yesterday'))"
+                :trend="$salesPercent === null ? null : ($salesPercent >= 0 ? 'up' : 'down')" />
+            <x-stat-card :label="__('Orders')" :value="$stats['Total Orders']" icon="orders" color="success"
+                :change="$trends['orders_this_week'] > 0 ? '+'.$trends['orders_this_week'].' '.__('this week') : null" trend="up" />
+            <x-stat-card :label="__('Customers')" :value="$stats['Total Customers']" icon="customers" color="info"
+                :change="$trends['customers_this_week'] > 0 ? '+'.$trends['customers_this_week'].' '.__('new this week') : null" trend="up" />
+            <x-stat-card :label="__('Low stock items')" :value="$lowStockTotal" icon="alert-triangle" color="warning"
+                :change="$lowStockTotal > 0 ? __('Needs attention') : __('All good')"
+                :trend="$lowStockTotal > 0 ? 'warning' : null" />
         </div>
 
         <x-card>
@@ -106,24 +116,24 @@
             <h3 class="font-semibold text-ink dark:text-gray-100 mb-3">{{ __('Quick actions') }}</h3>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 @can('create products')
-                    <a href="{{ route('products.create') }}" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 flex flex-col items-center text-center gap-2 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-card transition">
+                    <a href="{{ route('products.create') }}" class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 flex flex-col items-center text-center gap-2 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-card transition">
                         <span class="w-9 h-9 rounded-lg bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300 flex items-center justify-center"><x-icon name="plus" class="w-5 h-5" /></span>
                         <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ __('Add product') }}</span>
                     </a>
                 @endcan
                 @can('view orders')
-                    <a href="{{ route('orders.index') }}" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 flex flex-col items-center text-center gap-2 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-card transition">
+                    <a href="{{ route('orders.index') }}" class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 flex flex-col items-center text-center gap-2 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-card transition">
                         <span class="w-9 h-9 rounded-lg bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300 flex items-center justify-center"><x-icon name="orders" class="w-5 h-5" /></span>
                         <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ __('View orders') }}</span>
                     </a>
                 @endcan
                 <button type="button" onclick="navigator.clipboard.writeText('{{ route('storefront.show', $business) }}'); this.querySelector('span:last-child').textContent = '{{ __('Copied!') }}'"
-                        class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 flex flex-col items-center text-center gap-2 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-card transition">
+                        class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 flex flex-col items-center text-center gap-2 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-card transition">
                     <span class="w-9 h-9 rounded-lg bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300 flex items-center justify-center"><x-icon name="share" class="w-5 h-5" /></span>
                     <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ __('Share store') }}</span>
                 </button>
                 @can('manage settings')
-                    <a href="{{ route('whatsapp.index') }}" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 flex flex-col items-center text-center gap-2 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-card transition">
+                    <a href="{{ route('whatsapp.index') }}" class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 flex flex-col items-center text-center gap-2 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-card transition">
                         <span class="w-9 h-9 rounded-lg bg-whatsapp/10 text-whatsapp flex items-center justify-center"><x-icon name="whatsapp" class="w-5 h-5" /></span>
                         <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ __('WhatsApp link') }}</span>
                     </a>

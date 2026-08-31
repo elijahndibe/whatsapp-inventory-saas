@@ -1,6 +1,6 @@
 <x-storefront-layout :business="$business">
 
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 text-center">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 text-center">
         @if ($order->payment_status === 'paid')
             <div class="mx-auto h-12 w-12 rounded-full bg-success-bg dark:bg-green-900/40 flex items-center justify-center text-success dark:text-green-400">
                 <x-icon name="check-circle" class="w-6 h-6" />
@@ -52,7 +52,7 @@
         @endif
     </div>
 
-    <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6">
+    <div class="mt-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
         <h2 class="font-semibold text-gray-800 dark:text-gray-200 mb-3">{{ __('Order Summary') }}</h2>
         <div class="space-y-2 text-sm">
             @foreach ($order->items as $item)

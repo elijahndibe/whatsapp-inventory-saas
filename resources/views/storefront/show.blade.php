@@ -1,25 +1,37 @@
 <x-storefront-layout :business="$business">
 
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 mb-6">
-        <h1 class="text-2xl font-semibold text-ink dark:text-gray-100">{{ $business->name }}</h1>
-        @if ($business->description)
-            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ $business->description }}</p>
-        @endif
-        <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
-            @if ($business->phone)
-                <span>{{ __('Phone') }}: {{ $business->phone }}</span>
+    {{-- Hero: no product photography to build a banner around, so the hero
+         itself is the brand mark — a real gradient + a decorative ring
+         motif rather than a plain bordered info box. --}}
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-700 via-brand-800 to-gray-900 p-6 sm:p-10 mb-6">
+        <div class="pointer-events-none absolute -right-10 -top-16 w-64 h-64 rounded-full border-[24px] border-white/10"></div>
+        <div class="pointer-events-none absolute -right-24 -bottom-24 w-72 h-72 rounded-full border-[24px] border-white/5"></div>
+
+        <div class="relative">
+            @if ($business->logo)
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($business->logo) }}" alt=""
+                     class="h-14 w-14 rounded-full object-cover ring-2 ring-white/40 mb-4">
             @endif
-            @if ($business->address)
-                <span>{{ __('Location') }}: {{ collect([$business->address, $business->city, $business->state])->filter()->implode(', ') }}</span>
+            <h1 class="text-3xl sm:text-4xl font-semibold text-white tracking-tight">{{ $business->name }}</h1>
+            @if ($business->description)
+                <p class="mt-2 text-sm sm:text-base text-white/80 max-w-lg">{{ $business->description }}</p>
             @endif
+            <div class="mt-4 flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-white/70">
+                @if ($business->phone)
+                    <span class="inline-flex items-center gap-1.5"><x-icon name="whatsapp" class="w-4 h-4" aria-hidden="true" /> {{ $business->phone }}</span>
+                @endif
+                @if ($business->address)
+                    <span>{{ collect([$business->address, $business->city, $business->state])->filter()->implode(', ') }}</span>
+                @endif
+            </div>
         </div>
     </div>
 
     <form method="GET" class="mb-6">
         <div class="relative">
-            <x-icon name="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <x-icon name="search" class="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
             <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('Search products...') }}"
-                   class="block w-full pl-9 rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 shadow-sm text-sm" />
+                   class="block w-full pl-11 py-3 rounded-full border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 shadow-card text-sm focus:border-brand-500 focus:ring-brand-500" />
         </div>
     </form>
 
@@ -40,7 +52,7 @@
 
     @if ($featured->isNotEmpty())
         <div class="mb-8">
-            <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">{{ __('Featured') }}</h2>
+            <h2 class="text-xl font-semibold text-ink dark:text-gray-100 mb-4">{{ __('Best sellers') }}</h2>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 @foreach ($featured as $product)
                     @include('storefront._product-card', ['product' => $product, 'business' => $business])
@@ -51,7 +63,9 @@
 
     <div>
         @if ($featured->isEmpty())
-            <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">{{ __('Products') }}</h2>
+            <h2 class="text-xl font-semibold text-ink dark:text-gray-100 mb-4">{{ __('Products') }}</h2>
+        @else
+            <h2 class="text-xl font-semibold text-ink dark:text-gray-100 mb-4">{{ __('All products') }}</h2>
         @endif
 
         @if ($products->isEmpty())

@@ -13,7 +13,7 @@
             </x-empty-state>
         </x-card>
     @else
-        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
             @foreach ($items as $item)
                 <div class="p-4 flex items-center gap-4">
                     <div class="h-16 w-16 rounded-lg bg-gray-50 dark:bg-gray-700 shrink-0 overflow-hidden">
@@ -52,7 +52,7 @@
             @endforeach
         </div>
 
-        <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between">
+        <div class="mt-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between">
             <span class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Subtotal') }}</span>
             <span class="text-lg font-semibold text-ink dark:text-gray-100">{{ $business->currencySymbol() }}{{ number_format($subtotal, 2) }}</span>
         </div>

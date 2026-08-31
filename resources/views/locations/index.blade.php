@@ -14,7 +14,7 @@
 
             <x-flash-messages />
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
                 @if ($locations->isEmpty())
                     <x-empty-state icon="locations" :title="__('No locations yet')" :description="__('Add a location to track stock across warehouses, stores or pickup points.')">
                         <x-slot name="action">

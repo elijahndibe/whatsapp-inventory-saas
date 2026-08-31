@@ -13,7 +13,7 @@
                 <x-stat-card :label="__('Inventory Value')" :value="auth()->user()->business->currencySymbol() . number_format($inventoryValue, 2)" icon="trending-up" />
             </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <h3 class="font-semibold text-gray-800 dark:text-gray-200">{{ __('Out of Stock') }}</h3>
                     <x-badge variant="danger">{{ $outOfStock->count() }}</x-badge>
@@ -32,7 +32,7 @@
                 @endif
             </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <h3 class="font-semibold text-gray-800 dark:text-gray-200">{{ __('Low Stock') }}</h3>
                     <x-badge variant="warning">{{ $lowStock->count() }}</x-badge>

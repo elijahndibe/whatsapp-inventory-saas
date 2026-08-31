@@ -73,14 +73,14 @@ class DemoSeeder extends Seeder
         // and out of stock — so Products/Inventory/Dashboard all have
         // something real to show for every state.
         $products = [
-            ['name' => 'Ankara Maxi Dress', 'sku' => 'DRS-001', 'price' => 15000, 'stock' => 25, 'threshold' => 5, 'cat' => 'Dresses'],
-            ['name' => 'Lace Evening Gown', 'sku' => 'DRS-002', 'price' => 45000, 'stock' => 8, 'threshold' => 5, 'cat' => 'Dresses'],
-            ['name' => 'Denim Jacket Dress', 'sku' => 'DRS-003', 'price' => 12000, 'stock' => 3, 'threshold' => 5, 'cat' => 'Dresses'],
-            ['name' => 'Leather Sandals', 'sku' => 'SHO-001', 'price' => 8500, 'stock' => 40, 'threshold' => 8, 'cat' => 'Shoes'],
-            ['name' => 'Canvas Sneakers', 'sku' => 'SHO-002', 'price' => 11000, 'stock' => 0, 'threshold' => 5, 'cat' => 'Shoes'],
-            ['name' => 'Ankle Boots', 'sku' => 'SHO-003', 'price' => 18000, 'stock' => 15, 'threshold' => 5, 'cat' => 'Shoes'],
-            ['name' => 'Beaded Necklace Set', 'sku' => 'ACC-001', 'price' => 4500, 'stock' => 60, 'threshold' => 10, 'cat' => 'Accessories'],
-            ['name' => 'Leather Handbag', 'sku' => 'ACC-002', 'price' => 22000, 'stock' => 4, 'threshold' => 5, 'cat' => 'Accessories'],
+            ['name' => 'Ankara Maxi Dress', 'sku' => 'DRS-001', 'price' => 15000, 'stock' => 25, 'threshold' => 5, 'cat' => 'Dresses', 'featured' => true],
+            ['name' => 'Lace Evening Gown', 'sku' => 'DRS-002', 'price' => 45000, 'stock' => 8, 'threshold' => 5, 'cat' => 'Dresses', 'featured' => false],
+            ['name' => 'Denim Jacket Dress', 'sku' => 'DRS-003', 'price' => 12000, 'stock' => 3, 'threshold' => 5, 'cat' => 'Dresses', 'featured' => false],
+            ['name' => 'Leather Sandals', 'sku' => 'SHO-001', 'price' => 8500, 'stock' => 40, 'threshold' => 8, 'cat' => 'Shoes', 'featured' => true],
+            ['name' => 'Canvas Sneakers', 'sku' => 'SHO-002', 'price' => 11000, 'stock' => 0, 'threshold' => 5, 'cat' => 'Shoes', 'featured' => false],
+            ['name' => 'Ankle Boots', 'sku' => 'SHO-003', 'price' => 18000, 'stock' => 15, 'threshold' => 5, 'cat' => 'Shoes', 'featured' => true],
+            ['name' => 'Beaded Necklace Set', 'sku' => 'ACC-001', 'price' => 4500, 'stock' => 60, 'threshold' => 10, 'cat' => 'Accessories', 'featured' => false],
+            ['name' => 'Leather Handbag', 'sku' => 'ACC-002', 'price' => 22000, 'stock' => 4, 'threshold' => 5, 'cat' => 'Accessories', 'featured' => true],
         ];
 
         $productModels = collect($products)->map(fn (array $p) => Product::create([
@@ -92,6 +92,7 @@ class DemoSeeder extends Seeder
             'stock_quantity' => $p['stock'],
             'low_stock_threshold' => $p['threshold'],
             'status' => 'active',
+            'featured' => $p['featured'],
         ]));
 
         $customers = collect([

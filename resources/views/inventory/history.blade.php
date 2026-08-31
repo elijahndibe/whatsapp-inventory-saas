@@ -13,7 +13,7 @@
             <x-flash-messages />
 
             @if ($businessLocations->isNotEmpty())
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                     <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-3">{{ __('Stock by Location') }}</h3>
 
                     <table class="min-w-full text-sm mb-4">
@@ -71,7 +71,7 @@
                 </div>
             @endif
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
                 @if ($transactions->isEmpty())
                     <x-empty-state icon="inventory" :title="__('No stock movements recorded yet')" :description="__('Stock increases, decreases and transfers for this product will show up here.')" />
                 @else

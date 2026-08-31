@@ -31,7 +31,7 @@
                 </button>
             </form>
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
                 @if ($categories->isEmpty())
                     <x-empty-state icon="categories" :title="__('No categories yet')" :description="__('Create your first category to start organizing products.')">
                         <x-slot name="action">

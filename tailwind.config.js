@@ -67,7 +67,12 @@ export default {
                 info: { DEFAULT: '#2563EB', bg: '#EFF6FF' },
             },
             boxShadow: {
-                card: '0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.06)',
+                // The original tone (0.04/0.06 opacity) read as nearly flat —
+                // barely more than the 1px border already on every card.
+                // This keeps the same soft, non-harsh quality but gives cards
+                // actual lift, matching the approved mockup's card depth.
+                card: '0 1px 3px 0 rgb(17 24 39 / 0.06), 0 8px 20px -6px rgb(17 24 39 / 0.10)',
+                'card-hover': '0 4px 8px 0 rgb(17 24 39 / 0.08), 0 16px 32px -8px rgb(17 24 39 / 0.16)',
             },
         },
     },

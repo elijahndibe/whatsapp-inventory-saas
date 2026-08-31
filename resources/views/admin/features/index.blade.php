@@ -12,7 +12,7 @@
             @csrf
             @method('PUT')
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
                         <thead class="bg-gray-50 dark:bg-gray-900/50">
@@ -59,7 +59,7 @@
             </div>
         </form>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
             <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ __('Add Feature') }}</h3>
             <form method="POST" action="{{ route('admin.features.store') }}" class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
                 @csrf

@@ -7,17 +7,17 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                     <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ __('Sales — Last 30 Days') }}</h3>
                     <canvas id="salesChart" height="220"></canvas>
                 </div>
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                     <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ __('Orders — Last 30 Days') }}</h3>
                     <canvas id="ordersChart" height="220"></canvas>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 font-semibold text-gray-800 dark:text-gray-200">{{ __('Best-Selling Products') }}</div>
                 @if ($bestSellers->isEmpty())
                     <div class="p-6 text-sm text-gray-500 dark:text-gray-400">{{ __('No sales recorded yet.') }}</div>
@@ -45,7 +45,7 @@
 
             @if ($canUseAdvanced)
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                         <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ __('Sales by Category') }}</h3>
                         @if ($salesByCategory->isEmpty())
                             <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('No data yet.') }}</p>
@@ -53,7 +53,7 @@
                             <canvas id="categoryChart" height="220"></canvas>
                         @endif
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6">
                         <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ __('Payment Methods') }}</h3>
                         @if ($paymentMethods->isEmpty())
                             <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('No data yet.') }}</p>
@@ -63,7 +63,7 @@
                     </div>
                 </div>
             @else
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-card p-6 text-center">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-card p-6 text-center">
                     <p class="text-sm text-gray-600 dark:text-gray-400">
                         {{ __('Sales by category and payment method breakdowns are available on the Business plan.') }}
                     </p>
