@@ -1,7 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-[28px] leading-8 font-semibold text-ink dark:text-gray-100">{{ __('Good morning, :name! 👋', ['name' => $business->name]) }}</h2>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ __("Here's what's happening with your business today.") }}</p>
+        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Good morning,') }}</p>
+        <h2 class="text-[28px] leading-8 font-bold text-ink dark:text-gray-100 mt-0.5">{{ $business->name }} 👋</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1.5">{{ __("Here's what's happening with your business today.") }}</p>
     </x-slot>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -26,14 +27,14 @@
                 $salesPercent = $trends['sales_change_percent'];
                 $lowStockTotal = $stats['Low Stock'] + $stats['Out of Stock'];
             @endphp
-            <x-stat-card :label="__('Today\'s Sales')" :value="$business->currencySymbol() . number_format($todaysSales, 2)" icon="trending-up" color="brand"
+            <x-stat-card layout="leading-icon" :label="__('Today\'s Sales')" :value="$business->currencySymbol() . number_format($todaysSales, 2)" icon="trending-up" color="brand"
                 :change="$salesPercent === null ? null : (($salesPercent >= 0 ? '↑ ' : '↓ ').abs($salesPercent).'% '.__('vs yesterday'))"
                 :trend="$salesPercent === null ? null : ($salesPercent >= 0 ? 'up' : 'down')" />
-            <x-stat-card :label="__('Orders')" :value="$stats['Total Orders']" icon="orders" color="success"
+            <x-stat-card layout="leading-icon" :label="__('Orders')" :value="$stats['Total Orders']" icon="orders" color="success"
                 :change="$trends['orders_this_week'] > 0 ? '+'.$trends['orders_this_week'].' '.__('this week') : null" trend="up" />
-            <x-stat-card :label="__('Customers')" :value="$stats['Total Customers']" icon="customers" color="info"
+            <x-stat-card layout="leading-icon" :label="__('Customers')" :value="$stats['Total Customers']" icon="customers" color="info"
                 :change="$trends['customers_this_week'] > 0 ? '+'.$trends['customers_this_week'].' '.__('new this week') : null" trend="up" />
-            <x-stat-card :label="__('Low stock items')" :value="$lowStockTotal" icon="alert-triangle" color="warning"
+            <x-stat-card layout="leading-icon" :label="__('Low stock items')" :value="$lowStockTotal" icon="alert-triangle" color="warning"
                 :change="$lowStockTotal > 0 ? __('Needs attention') : __('All good')"
                 :trend="$lowStockTotal > 0 ? 'warning' : null" />
         </div>

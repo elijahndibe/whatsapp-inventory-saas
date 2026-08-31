@@ -73,77 +73,15 @@
             </div>
 
             <div class="relative flex justify-center lg:justify-end">
-                {{-- Soft glow seated behind the device for depth. --}}
-                <div class="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full bg-gradient-to-br from-brand-300/40 to-purple-300/30 blur-3xl"></div>
-
-                <div class="relative w-[248px] sm:w-[268px]">
-                    {{-- Phone shell --}}
-                    <div class="relative bg-gray-900 rounded-[2.75rem] p-2.5 shadow-2xl ring-1 ring-black/5">
-                        <span class="absolute -left-px top-24 w-[3px] h-7 bg-gray-800 rounded-l-sm"></span>
-                        <span class="absolute -left-px top-[8.5rem] w-[3px] h-11 bg-gray-800 rounded-l-sm"></span>
-                        <span class="absolute -right-px top-32 w-[3px] h-14 bg-gray-800 rounded-r-sm"></span>
-
-                        <div class="relative bg-white rounded-[2.25rem] overflow-hidden">
-                            {{-- Notch --}}
-                            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-gray-900 rounded-b-2xl z-10"></div>
-
-                            {{-- Status bar --}}
-                            <div class="h-10 flex items-end justify-between px-6 pb-1.5 text-[10px] font-semibold text-ink">
-                                <span>9:41</span>
-                                <span class="flex items-center gap-1 text-gray-800">
-                                    <span class="w-3 h-2 rounded-[1px] border border-current"></span>
-                                </span>
-                            </div>
-
-                            {{-- App header --}}
-                            <div class="bg-gray-900 px-4 py-2.5 flex items-center gap-2">
-                                <x-zwenko-logo variant="white" class="h-5 w-5" />
-                                <p class="text-white text-xs font-medium">{{ __('Good morning, Bella Fashion 👋') }}</p>
-                            </div>
-
-                            {{-- Dashboard content --}}
-                            <div class="p-3 space-y-2.5 bg-gray-50/60">
-                                <div class="grid grid-cols-2 gap-2.5">
-                                    <div class="rounded-lg border border-gray-100 bg-white p-2.5">
-                                        <p class="text-[9px] text-gray-500 uppercase tracking-wide">{{ __("Today's sales") }}</p>
-                                        <p class="text-sm font-semibold text-ink">₦185,000</p>
-                                        <p class="text-[10px] text-success-strong">↑ 12.5%</p>
-                                    </div>
-                                    <div class="rounded-lg border border-gray-100 bg-white p-2.5">
-                                        <p class="text-[9px] text-gray-500 uppercase tracking-wide">{{ __('Orders') }}</p>
-                                        <p class="text-sm font-semibold text-ink">24</p>
-                                        <p class="text-[10px] text-success-strong">↑ 8.2%</p>
-                                    </div>
-                                </div>
-                                <div class="rounded-lg border border-gray-100 bg-white p-2.5">
-                                    <p class="text-[10px] font-medium text-gray-600 mb-1.5">{{ __('Recent orders') }}</p>
-                                    <div class="space-y-1.5 text-[10px]">
-                                        <div class="flex justify-between"><span class="text-gray-600">#ORD-1025 John Doe</span><span class="text-success-strong font-medium">{{ __('Paid') }}</span></div>
-                                        <div class="flex justify-between"><span class="text-gray-600">#ORD-1024 Maryam Yusuf</span><span class="text-success-strong font-medium">{{ __('Paid') }}</span></div>
-                                        <div class="flex justify-between"><span class="text-gray-600">#ORD-1023 James Okafor</span><span class="text-warning-strong font-medium">{{ __('Processing') }}</span></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Home indicator --}}
-                            <div class="h-6 flex items-center justify-center bg-gray-50/60">
-                                <div class="w-24 h-1 bg-gray-300 rounded-full"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Floating WhatsApp chip — the visual thread tying the
-                         "chat" origin story to the phone beside it. --}}
-                    <div class="hidden sm:flex absolute -left-24 -bottom-6 items-center gap-2 bg-white rounded-xl shadow-xl border border-gray-100 pl-2 pr-4 py-2 max-w-[200px]">
-                        <span class="w-9 h-9 rounded-full bg-whatsapp flex items-center justify-center shrink-0">
-                            <x-icon name="whatsapp" class="w-4 h-4 text-white" />
-                        </span>
-                        <div class="leading-tight">
-                            <p class="text-[11px] text-gray-400">{{ __('New order via WhatsApp') }}</p>
-                            <p class="text-xs font-medium text-ink">{{ __('"I\'ll take the blue one, size M"') }}</p>
-                        </div>
-                    </div>
-                </div>
+                {{-- Soft glow seated behind the photo for depth. The photo
+                     already carries its own "New order" / "Payment
+                     received" / "Low stock alert" toast cards, so no
+                     separate floating chip is layered on top of it here —
+                     that would just duplicate what's already in the shot. --}}
+                <div class="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-gradient-to-br from-brand-300/30 to-purple-300/20 blur-3xl"></div>
+                <img src="{{ asset('images/marketing/dashboard-phone-mockup.webp') }}"
+                     alt="{{ __('The Zwenko dashboard shown on a phone — today\'s sales, orders, a sales chart, and WhatsApp order notifications') }}"
+                     class="relative w-full max-w-[380px] lg:max-w-[440px] h-auto" width="1199" height="1312" />
             </div>
         </div>
     </section>
