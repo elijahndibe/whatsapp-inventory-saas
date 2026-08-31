@@ -2,7 +2,13 @@
      for the actions a seller reaches for most. The "More" tab opens the
      full nav as a slide-over rather than trying to cram everything into
      five tabs. --}}
-<header x-data="{ menuOpen: false }" @keydown.escape.window="menuOpen = false" class="lg:hidden sticky top-0 z-40 bg-gray-900">
+{{-- z-50, not z-40 — the bottom tab bar below is also z-40, and this
+     header creates its own stacking context (position + z-index), so the
+     slide-over's z-50 inside it was only ever being compared to other
+     z-40 siblings as a tied whole, with the bottom nav's later DOM
+     position winning the tie and painting over the slide-over's account
+     section. Needs to outrank the bottom nav outright, not just match it. --}}
+<header x-data="{ menuOpen: false }" @keydown.escape.window="menuOpen = false" class="lg:hidden sticky top-0 z-50 bg-gray-900">
     <div class="flex items-center justify-between h-14 px-4">
         <x-zwenko-wordmark variant="white" text-class="text-lg" mark-class="h-7 w-7" />
         <div class="flex items-center gap-1">
@@ -31,7 +37,7 @@
                  there's no need for a click-to-reveal trigger here since the
                  slide-over already has the room to show Profile/Log Out
                  directly. --}}
-            <div class="shrink-0 px-3 pb-4 pt-3 border-t border-white/10">
+            <div class="shrink-0 px-3 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 border-t border-white/10">
                 <div class="flex items-center gap-2.5 px-2 py-2">
                     <span class="w-8 h-8 rounded-full bg-brand-700 text-white flex items-center justify-center text-xs font-semibold shrink-0">
                         {{ strtoupper(substr(Auth::user()->business->name ?? Auth::user()->name, 0, 1)) }}

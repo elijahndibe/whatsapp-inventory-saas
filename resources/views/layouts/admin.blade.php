@@ -88,7 +88,7 @@
                                 @endforeach
                             </div>
 
-                            <div class="shrink-0 px-3 pb-4 pt-3 border-t border-white/10">
+                            <div class="shrink-0 px-3 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 border-t border-white/10">
                                 <div class="flex items-center gap-2.5 px-2 py-2">
                                     <span class="w-8 h-8 rounded-full bg-brand-700 text-white flex items-center justify-center text-xs font-semibold shrink-0">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
                                     <span class="min-w-0 text-left">
